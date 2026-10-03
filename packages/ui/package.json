@@ -1,0 +1,17 @@
+{
+  "name": "@keystone/ui",
+  "version": "3.0.0",
+  "description": "Keystone UI — design system premium (thème clair éditorial) d'Atlas Keystone. CDC §5.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles/keystone.css": "./src/styles/keystone.css"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18",
+    "lucide-react": "^0.344.0"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "atlas-keystone",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
+  "description": "Atlas Keystone — plateforme intelligente de Facility Management (Hard FM · Soft FM · HSSE · Pilotage). Éditeur : Atlas Studio.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @keystone/web",
+    "build": "npm run build --workspace @keystone/web",
+    "lint": "npm run lint --workspace @keystone/web",
+    "typecheck": "tsc -b",
+    "test": "npm run test --workspace @keystone/domain",
+    "db:lint": "supabase db lint",
+    "db:types": "supabase gen types typescript --local > packages/domain/src/db/types.gen.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}
