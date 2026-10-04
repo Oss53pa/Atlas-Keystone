@@ -3,6 +3,7 @@ import {
   ShoppingCart, Package, AlertTriangle, Truck, RefreshCw, CheckCircle2, Bot, ClipboardList, Check, X, PackageCheck, Sparkles, ShieldAlert,
 } from 'lucide-react';
 import { Card, StatBig, TabBar } from '@keystone/ui';
+import { PurchaseOrderDoc } from '../documents/Documents.tsx';
 import { money, format } from '@keystone/domain';
 import type { StockRow, StockLevel, PurchaseRequestRow, PrStatus, PurchaseOrderRow, PoStatus, ProcurementSummary, BudgetCheck } from '@keystone/domain/db/keystone';
 import {
@@ -55,6 +56,7 @@ export function Procurement() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [poDoc, setPoDoc] = useState<string | null>(null);
 
   function load() {
     fetchStock().then(setStock).catch((e) => setErr(e instanceof Error ? e.message : String(e)));
@@ -261,6 +263,7 @@ export function Procurement() {
                       {o.qc_result && <div className="ks-faint" style={{ fontSize: 11, marginTop: 4 }}>QC : {o.qc_result === 'accepted' ? 'conforme' : o.qc_result === 'refused' ? 'refusé' : 'avec réserves'}</div>}
                     </td>
                     <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button className="ks-btn ks-btn--quiet ks-btn--sm" style={{ marginRight: 6 }} onClick={() => setPoDoc(o.id)}>BC PDF</button>
                       {o.status !== 'received' && o.status !== 'cancelled' && (
                         <>
                           <button className="ks-btn ks-btn--quiet ks-btn--sm" disabled={busy === o.id}
@@ -280,6 +283,7 @@ export function Procurement() {
           </div>
         </Card>
       )}
+      {poDoc && <PurchaseOrderDoc poId={poDoc} onClose={() => setPoDoc(null)} />}
     </div>
   );
 }

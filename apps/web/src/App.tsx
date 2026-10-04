@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone,
+  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone, SlidersHorizontal,
 } from 'lucide-react';
 import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
@@ -23,6 +23,7 @@ import { Waste } from './features/waste/Waste.tsx';
 import { Leases } from './features/leases/Leases.tsx';
 import { Notifications } from './features/notifications/Notifications.tsx';
 import { WoTemplates } from './features/wo-templates/WoTemplates.tsx';
+import { Settings as SettingsScreen } from './features/settings/Settings.tsx';
 import { NotificationBell } from './features/notifications/NotificationBell.tsx';
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
@@ -77,7 +78,8 @@ const GROUPS: NavGroup[] = [
     label: 'Système',
     items: [
       { id: 'notifications', label: 'Notifications', icon: I(BellRing) },
-      { id: 'admin', label: 'Admin & paramètres', icon: I(Settings) },
+      { id: 'settings', label: 'Paramètres', icon: I(SlidersHorizontal) },
+      { id: 'admin', label: 'Agents autonomes', icon: I(Settings) },
     ],
   },
 ];
@@ -183,6 +185,8 @@ export function App() {
           <SoftFm />
         ) : active === 'contractors' ? (
           <Contractors />
+        ) : active === 'settings' ? (
+          <SettingsScreen />
         ) : active === 'wo-templates' ? (
           <WoTemplates />
         ) : active === 'notifications' ? (

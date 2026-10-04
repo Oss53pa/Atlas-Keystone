@@ -295,6 +295,35 @@ export interface WoTemplateRow {
   safety_instructions: string | null; is_active: boolean; uses: number;
 }
 
+/** Documents imprimables & paramétrage société (migration 41). */
+export interface CompanyProfile {
+  tenant_id?: string; legal_name: string; trade_name: string | null; legal_form: string | null; rccm: string | null; ncc: string | null;
+  address: string | null; city: string | null; country: string; phone: string | null; email: string | null; website: string | null;
+  bank_name: string | null; bank_account: string | null; payment_terms_days: number; purchase_terms: string | null; document_footer: string | null;
+}
+export interface ApprovalThreshold { doc_type: string; step: 'budget' | 'direction'; min_amount: number; approver_label: string }
+export interface PoDocument {
+  company: CompanyProfile | null; ref: string; date: string; expected_at: string | null; status: string; currency: string;
+  pr_ref: string; pr_title: string; urgency: string;
+  supplier: { name: string; tax_id: string | null; phone: string | null; email: string | null } | null;
+  lines: { label: string; qty: number; unit_price: number; total: number; unit: string | null }[] | null;
+  amount_ht: number; tax_rate: number; tax: number; amount_ttc: number;
+  approvals: Record<'tech' | 'budget' | 'direction', { by: string | null; at: string | null } | null>;
+  delivery: string | null;
+}
+export interface WoDocument {
+  company: CompanyProfile | null; ref: string; title: string; description: string | null; type: string; status: string; priority: number;
+  created_at: string; planned_start: string | null; actual_start: string | null; actual_end: string | null; sla_due: string | null;
+  site: string | null; location: string | null;
+  asset: { tag: string; name: string; manufacturer: string | null; model: string | null; serial: string | null } | null;
+  assignee: string | null; contractor: string | null; safety: string | null; checklist: ChecklistStep[] | null; notes: string | null;
+  signed_by: string | null; verified_by: string | null; verified_at: string | null;
+  permit: { ref: string; type: string; status: string } | null;
+  lines: { kind: 'part' | 'labor'; label: string; qty: number; unit_cost: number | null; minutes: number | null }[] | null;
+  time: { kind: string; at: string; distance: number | null }[] | null;
+  cost_labor: number | null; cost_parts: number | null; downtime_hours: number | null; currency: string;
+}
+
 export interface DemoSummary {
   wo_total: number;
   wo_open: number;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Wrench, Lock, RefreshCw, AlertTriangle, AlertCircle, Database, Boxes, ShieldCheck, ClipboardList, Radar, TrendingUp } from 'lucide-react';
+import { Wrench, Lock, RefreshCw, AlertTriangle, AlertCircle, Database, Boxes, ShieldCheck, ClipboardList, Radar, TrendingUp, FileText } from 'lucide-react';
+import { WorkOrderDoc } from '../documents/Documents.tsx';
 import { Card, StatBig } from '@keystone/ui';
 import type { WorkOrderRow, WoStatus, WoType, DemoSummary, MaintKpi, PredictionRow } from '@keystone/domain/db/keystone';
 import { fetchWorkOrders, fetchSummary, fetchKpi, fetchPredictions } from '../../data/gmao.ts';
@@ -31,6 +32,7 @@ function slaText(due: string | null, open: boolean): { txt: string; over: boolea
 
 export function WorkOrders() {
   const [rows, setRows] = useState<WorkOrderRow[] | null>(null);
+  const [doc, setDoc] = useState<string | null>(null);
   const [summary, setSummary] = useState<DemoSummary | null>(null);
   const [kpi, setKpi] = useState<MaintKpi | null>(null);
   const [preds, setPreds] = useState<PredictionRow[]>([]);
@@ -140,7 +142,7 @@ export function WorkOrders() {
             <table className="ks-table">
               <thead>
                 <tr>
-                  <th>Réf.</th><th>Intervention</th><th>Type</th><th>Statut</th><th>P.</th><th>Actif</th><th>SLA</th>
+                  <th>Réf.</th><th>Intervention</th><th>Type</th><th>Statut</th><th>P.</th><th>Actif</th><th>SLA</th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -169,17 +171,19 @@ export function WorkOrders() {
                         ) : <span className="ks-faint">—</span>}
                       </td>
                       <td><span className="ks-mono" style={{ fontWeight: 600, color: sla.over ? 'var(--ks-critical)' : 'var(--ks-ink-2)' }}>{sla.txt}</span></td>
+                      <td style={{ textAlign: 'right' }}><button className="ks-icon-btn" aria-label={`Fiche d’intervention ${w.ref}`} title="Fiche d’intervention (PDF)" onClick={() => setDoc(w.id)}><FileText size={15} /></button></td>
                     </tr>
                   );
                 })}
                 {rows.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40 }} className="ks-dim">Aucun ordre de travail.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40 }} className="ks-dim">Aucun ordre de travail.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         )}
       </Card>
+      {doc && <WorkOrderDoc woId={doc} onClose={() => setDoc(null)} />}
     </div>
   );
 }
