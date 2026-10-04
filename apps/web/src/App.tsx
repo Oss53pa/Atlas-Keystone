@@ -109,6 +109,11 @@ export function App() {
       { id: 'a:wo', label: 'Créer un ordre de travail', group: 'Actions', icon: <Plus size={17} />, run: () => setActive('work-orders') },
       { id: 'a:permit', label: 'Demander un permis de travail', group: 'Actions', icon: <FileCheck2 size={17} />, run: () => setActive('permits') },
       { id: 'a:report', label: 'Générer le rapport mensuel', group: 'Actions', icon: <FileText size={17} />, run: () => setActive('control-tower') },
+      { id: 'a:round', label: 'Lancer une ronde d’inspection', group: 'Actions', icon: <ListChecks size={17} />, run: () => setActive('inspections') },
+      { id: 'a:pm', label: 'Générer les OT préventifs à 14 jours', group: 'Actions', icon: <CalendarCheck2 size={17} />, run: () => setActive('preventive') },
+      { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => setActive('procurement') },
+      { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => setActive('assets') },
+      { id: 'a:portal', label: 'Ouvrir l’espace prestataire', group: 'Actions', icon: <HardHat size={17} />, run: () => window.open('?prestataire', '_blank', 'noopener') },
     ];
     const ctx: Command[] = SITES.filter((s) => s !== site).map((s) => ({
       id: `site:${s}`,

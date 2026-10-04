@@ -28,7 +28,7 @@ export function Overview(_: PanelProps) {
       .then((live) =>
         setAttention(
           live.map((a, i) => ({
-            id: a.ref || `${a.domain}-${i}`, level: a.level, domain: a.domain, title: a.title,
+            id: `${a.domain}-${a.ref || i}`, level: a.level, domain: a.domain, title: a.title,
             site: a.scope || '—', asset: undefined, riskScore: a.risk, age: a.detail,
           })),
         ),
