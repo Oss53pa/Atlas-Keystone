@@ -5,12 +5,14 @@ import './styles/global.css';
 import { App } from './App.tsx';
 import { OccupantPortal } from './features/portal/OccupantPortal.tsx';
 import { ContractorApp } from './features/contractor-app/ContractorApp.tsx';
+import { TenantApp } from './features/tenant-portal/TenantApp.tsx';
 
-// Portail occupant public (sans compte) si l'URL porte ?qr=… / ?suivi=… / ?portail ; espace prestataire si ?prestataire
+// Portail occupant public (sans compte) si l'URL porte ?qr=… / ?suivi=… / ?portail ; espace prestataire si ?prestataire ; portail locataire si ?locataire
 const params = new URLSearchParams(window.location.search);
 const isPortal = params.has('qr') || params.has('suivi') || params.has('portail');
 const isContractor = params.has('prestataire');
+const isLessee = params.has('locataire');
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>{isContractor ? <ContractorApp /> : isPortal ? <OccupantPortal /> : <App />}</StrictMode>,
+  <StrictMode>{isLessee ? <TenantApp /> : isContractor ? <ContractorApp /> : isPortal ? <OccupantPortal /> : <App />}</StrictMode>,
 );

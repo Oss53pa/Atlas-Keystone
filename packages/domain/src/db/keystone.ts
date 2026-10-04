@@ -187,6 +187,58 @@ export interface PortalDetail {
   pauses: { id: string; reason: string; started_at: string; ended_at: string | null; justified: boolean | null }[] | null;
 }
 
+/** Baux, loyers & portail locataire (migration 38). */
+export interface RentRollRow {
+  lease_id: string; ref: string; lessee_id: string; lessee: string; trade_name: string | null; sector: string | null; site: string;
+  spaces: string | null; area_m2: number; monthly_rent: number; rent_m2_month: number | null; charges_provision: number;
+  start_date: string; end_date: string | null; months_left: number | null; status: 'active' | 'notice' | string;
+  next_indexation_date: string | null; indexation_due: boolean; arrears: number; arrears_days: number | null; open_tickets: number;
+}
+export interface RentSummary {
+  leases: number; gla_m2: number; leased_m2: number; occupancy_pct: number | null; monthly_rent: number; annual_rent: number;
+  avg_rent_m2: number | null; walt_years: number | null; collection_pct: number | null; arrears_total: number; arrears_lessees: number;
+  expiring_12m: number; indexation_due: number; deposits: number;
+}
+export type ArrearsBucket = '0-30' | '31-60' | '61-90' | '90+';
+export interface ArrearsRow {
+  schedule_id: string; lease_ref: string; lessee: string; period: string; due_date: string; total_due: number; paid: number; balance: number;
+  days_late: number; bucket: ArrearsBucket; reminders_sent: number; last_reminder_at: string | null; contact_phone: string | null;
+}
+export type ScheduleStatus = 'paid' | 'partial' | 'partial_overdue' | 'overdue' | 'pending';
+export interface ScheduleRow {
+  schedule_id: string; lease_ref: string; lessee_id: string; lessee: string; period: string; due_date: string; rent: number; charges: number;
+  vat: number; total_due: number; paid: number; status: ScheduleStatus; last_payment_at: string | null; last_method: string | null;
+}
+export interface ChargeRegRow {
+  lease_id: string; lease_ref: string; lessee: string; site: string; weighted_m2: number; share_pct: number; real_charges: number;
+  provisions_billed: number; balance: number;
+}
+export interface RentReceipt {
+  number: string; site: string; lessee: string; trade_name: string | null; rccm: string | null; lease_ref: string; spaces: string | null;
+  period_start: string; period_end: string; rent: number; charges: number; vat: number; vat_rate: number; total: number;
+  payments: { amount: number; method: string; ref: string | null; at: string }[] | null; issued_at: string;
+}
+export interface NewsItem { id: string; site?: string; kind: 'info' | 'event' | 'maintenance' | 'safety'; title: string; body: string | null; event_date: string | null; published_at: string }
+export interface LesseeHome {
+  is_lessee: boolean;
+  lessee: { id: string; name: string; trade_name: string | null; contact: string | null };
+  site: string | null;
+  leases: {
+    id: string; ref: string; start: string; end: string | null; rent: number; charges: number; vat_rate: number; payment_day: number; deposit: number;
+    next_indexation: string | null; indexation_type: string; indexation_rate: number | null;
+    spaces: { code: string; name: string | null; m2: number }[] | null;
+  }[] | null;
+  balance: number;
+  next_due: { id: string; due_date: string; amount: number } | null;
+  schedules: { id: string; period: string; due_date: string; total_due: number; paid_amount: number; status: ScheduleStatus }[] | null;
+  tickets: {
+    id: string; ref: string; category: string | null; description: string | null; status: TicketStatus; priority: number; created_at: string;
+    resolved_at: string | null; satisfaction: number | null; sla_due: string | null; last_message: { body: string; at: string } | null; messages: number;
+  }[] | null;
+  news: NewsItem[] | null;
+  contacts: { emergency_phone: string | null; management_email: string | null; management_phone: string | null; reception: string | null } | null;
+}
+
 export interface DemoSummary {
   wo_total: number;
   wo_open: number;

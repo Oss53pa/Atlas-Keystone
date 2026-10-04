@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle,
+  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store,
 } from 'lucide-react';
 import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
@@ -20,6 +20,7 @@ import { EnergyCarbon } from './features/energy/EnergyCarbon.tsx';
 import { Inspections } from './features/inspections/Inspections.tsx';
 import { Preventive } from './features/preventive/Preventive.tsx';
 import { Waste } from './features/waste/Waste.tsx';
+import { Leases } from './features/leases/Leases.tsx';
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
 import { useSession, signOut } from './lib/auth.ts';
@@ -38,6 +39,7 @@ const GROUPS: NavGroup[] = [
       { id: 'preventive', label: 'Préventif & gammes', icon: I(CalendarCheck2) },
       { id: 'crp', label: 'Contrôles réglementaires', icon: I(ShieldCheck), badge: 3 },
       { id: 'spaces', label: 'Espaces & plans', icon: I(Map) },
+      { id: 'leases', label: 'Baux & loyers', icon: I(KeyRound) },
     ],
   },
   {
@@ -113,6 +115,8 @@ export function App() {
       { id: 'a:pm', label: 'Générer les OT préventifs à 14 jours', group: 'Actions', icon: <CalendarCheck2 size={17} />, run: () => setActive('preventive') },
       { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => setActive('procurement') },
       { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => setActive('assets') },
+      { id: 'a:rent', label: 'Encaisser un loyer / voir les impayés', group: 'Actions', icon: <KeyRound size={17} />, run: () => setActive('leases') },
+      { id: 'a:tenant', label: 'Ouvrir le portail locataire', group: 'Actions', icon: <Store size={17} />, run: () => window.open('?locataire', '_blank', 'noopener') },
       { id: 'a:portal', label: 'Ouvrir l’espace prestataire', group: 'Actions', icon: <HardHat size={17} />, run: () => window.open('?prestataire', '_blank', 'noopener') },
     ];
     const ctx: Command[] = SITES.filter((s) => s !== site).map((s) => ({
@@ -167,6 +171,8 @@ export function App() {
           <SoftFm />
         ) : active === 'contractors' ? (
           <Contractors />
+        ) : active === 'leases' ? (
+          <Leases />
         ) : active === 'preventive' ? (
           <Preventive />
         ) : active === 'waste' ? (
