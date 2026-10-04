@@ -28,6 +28,7 @@ export function AppShell({
   children,
   onCommand,
   onSignOut,
+  bell,
 }: {
   groups: NavGroup[];
   activeId: string;
@@ -41,6 +42,8 @@ export function AppShell({
   children: ReactNode;
   onCommand?: () => void;
   onSignOut?: () => void;
+  /** Remplace la cloche par défaut (ex. centre de notifications connecté). */
+  bell?: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   return (
@@ -127,9 +130,11 @@ export function AppShell({
               <span className="ks-sync__dot" /> Live
             </span>
 
-            <IconButton label="Notifications">
-              <Bell size={18} />
-            </IconButton>
+            {bell ?? (
+              <IconButton label="Notifications">
+                <Bell size={18} />
+              </IconButton>
+            )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Avatar initials={user.initials} />

@@ -407,3 +407,45 @@ input.ki-input { width: 120px; font-family: var(--ks-font-mono); }
 .kz-nav__btn:focus-visible { box-shadow: var(--ks-ring); }
 .kz-nav__badge { position: absolute; top: 2px; right: calc(50% - 22px); min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--ks-critical); color: #fff; font: 700 10px/16px var(--ks-font-ui); font-style: normal; text-align: center; }
 @media (max-width: 640px) { .kz-grid { grid-template-columns: 1fr; } .kz-cats { grid-template-columns: repeat(2, 1fr); } }
+
+
+/* ============================ Cloche in-app (kb-*) ============================ */
+.kb-wrap { position: relative; }
+.kb-btn { position: relative; }
+.kb-btn--pulse { animation: kb-ring 1.6s var(--ks-ease); }
+@keyframes kb-ring { 0%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(-12deg); } 20%, 40% { transform: rotate(12deg); } 50% { transform: rotate(0); } }
+.kb-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--ks-critical); color: #fff; font: 700 10px/16px var(--ks-font-ui); text-align: center; box-shadow: 0 0 0 2px var(--ks-bg); }
+.kb-panel { position: absolute; right: 0; top: calc(100% + 10px); z-index: 70; width: min(380px, 92vw); background: var(--ks-surface); border: 1px solid var(--ks-line); border-radius: var(--ks-r-lg); box-shadow: var(--ks-shadow-3); overflow: hidden; animation: ka-fade .16s var(--ks-ease); }
+.kb-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--ks-line); font-size: 14px; }
+.kb-list { max-height: 380px; overflow-y: auto; }
+.kb-item { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-bottom: 1px solid var(--ks-line); }
+.kb-item--unread { background: var(--ks-amber-50); }
+.kb-ico { width: 26px; height: 26px; flex-shrink: 0; border-radius: 8px; display: grid; place-items: center; background: var(--ks-info-100); color: #2A47A0; }
+.kb-ico--critical, .kb-ico--high { background: var(--ks-critical-100); color: #8E1E22; }
+.kb-ico--warning { background: var(--ks-amber-100); color: var(--ks-amber-700); }
+.kb-title { font-size: 13px; font-weight: 600; }
+.kb-body { font-size: 12px; color: var(--ks-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kb-foot { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 11px 14px; text-align: center; font-size: 12.5px; font-weight: 600; color: var(--ks-amber-700); }
+.kb-foot:hover { background: var(--ks-surface-2); }
+
+/* ============================ Centre de notifications (kn-banner, kn-rule…) ============================ */
+.kn-banner { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; padding: 12px 14px; border-radius: var(--ks-r-md); background: var(--ks-info-100); color: #2A47A0; font-size: 13px; line-height: 1.5; }
+.kn-banner svg { flex-shrink: 0; margin-top: 2px; }
+.kn-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.kn-rule { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--ks-line); font-size: 13px; cursor: pointer; }
+.kn-switch { flex-shrink: 0; position: relative; width: 36px; height: 20px; border-radius: 10px; background: var(--ks-line-strong); cursor: pointer; transition: background var(--ks-dur); }
+.kn-switch i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: var(--ks-shadow-1); transition: transform var(--ks-dur) var(--ks-ease); }
+.kn-switch--on { background: var(--ks-low); }
+.kn-switch--on i { transform: translateX(16px); }
+.kn-switch:focus-visible { outline: none; box-shadow: var(--ks-ring); }
+.kn-tpl-list { max-height: 560px; overflow-y: auto; }
+.kn-tpl { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--ks-line); }
+.kn-tpl:hover { background: var(--ks-surface-2); }
+.kn-tpl--on { background: var(--ks-amber-50); box-shadow: inset 3px 0 0 var(--ks-amber); }
+.kn-bubble { max-width: 520px; padding: 12px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.55; background: var(--ks-surface); border: 1px solid var(--ks-line); }
+.kn-bubble--whatsapp { background: #DCF8C6; border-color: #C5E8AE; color: #14361F; border-bottom-left-radius: 4px; }
+.kn-bubble--sms { background: var(--ks-info-100); border-color: transparent; color: #1E2F66; border-bottom-left-radius: 4px; }
+.kn-bubble--email { background: #fff; font-family: var(--ks-font-ui); }
+.kn-channels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.kn-chico { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--ks-surface-2); border: 1px solid var(--ks-line); }
+@media (max-width: 640px) { .kn-channels { grid-template-columns: 1fr; } }

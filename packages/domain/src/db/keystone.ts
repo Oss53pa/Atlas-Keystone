@@ -239,6 +239,30 @@ export interface LesseeHome {
   contacts: { emergency_phone: string | null; management_email: string | null; management_phone: string | null; reception: string | null } | null;
 }
 
+/** Notifications multicanal (migration 39). */
+export type NotifChannel = 'whatsapp' | 'sms' | 'email' | 'in_app';
+export type NotifAudience = 'lessee' | 'contractor' | 'staff' | 'requester';
+export type NotifStatus = 'queued' | 'deferred' | 'sent' | 'failed' | 'suppressed';
+export interface NotifJournalRow {
+  id: string; event_type: string; event_label: string | null; severity: string; entity_ref: string | null; channel: NotifChannel;
+  audience: NotifAudience; recipient_label: string | null; address: string | null; subject: string | null; body: string;
+  status: NotifStatus; status_reason: string | null; scheduled_for: string; sent_at: string | null; provider_ref: string | null; created_at: string;
+}
+export interface NotifStats {
+  sent_24h: number; queued: number; deferred: number; suppressed_24h: number; failed_24h: number;
+  by_channel: Partial<Record<NotifChannel, number>> | null; live_channels: number;
+}
+export interface NotifMatrixRow {
+  rule_id: string; event_type: string; label: string; domain: string; default_severity: string; channel: NotifChannel;
+  audience: NotifAudience; is_enabled: boolean; has_template: boolean;
+}
+export interface NotifChannelConfig { channel: NotifChannel; is_enabled: boolean; mode: 'simulation' | 'live'; provider: string | null; sender: string | null }
+export interface NotifTemplate {
+  id: string; event_type: string; channel: NotifChannel; locale: 'fr' | 'en'; subject: string | null; body: string; wa_template_name: string | null;
+}
+export interface QuietHours { start_local: string; end_local: string; timezone: string; applies_to: NotifChannel[] }
+export interface MyNotification { id: string; kind: string; title: string; body: string | null; ref: string | null; severity: string; created_at: string; read_at: string | null }
+
 export interface DemoSummary {
   wo_total: number;
   wo_open: number;

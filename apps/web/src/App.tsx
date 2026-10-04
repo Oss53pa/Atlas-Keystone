@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store,
+  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing,
 } from 'lucide-react';
 import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
@@ -21,6 +21,8 @@ import { Inspections } from './features/inspections/Inspections.tsx';
 import { Preventive } from './features/preventive/Preventive.tsx';
 import { Waste } from './features/waste/Waste.tsx';
 import { Leases } from './features/leases/Leases.tsx';
+import { Notifications } from './features/notifications/Notifications.tsx';
+import { NotificationBell } from './features/notifications/NotificationBell.tsx';
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
 import { useSession, signOut } from './lib/auth.ts';
@@ -69,7 +71,13 @@ const GROUPS: NavGroup[] = [
       { id: 'contractors', label: 'Prestataires', icon: I(HardHat) },
     ],
   },
-  { label: 'Système', items: [{ id: 'admin', label: 'Admin & paramètres', icon: I(Settings) }] },
+  {
+    label: 'Système',
+    items: [
+      { id: 'notifications', label: 'Notifications', icon: I(BellRing) },
+      { id: 'admin', label: 'Admin & paramètres', icon: I(Settings) },
+    ],
+  },
 ];
 
 function findLabel(id: string): string {
@@ -154,6 +162,7 @@ export function App() {
         user={{ name, initials, role: 'Exploitant · Admin' }}
         onCommand={() => setPalette(true)}
         onSignOut={isBackendConfigured ? () => void signOut() : undefined}
+        bell={isBackendConfigured ? <NotificationBell onOpenCenter={() => setActive('notifications')} /> : undefined}
       >
         {active === 'control-tower' ? (
           <ControlTower site={site} />
@@ -171,6 +180,8 @@ export function App() {
           <SoftFm />
         ) : active === 'contractors' ? (
           <Contractors />
+        ) : active === 'notifications' ? (
+          <Notifications />
         ) : active === 'leases' ? (
           <Leases />
         ) : active === 'preventive' ? (
