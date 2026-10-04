@@ -47,7 +47,7 @@ export const reportSubmit = (wo: string, summary: string, technician: string, be
 const BUCKET = 'keystone-wo-photos';
 export const isStoredPhoto = (path: string) => path.split('/').length === 3;
 
-export async function uploadWoPhoto(tenantId: string, woId: string, phase: 'avant' | 'apres', file: File): Promise<string> {
+export async function uploadWoPhoto(tenantId: string, woId: string, phase: string, file: File): Promise<string> {
   if (!supabase) throw new Error('Supabase non configuré.');
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
   const path = `${tenantId}/${woId}/${phase}-${Date.now()}.${ext}`;

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing,
+  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone,
 } from 'lucide-react';
 import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
@@ -22,6 +22,7 @@ import { Preventive } from './features/preventive/Preventive.tsx';
 import { Waste } from './features/waste/Waste.tsx';
 import { Leases } from './features/leases/Leases.tsx';
 import { Notifications } from './features/notifications/Notifications.tsx';
+import { WoTemplates } from './features/wo-templates/WoTemplates.tsx';
 import { NotificationBell } from './features/notifications/NotificationBell.tsx';
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
@@ -39,6 +40,7 @@ const GROUPS: NavGroup[] = [
       { id: 'assets', label: 'Actifs & composants', icon: I(Boxes) },
       { id: 'work-orders', label: 'GMAO · Ordres de travail', icon: I(Wrench) },
       { id: 'preventive', label: 'Préventif & gammes', icon: I(CalendarCheck2) },
+      { id: 'wo-templates', label: 'Modèles d’OT', icon: I(ClipboardList) },
       { id: 'crp', label: 'Contrôles réglementaires', icon: I(ShieldCheck), badge: 3 },
       { id: 'spaces', label: 'Espaces & plans', icon: I(Map) },
       { id: 'leases', label: 'Baux & loyers', icon: I(KeyRound) },
@@ -124,6 +126,7 @@ export function App() {
       { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => setActive('procurement') },
       { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => setActive('assets') },
       { id: 'a:rent', label: 'Encaisser un loyer / voir les impayés', group: 'Actions', icon: <KeyRound size={17} />, run: () => setActive('leases') },
+      { id: 'a:tech', label: 'Ouvrir l’app technicien (terrain)', group: 'Actions', icon: <Smartphone size={17} />, run: () => window.open('?technicien', '_blank', 'noopener') },
       { id: 'a:tenant', label: 'Ouvrir le portail locataire', group: 'Actions', icon: <Store size={17} />, run: () => window.open('?locataire', '_blank', 'noopener') },
       { id: 'a:portal', label: 'Ouvrir l’espace prestataire', group: 'Actions', icon: <HardHat size={17} />, run: () => window.open('?prestataire', '_blank', 'noopener') },
     ];
@@ -180,6 +183,8 @@ export function App() {
           <SoftFm />
         ) : active === 'contractors' ? (
           <Contractors />
+        ) : active === 'wo-templates' ? (
+          <WoTemplates />
         ) : active === 'notifications' ? (
           <Notifications />
         ) : active === 'leases' ? (

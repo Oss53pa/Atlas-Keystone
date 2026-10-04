@@ -263,6 +263,38 @@ export interface NotifTemplate {
 export interface QuietHours { start_local: string; end_local: string; timezone: string; applies_to: NotifChannel[] }
 export interface MyNotification { id: string; kind: string; title: string; body: string | null; ref: string | null; severity: string; created_at: string; read_at: string | null }
 
+/** Exécution terrain & modèles d'OT (migration 40). */
+export type StepType = 'check' | 'numeric' | 'photo' | 'text';
+export interface ChecklistStep {
+  index: number; label: string; type: StepType; min?: number; max?: number; unit?: string; required?: boolean; critical?: boolean;
+  value: unknown; ok: boolean | null; done_at: string | null;
+}
+export interface TechDayRow {
+  wo_id: string; ref: string; title: string; type: string; status: WoStatus; priority: number; asset_tag: string | null; asset_name: string | null;
+  location: string | null; planned_start: string | null; sla_due: string | null; requires_permit: boolean; permit_active: boolean;
+  steps_total: number; steps_done: number; checked_in_at: string | null; template: string | null;
+}
+export interface TechWoDetail {
+  id: string; ref: string; title: string; description: string | null; status: WoStatus; priority: number; type: string;
+  asset: { tag: string; name: string; manufacturer: string | null; model: string | null } | null; location: string | null;
+  safety: string | null; requires_permit: boolean; permit_active: boolean; checklist: ChecklistStep[]; sla_due: string | null; notes: string | null;
+  parts: { id: string; kind: 'part' | 'planned_part'; label: string; qty: number; unit_cost: number | null; part_id: string | null; in_stock: number | null }[] | null;
+  time: { kind: string; at: string; distance: number | null }[] | null;
+}
+export interface AssetScan {
+  asset: { id: string; tag: string; name: string; category: string | null; location: string | null; site: string | null; criticality: string;
+    status: string; manufacturer: string | null; model: string | null; health: number; mtbf_h: number | null; max_rpn: number | null;
+    rul_days: number | null; warranty_until: string | null };
+  open_wo: { ref: string; title: string; status: WoStatus; priority: number }[] | null;
+  history: { ref: string; title: string; type: string; actual_end: string | null }[] | null;
+  top_risk: { component: string; rpn: number; effect: string } | null;
+}
+export interface WoTemplateRow {
+  id: string; name: string; wo_type: string; category: string | null; estimated_minutes: number; requires_permit: boolean;
+  steps: Omit<ChecklistStep, 'index' | 'value' | 'ok' | 'done_at'>[]; required_parts: { part_ref: string; qty: number }[];
+  safety_instructions: string | null; is_active: boolean; uses: number;
+}
+
 export interface DemoSummary {
   wo_total: number;
   wo_open: number;
