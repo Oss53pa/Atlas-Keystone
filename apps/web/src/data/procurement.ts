@@ -47,7 +47,7 @@ const nums = <T extends object>(o: T, keys: (keyof T)[]): T => {
   return out as T;
 };
 export async function fetchSupplierInvoices(): Promise<SupplierInvoiceRow[]> {
-  const rows = await rpc<SupplierInvoiceRow[]>('invoices_board');
+  const rows = await rpc<SupplierInvoiceRow[]>('supplier_invoices_board');
   return (rows ?? []).map((r) => nums({ ...r, issues: r.issues ?? [], issue_labels: r.issue_labels ?? [] }, ['amount_ht', 'amount_ttc', 'expected_ht', 'variance_ht']));
 }
 export const fetchSupplierInvoice = (id: string) => rpc<SupplierInvoiceDetail>('invoice_detail', { p_inv: id });
