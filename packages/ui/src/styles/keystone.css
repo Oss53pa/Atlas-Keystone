@@ -445,6 +445,8 @@ button { font-family: inherit; }
 .kc-item__hint { font-size: 11.5px; color: var(--ks-ink-3); }
 .kc-item kbd { font-family: var(--ks-font-mono); font-size: 11px; color: var(--ks-ink-3); }
 .kc-empty { padding: 36px 18px; text-align: center; color: var(--ks-ink-3); font-size: 13.5px; }
+.kc-spin { width: 15px; height: 15px; flex-shrink: 0; border-radius: 50%; border: 2px solid var(--ks-line-2); border-top-color: var(--ks-amber); animation: kc-spin .7s linear infinite; }
+@keyframes kc-spin { to { transform: rotate(360deg); } }
 .kc-foot { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--ks-line); font-size: 11.5px; color: var(--ks-ink-3); }
 .kc-foot span { display: inline-flex; align-items: center; gap: 5px; }
 .kc-foot kbd { font-family: var(--ks-font-mono); background: var(--ks-surface-3); border: 1px solid var(--ks-line-2); border-radius: 5px; padding: 1px 5px; }

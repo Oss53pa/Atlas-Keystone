@@ -566,3 +566,20 @@ input.ki-input { width: 120px; font-family: var(--ks-font-mono); }
 .ku-breakdown__side { padding: 12px; border-radius: var(--ks-r-lg); background: var(--ks-surface); border: 1px solid var(--ks-line); align-self: start; }
 .ku-bands td, .ku-bands th { padding-top: 6px; padding-bottom: 6px; }
 @media (max-width: 720px) { .ku-breakdown { grid-template-columns: 1fr; } .ku-stack { gap: 5px; } }
+
+/* ============================ Sécurité, données personnelles, comptabilité (km-*) ============================ */
+.km-badge { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--ks-amber-50); color: var(--ks-amber-700); border: 1px solid var(--ks-amber-100); }
+.km-code { width: 100%; height: 58px; text-align: center; font-size: 28px; font-weight: 700; letter-spacing: .5em; padding-left: .5em; border: 1px solid var(--ks-line-2); border-radius: 12px; background: var(--ks-surface); color: var(--ks-ink); }
+.km-code:focus { outline: none; border-color: var(--ks-amber); box-shadow: var(--ks-ring); }
+.km-state { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: var(--ks-r-lg); background: var(--ks-surface-2); border: 1px solid var(--ks-line); color: var(--ks-ink-2); margin: 4px 0 10px; }
+.km-state--on { background: var(--ks-low-100); border-color: var(--ks-low); color: #2C6230; }
+.km-enroll { display: flex; gap: 16px; align-items: flex-start; margin-top: 12px; padding: 14px; border: 1px dashed var(--ks-line-strong); border-radius: var(--ks-r-lg); background: var(--ks-surface); flex-wrap: wrap; }
+.km-enroll img { border-radius: 10px; background: #fff; padding: 6px; border: 1px solid var(--ks-line); }
+.km-steps { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; color: var(--ks-ink-2); }
+.km-secret { background: var(--ks-surface-2); padding: 2px 6px; border-radius: 6px; font-size: 12px; word-break: break-all; }
+.km-toggle { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; cursor: pointer; margin-top: 6px; }
+.km-toggle input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--ks-amber); }
+.km-subject { display: flex; gap: 6px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--ks-line); flex-wrap: wrap; }
+.km-group { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ks-ink-3); margin: 14px 0 4px; }
+.km-acct { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: center; padding: 4px 0; }
+.km-acct .kx-in { height: 34px; }

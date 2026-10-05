@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Building, GitBranch, Scale, Save, CheckCircle2, AlertTriangle, X, ChevronRight } from 'lucide-react';
+import { Building, GitBranch, Scale, Save, CheckCircle2, AlertTriangle, X, ChevronRight, ShieldCheck, UserCog, Landmark } from 'lucide-react';
+import { SecurityTab, PrivacyTab, AccountingTab } from './Governance.tsx';
 import { Card, TabBar } from '@keystone/ui';
 import { money, format } from '@keystone/domain';
 import type { CompanyProfile, ApprovalThreshold } from '@keystone/domain/db/keystone';
@@ -26,7 +27,7 @@ export function Settings() {
         <div className="ks-reveal">
           <div className="ks-eyebrow">Système · Paramétrage client</div>
           <h1 className="kt-hero__title" style={{ fontSize: 34 }}>Paramètres</h1>
-          <div className="kt-hero__sub"><span className="ks-faint">identité légale des documents · circuits d’approbation · pondérations d’évaluation — par client, sans code</span></div>
+          <div className="kt-hero__sub"><span className="ks-faint">identité légale · circuits d’approbation · double authentification · données personnelles · export comptable — par client, sans code</span></div>
         </div>
       </header>
       {toast && <div className="ka-toast"><CheckCircle2 size={16} /> {toast}</div>}
@@ -36,11 +37,17 @@ export function Settings() {
           { id: 'company', label: 'Société & documents', icon: <Building size={15} /> },
           { id: 'approvals', label: 'Circuit d’approbation des achats', icon: <GitBranch size={15} /> },
           { id: 'weights', label: 'Évaluation prestataires', icon: <Scale size={15} /> },
+          { id: 'security', label: 'Sécurité', icon: <ShieldCheck size={15} /> },
+          { id: 'privacy', label: 'Données personnelles', icon: <UserCog size={15} /> },
+          { id: 'accounting', label: 'Comptabilité', icon: <Landmark size={15} /> },
         ]} active={tab} onChange={setTab} />
       </div>
       {tab === 'company' && <CompanyTab onOk={ok} onErr={setErr} />}
       {tab === 'approvals' && <ApprovalsTab onOk={ok} onErr={setErr} />}
       {tab === 'weights' && <WeightsTab onOk={ok} onErr={setErr} />}
+      {tab === 'security' && <SecurityTab onOk={ok} onErr={setErr} />}
+      {tab === 'privacy' && <PrivacyTab onOk={ok} onErr={setErr} />}
+      {tab === 'accounting' && <AccountingTab onOk={ok} onErr={setErr} />}
     </div>
   );
 }

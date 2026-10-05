@@ -14,12 +14,17 @@ export function CommandPalette({
   open,
   onClose,
   commands,
+  onSearch,
 }: {
   open: boolean;
   onClose: () => void;
   commands: Command[];
+  /** Recherche distante (plein texte dans les données) — résultats ajoutés en tête, groupés. */
+  onSearch?: (q: string) => Promise<Command[]>;
 }) {
   const [q, setQ] = useState('');
+  const [remote, setRemote] = useState<Command[]>([]);
+  const [searching, setSearching] = useState(false);
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -27,8 +32,23 @@ export function CommandPalette({
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return commands;
-    return commands.filter((c) => (c.label + ' ' + c.group).toLowerCase().includes(needle));
-  }, [q, commands]);
+    const local = commands.filter((c) => (c.label + ' ' + c.group).toLowerCase().includes(needle));
+    return [...remote, ...local];
+  }, [q, commands, remote]);
+
+  useEffect(() => {
+    const needle = q.trim();
+    if (!onSearch || needle.length < 2) { setRemote([]); setSearching(false); return; }
+    let alive = true;
+    setSearching(true);
+    const h = setTimeout(() => {
+      onSearch(needle)
+        .then((r) => { if (alive) setRemote(r); })
+        .catch(() => { if (alive) setRemote([]); })
+        .finally(() => { if (alive) setSearching(false); });
+    }, 220);
+    return () => { alive = false; clearTimeout(h); };
+  }, [q, onSearch]);
 
   useEffect(() => {
     if (open) {
@@ -81,14 +101,15 @@ export function CommandPalette({
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher ou poser une question en langage naturel…"
+            placeholder="Rechercher un OT, un équipement, un bail, une facture, une commande…"
             aria-label="Recherche"
           />
+          {searching && <span className="kc-spin" aria-label="Recherche en cours" />}
           <kbd>Échap</kbd>
         </div>
 
         <div className="kc-list" ref={listRef}>
-          {filtered.length === 0 && <div className="kc-empty">Aucun résultat pour « {q} »</div>}
+          {filtered.length === 0 && <div className="kc-empty">{searching ? 'Recherche…' : <>Aucun résultat pour « {q} »</>}</div>}
           {filtered.map((c) => {
             idx += 1;
             const here = idx;

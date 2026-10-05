@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone, SlidersHorizontal, Gauge,
+  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone, SlidersHorizontal, Gauge, Package, Receipt, Truck, User,
 } from 'lucide-react';
 import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
@@ -29,6 +29,9 @@ import { NotificationBell } from './features/notifications/NotificationBell.tsx'
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
 import { useSession, signOut } from './lib/auth.ts';
+import { useAal } from './lib/mfa.ts';
+import { MfaChallenge } from './features/auth/MfaChallenge.tsx';
+import { globalSearch } from './data/search.ts';
 import { isBackendConfigured } from './lib/supabase.ts';
 import { SITES } from './data/demo.ts';
 
@@ -86,6 +89,17 @@ const GROUPS: NavGroup[] = [
   },
 ];
 
+const HIT: Record<string, { label: string; icon: React.ReactNode }> = {
+  wo: { label: 'OT', icon: <Wrench size={17} /> }, asset: { label: 'Équipement', icon: <Boxes size={17} /> },
+  ticket: { label: 'Ticket', icon: <Ticket size={17} /> }, hsse: { label: 'HSSE', icon: <AlertTriangle size={17} /> },
+  nc: { label: 'Non-conformité', icon: <ListChecks size={17} /> }, permit: { label: 'Permis', icon: <FileCheck2 size={17} /> },
+  contractor: { label: 'Prestataire', icon: <HardHat size={17} /> }, lessee: { label: 'Preneur', icon: <User size={17} /> },
+  lease: { label: 'Bail', icon: <KeyRound size={17} /> }, pr: { label: 'DA', icon: <ClipboardList size={17} /> },
+  po: { label: 'BC', icon: <Truck size={17} /> }, invoice: { label: 'Facture', icon: <Receipt size={17} /> },
+  part: { label: 'Pièce', icon: <Package size={17} /> }, space: { label: 'Lot', icon: <Map size={17} /> },
+  meter: { label: 'Compteur', icon: <Gauge size={17} /> },
+};
+
 function findLabel(id: string): string {
   for (const g of GROUPS) for (const it of g.items) if (it.id === id) return it.label;
   return id;
@@ -93,6 +107,7 @@ function findLabel(id: string): string {
 
 export function App() {
   const { session, ready } = useSession();
+  const { aal, refresh: refreshAal } = useAal(session);
   const [active, setActive] = useState('control-tower');
   const [density, setDensity] = useState<Density>('office');
   const [site, setSite] = useState(SITES[0]);
@@ -146,11 +161,30 @@ export function App() {
     return [...nav, ...actions, ...ctx];
   }, [site]);
 
+  const onSearch = useCallback(async (q: string): Promise<Command[]> => {
+    if (!isBackendConfigured) return [];
+    const hits = await globalSearch(q);
+    return hits.map((h) => {
+      const k = HIT[h.kind] ?? { label: h.kind, icon: <FileText size={17} /> };
+      return {
+        id: `s:${h.kind}:${h.id}`,
+        label: h.ref ? `${h.ref} · ${h.title}` : h.title,
+        group: 'Dans les données',
+        hint: [k.label, h.subtitle].filter(Boolean).join(' · '),
+        icon: k.icon,
+        run: () => setActive(h.module),
+      };
+    });
+  }, []);
+
   if (isBackendConfigured && !ready) {
     return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: 'var(--ks-ink-3)' }}>Chargement…</div>;
   }
   if (isBackendConfigured && !session) {
     return <Login />;
+  }
+  if (isBackendConfigured && aal?.next === 'aal2' && aal.current !== 'aal2') {
+    return <MfaChallenge email={session?.user?.email ?? ''} onDone={refreshAal} />;
   }
 
   const email = session?.user?.email ?? '';
@@ -219,7 +253,7 @@ export function App() {
           <ModulePlaceholder title={findLabel(active)} />
         )}
       </AppShell>
-      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} />
+      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} onSearch={onSearch} />
     </>
   );
 }
