@@ -421,7 +421,7 @@ CREATE TABLE IF NOT EXISTS keystone.utility_tariff_bands (
   unit_price numeric NOT NULL CHECK (unit_price >= 0),
   label text
 );
-CREATE TABLE IF NOT EXISTS keystone.meters (
+CREATE TABLE IF NOT EXISTS keystone.utility_meters (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL DEFAULT keystone.current_tenant(),
   site_id uuid NOT NULL REFERENCES keystone.sites(id),
@@ -430,7 +430,7 @@ CREATE TABLE IF NOT EXISTS keystone.meters (
   carrier text NOT NULL CHECK (carrier IN ('electricity','water')),
   unit text NOT NULL,
   kind text NOT NULL CHECK (kind IN ('main','sub')),
-  parent_id uuid REFERENCES keystone.meters(id),
+  parent_id uuid REFERENCES keystone.utility_meters(id),
   space_unit_id uuid REFERENCES keystone.space_units(id),   -- lot desservi (refacturation) ; NULL = parties communes
   usage text,                                    -- lot, CVC, éclairage, sanitaires…
   tariff_id uuid REFERENCES keystone.utility_tariffs(id),  -- compteur général : contrat fournisseur
@@ -442,10 +442,10 @@ CREATE TABLE IF NOT EXISTS keystone.meters (
   UNIQUE (tenant_id, code),
   CHECK ((kind = 'main' AND parent_id IS NULL) OR (kind = 'sub' AND parent_id IS NOT NULL))
 );
-CREATE TABLE IF NOT EXISTS keystone.meter_readings (
+CREATE TABLE IF NOT EXISTS keystone.utility_meter_readings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL DEFAULT keystone.current_tenant(),
-  meter_id uuid NOT NULL REFERENCES keystone.meters(id) ON DELETE CASCADE,
+  meter_id uuid NOT NULL REFERENCES keystone.utility_meters(id) ON DELETE CASCADE,
   read_at date NOT NULL,
   index_value numeric NOT NULL CHECK (index_value >= 0),
   is_reset boolean NOT NULL DEFAULT false,       -- remplacement / remise à zéro du compteur
@@ -459,7 +459,7 @@ CREATE TABLE IF NOT EXISTS keystone.utility_rebills (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL DEFAULT keystone.current_tenant(),
   period date NOT NULL,
-  meter_id uuid NOT NULL REFERENCES keystone.meters(id),
+  meter_id uuid NOT NULL REFERENCES keystone.utility_meters(id),
   lease_id uuid NOT NULL REFERENCES keystone.leases(id),
   lessee_id uuid NOT NULL REFERENCES keystone.lessees(id),
   carrier text NOT NULL,
@@ -474,7 +474,7 @@ CREATE TABLE IF NOT EXISTS keystone.utility_rebills (
 );
 
 DO $$ DECLARE t text; BEGIN
-  FOREACH t IN ARRAY ARRAY['utility_tariffs','utility_tariff_bands','meters','meter_readings','utility_rebills'] LOOP
+  FOREACH t IN ARRAY ARRAY['utility_tariffs','utility_tariff_bands','utility_meters','utility_meter_readings','utility_rebills'] LOOP
     EXECUTE format('ALTER TABLE keystone.%I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format('DROP POLICY IF EXISTS tenant_isolation ON keystone.%I', t);
     EXECUTE format('CREATE POLICY tenant_isolation ON keystone.%I USING (tenant_id = keystone.current_tenant()) WITH CHECK (tenant_id = keystone.current_tenant())', t);
@@ -483,7 +483,7 @@ DO $$ DECLARE t text; BEGIN
     EXECUTE format('GRANT SELECT ON keystone.%I TO authenticated', t);
   END LOOP;
 END $$;
-GRANT INSERT, UPDATE ON keystone.utility_tariffs, keystone.utility_tariff_bands, keystone.meters TO authenticated;
+GRANT INSERT, UPDATE ON keystone.utility_tariffs, keystone.utility_tariff_bands, keystone.utility_meters TO authenticated;
 GRANT DELETE ON keystone.utility_tariff_bands TO authenticated;
 
 -- Calcul d'une facture théorique : tranches (progressives ou horaires), fixe, prime de puissance, taxes, TVA
@@ -527,7 +527,7 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
   WITH r AS (
     SELECT mr.meter_id, mr.read_at, mr.index_value, mr.is_reset, m.multiplier,
       lag(mr.read_at) OVER w AS prev_at, lag(mr.index_value) OVER w AS prev_idx
-    FROM meter_readings mr JOIN meters m ON m.id = mr.meter_id
+    FROM utility_meter_readings mr JOIN utility_meters m ON m.id = mr.meter_id
     WINDOW w AS (PARTITION BY mr.meter_id ORDER BY mr.read_at)
   )
   SELECT r.meter_id, date_trunc('month', r.prev_at)::date,
@@ -546,7 +546,7 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
        lastp AS (SELECT DISTINCT ON (meter_id) meter_id, period, qty FROM c ORDER BY meter_id, period DESC),
        prev AS (SELECT c.meter_id, avg(c.qty) AS a FROM c JOIN lastp l ON l.meter_id = c.meter_id
                 WHERE c.period < l.period AND c.period >= l.period - interval '3 months' GROUP BY c.meter_id),
-       lr AS (SELECT DISTINCT ON (meter_id) meter_id, read_at, index_value FROM meter_readings ORDER BY meter_id, read_at DESC),
+       lr AS (SELECT DISTINCT ON (meter_id) meter_id, read_at, index_value FROM utility_meter_readings ORDER BY meter_id, read_at DESC),
        occ AS (SELECT DISTINCT ON (ls.space_unit_id) ls.space_unit_id, l.id AS lease_id, coalesce(le.trade_name, le.company_name) AS lessee
                FROM lease_spaces ls JOIN leases l ON l.id = ls.lease_id JOIN lessees le ON le.id = l.lessee_id
                WHERE l.status IN ('active','notice') ORDER BY ls.space_unit_id, l.start_date DESC)
@@ -560,8 +560,8 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
          WHEN prev.a > 0 AND lastp.qty > prev.a * 1.6 THEN 'SPIKE'
          WHEN prev.a > 0 AND lastp.qty < prev.a * 0.3 THEN 'DROP' END,
     ARRAY(SELECT c2.qty FROM c c2 WHERE c2.meter_id = m.id ORDER BY c2.period)
-  FROM meters m JOIN sites s ON s.id = m.site_id
-  LEFT JOIN meters p ON p.id = m.parent_id
+  FROM utility_meters m JOIN sites s ON s.id = m.site_id
+  LEFT JOIN utility_meters p ON p.id = m.parent_id
   LEFT JOIN space_units su ON su.id = m.space_unit_id
   LEFT JOIN occ ON occ.space_unit_id = m.space_unit_id
   LEFT JOIN utility_tariffs t ON t.id = m.tariff_id
@@ -585,11 +585,11 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
          WHEN coalesce(sum(cs.qty), 0) > cm.qty * 1.01 THEN 'inconsistent'
          WHEN (cm.qty - coalesce(sum(cs.qty), 0)) / cm.qty > 0.15 THEN 'alert'
          WHEN (cm.qty - coalesce(sum(cs.qty), 0)) / cm.qty > 0.10 THEN 'watch' ELSE 'ok' END
-  FROM meters m JOIN sites s ON s.id = m.site_id
+  FROM utility_meters m JOIN sites s ON s.id = m.site_id
   JOIN c cm ON cm.meter_id = m.id
-  LEFT JOIN meters sm ON sm.parent_id = m.id AND sm.active
+  LEFT JOIN utility_meters sm ON sm.parent_id = m.id AND sm.active
   LEFT JOIN c cs ON cs.meter_id = sm.id AND cs.period = cm.period
-  WHERE m.kind = 'main' AND m.active AND EXISTS (SELECT 1 FROM meters x WHERE x.parent_id = m.id AND x.active)
+  WHERE m.kind = 'main' AND m.active AND EXISTS (SELECT 1 FROM utility_meters x WHERE x.parent_id = m.id AND x.active)
   GROUP BY m.id, m.code, s.name, m.carrier, m.unit, cm.period, cm.qty
   ORDER BY s.name, m.carrier, cm.period DESC;
 $$;
@@ -608,7 +608,7 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
     x.j
   FROM energy_readings er
   JOIN sites s ON s.id = er.site_id
-  JOIN LATERAL (SELECT * FROM meters m WHERE m.site_id = er.site_id AND m.carrier = er.carrier AND m.kind = 'main' AND m.tariff_id IS NOT NULL
+  JOIN LATERAL (SELECT * FROM utility_meters m WHERE m.site_id = er.site_id AND m.carrier = er.carrier AND m.kind = 'main' AND m.tariff_id IS NOT NULL
                 ORDER BY m.code LIMIT 1) m ON true
   JOIN utility_tariffs t ON t.id = m.tariff_id
   CROSS JOIN LATERAL (SELECT keystone.tariff_compute(m.tariff_id, er.quantity, m.subscribed_kva) AS j) x
@@ -630,14 +630,14 @@ LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
                     (keystone.tariff_compute(m.tariff_id, cm.qty, m.subscribed_kva)->>'ht')::numeric) AS cost,
            CASE WHEN EXISTS (SELECT 1 FROM energy_readings er WHERE er.site_id = m.site_id AND er.carrier = m.carrier
                        AND er.period = date_trunc('month', p_period)::date AND er.cost IS NOT NULL) THEN 'facture' ELSE 'grille' END AS basis
-         FROM meters m JOIN c cm ON cm.meter_id = m.id WHERE m.kind = 'main')
+         FROM utility_meters m JOIN c cm ON cm.meter_id = m.id WHERE m.kind = 'main')
   SELECT sm.id, sm.code, sm.carrier, sm.unit, su.code, l.id, l.ref, le.id, coalesce(le.trade_name, le.company_name),
     cs.qty, round(mn.cost / NULLIF(mn.qty, 0), 2),
     round(cs.qty * mn.cost / NULLIF(mn.qty, 0)), round(cs.qty * mn.cost / NULLIF(mn.qty, 0) * l.vat_rate / 100),
     mn.basis,
     EXISTS (SELECT 1 FROM utility_rebills ur WHERE ur.meter_id = sm.id AND ur.period = date_trunc('month', p_period)::date),
     (SELECT min(rs.due_date) FROM rent_schedules rs WHERE rs.lease_id = l.id AND rs.due_date >= current_date)
-  FROM meters sm
+  FROM utility_meters sm
   JOIN main mn ON mn.id = sm.parent_id
   JOIN c cs ON cs.meter_id = sm.id
   JOIN space_units su ON su.id = sm.space_unit_id
@@ -671,15 +671,15 @@ END $$;
 CREATE OR REPLACE FUNCTION keystone.meter_record_reading(p_meter uuid, p_date date, p_index numeric, p_reset boolean DEFAULT false,
   p_note text DEFAULT NULL, p_source text DEFAULT 'manual')
 RETURNS json LANGUAGE plpgsql SECURITY INVOKER SET search_path TO 'keystone','public' AS $$
-DECLARE m meters; prev meter_readings; nxt meter_readings; v_qty numeric; v_avg numeric; v_flag text;
+DECLARE m utility_meters; prev utility_meter_readings; nxt utility_meter_readings; v_qty numeric; v_avg numeric; v_flag text;
 BEGIN
   PERFORM staff_guard();
-  SELECT * INTO m FROM meters WHERE id = p_meter;
+  SELECT * INTO m FROM utility_meters WHERE id = p_meter;
   IF NOT FOUND THEN RAISE EXCEPTION 'NOT_FOUND'; END IF;
   IF p_date > current_date THEN RAISE EXCEPTION 'FUTURE_DATE'; END IF;
   IF p_index < 0 THEN RAISE EXCEPTION 'INVALID_INDEX'; END IF;
-  SELECT * INTO prev FROM meter_readings WHERE meter_id = p_meter AND read_at < p_date ORDER BY read_at DESC LIMIT 1;
-  SELECT * INTO nxt FROM meter_readings WHERE meter_id = p_meter AND read_at > p_date ORDER BY read_at LIMIT 1;
+  SELECT * INTO prev FROM utility_meter_readings WHERE meter_id = p_meter AND read_at < p_date ORDER BY read_at DESC LIMIT 1;
+  SELECT * INTO nxt FROM utility_meter_readings WHERE meter_id = p_meter AND read_at > p_date ORDER BY read_at LIMIT 1;
   IF NOT p_reset AND prev.id IS NOT NULL AND p_index < prev.index_value THEN
     RAISE EXCEPTION 'INDEX_ROLLBACK' USING DETAIL = format('Index %s inférieur au relevé du %s (%s). Cochez « compteur remplacé » si c''est le cas.',
       p_index, to_char(prev.read_at, 'DD/MM/YYYY'), prev.index_value);
@@ -687,7 +687,7 @@ BEGIN
   IF nxt.id IS NOT NULL AND NOT nxt.is_reset AND p_index > nxt.index_value THEN
     RAISE EXCEPTION 'INDEX_ROLLBACK' USING DETAIL = format('Index %s supérieur au relevé suivant du %s (%s).', p_index, to_char(nxt.read_at, 'DD/MM/YYYY'), nxt.index_value);
   END IF;
-  INSERT INTO meter_readings(tenant_id, meter_id, read_at, index_value, is_reset, note, source)
+  INSERT INTO utility_meter_readings(tenant_id, meter_id, read_at, index_value, is_reset, note, source)
   VALUES (m.tenant_id, p_meter, p_date, p_index, p_reset, p_note, coalesce(p_source, 'manual'))
   ON CONFLICT (meter_id, read_at) DO UPDATE SET index_value = EXCLUDED.index_value, is_reset = EXCLUDED.is_reset, note = EXCLUDED.note;
   IF prev.id IS NOT NULL THEN
@@ -704,7 +704,7 @@ RETURNS json LANGUAGE sql STABLE SET search_path TO 'keystone','public' AS $$
     'id', t.id, 'code', t.code, 'provider', t.provider, 'country', t.country, 'carrier', t.carrier, 'name', t.name, 'unit', t.unit,
     'fixed_monthly', t.fixed_monthly, 'demand_charge', t.demand_charge, 'default_profile', t.default_profile, 'levies', t.levies,
     'vat_rate', t.vat_rate, 'valid_from', t.valid_from, 'is_indicative', t.is_indicative, 'source', t.source,
-    'meters', (SELECT count(*) FROM meters m WHERE m.tariff_id = t.id),
+    'meters', (SELECT count(*) FROM utility_meters m WHERE m.tariff_id = t.id),
     'bands', (SELECT json_agg(json_build_object('id', b.id, 'slot', b.slot, 'from_qty', b.from_qty, 'to_qty', b.to_qty, 'unit_price', b.unit_price, 'label', b.label)
                               ORDER BY b.slot, b.from_qty) FROM utility_tariff_bands b WHERE b.tariff_id = t.id)
   ) ORDER BY t.carrier, t.provider, t.code), '[]'::json)
@@ -734,7 +734,7 @@ GRANT EXECUTE ON FUNCTION keystone.staff_guard(), keystone.invoice_match(uuid),
   keystone.utility_bill_check(int), keystone.rebill_preview(date), keystone.rebill_post(date),
   keystone.meter_record_reading(uuid, date, numeric, boolean, text, text), keystone.tariffs_board(), keystone.utilities_summary()
   TO authenticated;
-GRANT INSERT, UPDATE ON keystone.supplier_invoices, keystone.supplier_invoice_lines, keystone.meter_readings, keystone.utility_rebills TO authenticated;
+GRANT INSERT, UPDATE ON keystone.supplier_invoices, keystone.supplier_invoice_lines, keystone.utility_meter_readings, keystone.utility_rebills TO authenticated;
 
 -- Événement de notification
 INSERT INTO keystone.notification_events(event_type, label, domain, default_severity, placeholders) VALUES

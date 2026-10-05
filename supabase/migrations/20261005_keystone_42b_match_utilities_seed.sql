@@ -9,7 +9,7 @@ DECLARE
   pr uuid; po uuid; inv uuid; l1 uuid; l2 uuid; l3 uuid; v_spike numeric;
 BEGIN
   PERFORM set_config('keystone.tenant_id', t::text, true);
-  IF EXISTS (SELECT 1 FROM keystone.meters WHERE tenant_id = t) THEN RETURN; END IF;
+  IF EXISTS (SELECT 1 FROM keystone.utility_meters WHERE tenant_id = t) THEN RETURN; END IF;
   SELECT id INTO yop FROM keystone.sites WHERE tenant_id = t AND name ILIKE '%Yopougon%';
 
   -- ---------------- Tolérances de rapprochement ----------------
@@ -56,7 +56,7 @@ Atlas Keystone'),
   -- ---------------- Compteurs généraux (tous sites) — index cohérents avec les factures saisies ----------------
   FOR s IN SELECT id, name FROM keystone.sites WHERE tenant_id = t LOOP
     FOR r IN SELECT * FROM (VALUES ('electricity', 'kWh', 'ELEC', tf_mt, 1000000::numeric), ('water', 'm3', 'EAU', tf_eau, 50000::numeric)) v(carrier, unit, pfx, tariff, start_idx) LOOP
-      INSERT INTO keystone.meters(tenant_id, site_id, code, name, carrier, unit, kind, tariff_id, subscribed_kva, provider_contract, usage)
+      INSERT INTO keystone.utility_meters(tenant_id, site_id, code, name, carrier, unit, kind, tariff_id, subscribed_kva, provider_contract, usage)
       VALUES (t, s.id, r.pfx || '-' || upper(left(regexp_replace((string_to_array(s.name, ' '))[array_length(string_to_array(s.name, ' '), 1)], '[^A-Za-z]', '', 'g'), 3)) || '-GEN',
               CASE r.carrier WHEN 'electricity' THEN 'Poste de livraison CIE — ' ELSE 'Compteur général SODECI — ' END || s.name,
               r.carrier, r.unit, 'main', r.tariff,
@@ -66,7 +66,7 @@ Atlas Keystone'),
       idx := r.start_idx;
       FOR k IN 0..6 LOOP
         p := (date_trunc('month', current_date) - make_interval(months => 6 - k))::date;
-        INSERT INTO keystone.meter_readings(tenant_id, meter_id, read_at, index_value, source) VALUES (t, m_main, p, idx, 'manual');
+        INSERT INTO keystone.utility_meter_readings(tenant_id, meter_id, read_at, index_value, source) VALUES (t, m_main, p, idx, 'manual');
         IF k < 6 THEN
           SELECT quantity INTO q FROM keystone.energy_readings WHERE tenant_id = t AND site_id = s.id AND carrier = r.carrier AND period = p;
           idx := idx + coalesce(q, 0);
@@ -94,8 +94,8 @@ Atlas Keystone'),
     ('EAU-YOP-SAN', 'Sanitaires publics (parties communes)', 'water', NULL, 'Sanitaires', 0.300),
     ('EAU-YOP-EXT', 'Espaces verts & nettoyage (parties communes)', 'water', NULL, 'Extérieurs', 0.120)
   ) v(code, name, carrier, lot, usage, share) LOOP
-    SELECT id INTO m_main FROM keystone.meters WHERE tenant_id = t AND site_id = yop AND carrier = r.carrier AND kind = 'main';
-    INSERT INTO keystone.meters(tenant_id, site_id, code, name, carrier, unit, kind, parent_id, space_unit_id, usage)
+    SELECT id INTO m_main FROM keystone.utility_meters WHERE tenant_id = t AND site_id = yop AND carrier = r.carrier AND kind = 'main';
+    INSERT INTO keystone.utility_meters(tenant_id, site_id, code, name, carrier, unit, kind, parent_id, space_unit_id, usage)
     VALUES (t, yop, r.code, r.name, r.carrier, CASE r.carrier WHEN 'electricity' THEN 'kWh' ELSE 'm3' END, 'sub', m_main,
             (SELECT id FROM keystone.space_units WHERE tenant_id = t AND code = r.lot), r.usage)
     RETURNING id INTO m_sub;
@@ -104,7 +104,7 @@ Atlas Keystone'),
       p := (date_trunc('month', current_date) - make_interval(months => 6 - k))::date;
       -- Banque Lagune : relevés interrompus depuis 2 mois (local en préavis, accès refusé)
       IF NOT (r.code = 'ELEC-YOP-BANQ' AND k >= 5) THEN
-        INSERT INTO keystone.meter_readings(tenant_id, meter_id, read_at, index_value, source)
+        INSERT INTO keystone.utility_meter_readings(tenant_id, meter_id, read_at, index_value, source)
         VALUES (t, m_sub, p, idx, CASE WHEN k % 3 = 0 THEN 'photo' ELSE 'manual' END);
       END IF;
       IF k < 6 THEN
