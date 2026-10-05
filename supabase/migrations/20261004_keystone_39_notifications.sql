@@ -8,8 +8,15 @@
 --   · aucun secret en base (clés API dans les secrets Supabase de l'Edge Function) ; outbox invisible aux locataires/prestataires
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 ALTER TABLE keystone.contractors ADD COLUMN IF NOT EXISTS contact_phone text, ADD COLUMN IF NOT EXISTS contact_email text;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 CREATE TABLE IF NOT EXISTS keystone.notification_channels (
   tenant_id uuid NOT NULL DEFAULT keystone.current_tenant(),

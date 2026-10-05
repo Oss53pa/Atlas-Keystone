@@ -9,6 +9,7 @@
 --   · correctif : la couverture de stock lit les sorties en valeur absolue (consume_part les enregistre en négatif)
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 ALTER TABLE keystone.persons ADD COLUMN IF NOT EXISTS hourly_rate numeric NOT NULL DEFAULT 4000;
 ALTER TABLE keystone.work_orders
@@ -17,6 +18,12 @@ ALTER TABLE keystone.work_orders
   ADD COLUMN IF NOT EXISTS safety_instructions text,
   ADD COLUMN IF NOT EXISTS completion_notes text,
   ADD COLUMN IF NOT EXISTS signed_by text;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 -- Pièces prévues par un modèle (distinctes des pièces réellement sorties) : extension additive de la contrainte
 ALTER TABLE keystone.work_order_lines DROP CONSTRAINT IF EXISTS work_order_lines_kind_check;

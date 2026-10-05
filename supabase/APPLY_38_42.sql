@@ -1,6 +1,7 @@
 -- Atlas Keystone · migrations 38 (baux & portail locataire), 39 (notifications), 40 (exécution terrain), 41 (documents & paramétrage),
 -- 42 (rapprochement BC / réception / facture, compteurs & grilles CIE-SODECI) + seeds
 -- À coller en une fois dans le SQL Editor (projet vgtmljfayiysuvrcmunt) · transactions successives, dans l'ordre
+-- v2 : ALTER sur users / contractors / work_orders isolés en transactions courtes (anti-interblocage avec l'API Storage)
 
 -- ==================== 20261004_keystone_38_leases_tenant_portal.sql ====================
 -- keystone_38_leases_tenant_portal — Baux, loyers, charges & portail locataire
@@ -16,6 +17,7 @@
 --   + garde dans chaque RPC). Un exploitant (lessee_id NULL) peut prévisualiser le portail de n'importe quel locataire.
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 -- ===================== Données =====================
 CREATE TABLE IF NOT EXISTS keystone.lessees (
@@ -31,6 +33,13 @@ CREATE TABLE IF NOT EXISTS keystone.lessees (
 );
 ALTER TABLE keystone.users ADD COLUMN IF NOT EXISTS lessee_id uuid REFERENCES keystone.lessees(id);
 ALTER TABLE keystone.service_requests ADD COLUMN IF NOT EXISTS lessee_id uuid REFERENCES keystone.lessees(id);
+ALTER TABLE keystone.lessees ENABLE ROW LEVEL SECURITY;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 CREATE TABLE IF NOT EXISTS keystone.leases (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -649,8 +658,15 @@ COMMIT;
 --   · aucun secret en base (clés API dans les secrets Supabase de l'Edge Function) ; outbox invisible aux locataires/prestataires
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 ALTER TABLE keystone.contractors ADD COLUMN IF NOT EXISTS contact_phone text, ADD COLUMN IF NOT EXISTS contact_email text;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 CREATE TABLE IF NOT EXISTS keystone.notification_channels (
   tenant_id uuid NOT NULL DEFAULT keystone.current_tenant(),
@@ -1143,6 +1159,7 @@ COMMIT;
 --   · correctif : la couverture de stock lit les sorties en valeur absolue (consume_part les enregistre en négatif)
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 ALTER TABLE keystone.persons ADD COLUMN IF NOT EXISTS hourly_rate numeric NOT NULL DEFAULT 4000;
 ALTER TABLE keystone.work_orders
@@ -1151,6 +1168,12 @@ ALTER TABLE keystone.work_orders
   ADD COLUMN IF NOT EXISTS safety_instructions text,
   ADD COLUMN IF NOT EXISTS completion_notes text,
   ADD COLUMN IF NOT EXISTS signed_by text;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 -- Pièces prévues par un modèle (distinctes des pièces réellement sorties) : extension additive de la contrainte
 ALTER TABLE keystone.work_order_lines DROP CONSTRAINT IF EXISTS work_order_lines_kind_check;

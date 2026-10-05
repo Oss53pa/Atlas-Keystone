@@ -11,6 +11,7 @@
 --   + garde dans chaque RPC). Un exploitant (lessee_id NULL) peut prévisualiser le portail de n'importe quel locataire.
 BEGIN;
 SET LOCAL search_path = keystone, public, extensions;
+SET LOCAL lock_timeout = '15s';
 
 -- ===================== Données =====================
 CREATE TABLE IF NOT EXISTS keystone.lessees (
@@ -26,6 +27,13 @@ CREATE TABLE IF NOT EXISTS keystone.lessees (
 );
 ALTER TABLE keystone.users ADD COLUMN IF NOT EXISTS lessee_id uuid REFERENCES keystone.lessees(id);
 ALTER TABLE keystone.service_requests ADD COLUMN IF NOT EXISTS lessee_id uuid REFERENCES keystone.lessees(id);
+ALTER TABLE keystone.lessees ENABLE ROW LEVEL SECURITY;
+COMMIT;
+
+-- Transaction courte : le verrou exclusif sur la table est relâché aussitôt (les policies Storage des photos d'OT
+-- lisent keystone.users / work_orders ; un verrou tenu toute la migration provoquait un interblocage avec l'API Storage).
+BEGIN;
+SET LOCAL search_path = keystone, public, extensions;
 
 CREATE TABLE IF NOT EXISTS keystone.leases (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
