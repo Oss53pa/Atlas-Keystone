@@ -51,7 +51,7 @@ Atlas Keystone'),
           '[{"label":"Assainissement & FDE (indicatif)","pct":5}]', 'Grille indicative Keystone (démo) — à recaler sur la dernière facture SODECI du site')
   RETURNING id INTO tf_eau;
   INSERT INTO keystone.utility_tariff_bands(tenant_id, tariff_id, slot, from_qty, to_qty, unit_price) VALUES
-    (t, tf_eau, 'all', 0, 500, 480), (t, tf_eau, 'all', 500, 2000, 560), (t, tf_eau, 'all', 2000, NULL, 620);
+    (t, tf_eau, 'all', 0, 500, 520), (t, tf_eau, 'all', 500, 2000, 580), (t, tf_eau, 'all', 2000, NULL, 600);
 
   -- ---------------- Compteurs généraux (tous sites) — index cohérents avec les factures saisies ----------------
   FOR s IN SELECT id, name FROM keystone.sites WHERE tenant_id = t LOOP
