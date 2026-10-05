@@ -85,6 +85,16 @@ function CompanyTab({ onOk, onErr }: { onOk: (m: string) => void; onErr: (m: str
         <label className="kx-lbl" style={{ marginTop: 10 }}>Conditions générales d’achat (sur les BC)
           <textarea className="kt-field ki-input" rows={6} value={c.purchase_terms ?? ''} onChange={(e) => setC({ ...c, purchase_terms: e.target.value || null })} />
         </label>
+        <div className="kd-form" style={{ marginTop: 10 }}>
+          <label className="kx-lbl">Tolérance prix facture / BC (%)
+            <input className="kx-in ks-mono" type="number" min={0} max={20} step={0.5} value={c.match_price_tolerance_pct ?? 2}
+              onChange={(e) => setC({ ...c, match_price_tolerance_pct: Number(e.target.value) })} />
+          </label>
+          <label className="kx-lbl">Tolérance écart global (FCFA HT)
+            <input className="kx-in ks-mono" type="number" min={0} step={1000} value={c.match_amount_tolerance ?? 10000}
+              onChange={(e) => setC({ ...c, match_amount_tolerance: Number(e.target.value) })} />
+          </label>
+        </div>
         <label className="kx-lbl" style={{ marginTop: 10 }}>Pied de page des documents
           <input className="kx-in" value={c.document_footer ?? ''} onChange={(e) => setC({ ...c, document_footer: e.target.value || null })} />
         </label>

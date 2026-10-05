@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase.ts';
-import type { StockRow, PurchaseRequestRow, PurchaseOrderRow, ProcurementSummary } from '@keystone/domain/db/keystone';
+import type {
+  StockRow, PurchaseRequestRow, PurchaseOrderRow, ProcurementSummary, SupplierInvoiceRow, SupplierInvoiceDetail, PoLineStatus, ApSummary,
+} from '@keystone/domain/db/keystone';
 
 async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
   if (!supabase) throw new Error('Supabase non configuré.');
@@ -37,3 +39,33 @@ export const prToPo = (id: string) => rpc<{ po_id: string; ref: string }>('pr_to
 export const poReceive = (id: string, qc: 'accepted' | 'accepted_with_reserves' | 'refused') =>
   rpc<{ status: string; stock_in: number }>('po_receive', { p_po: id, p_qc: qc, p_notes: null });
 export const prFromStockAlerts = () => rpc<{ created: number }>('pr_from_stock_alerts');
+
+/* ---------- Rapprochement BC / réception / facture (migration 42) ---------- */
+const nums = <T extends object>(o: T, keys: (keyof T)[]): T => {
+  const out = { ...o } as Record<keyof T, unknown>;
+  for (const k of keys) if (out[k] != null) out[k] = Number(out[k]);
+  return out as T;
+};
+export async function fetchSupplierInvoices(): Promise<SupplierInvoiceRow[]> {
+  const rows = await rpc<SupplierInvoiceRow[]>('invoices_board');
+  return (rows ?? []).map((r) => nums({ ...r, issues: r.issues ?? [], issue_labels: r.issue_labels ?? [] }, ['amount_ht', 'amount_ttc', 'expected_ht', 'variance_ht']));
+}
+export const fetchSupplierInvoice = (id: string) => rpc<SupplierInvoiceDetail>('invoice_detail', { p_inv: id });
+export async function fetchPoLines(po: string): Promise<PoLineStatus[]> {
+  const rows = await rpc<PoLineStatus[]>('po_lines_status', { p_po: po });
+  return (rows ?? []).map((r) => nums(r, ['qty_ordered', 'qty_received', 'qty_refused', 'qty_to_receive', 'qty_invoiced', 'qty_to_invoice', 'unit_price']));
+}
+export async function fetchApSummary(): Promise<ApSummary> {
+  const s = await rpc<Record<string, unknown>>('ap_summary');
+  return Object.fromEntries(Object.entries(s).map(([k, v]) => [k, v == null ? null : Number(v)])) as unknown as ApSummary;
+}
+export type InvoiceLineInput = { po_line_id: string | null; label?: string; qty: number; unit_price: number };
+export const invoiceRegister = (po: string, supplierRef: string, date: string, lines: InvoiceLineInput[] | null, amountHt?: number | null) =>
+  rpc<{ id: string; ref: string; status: string; variance_ht: number }>('invoice_register', {
+    p_po: po, p_supplier_ref: supplierRef, p_invoice_date: date, p_lines: lines, p_amount_ht: amountHt ?? null, p_tax_rate: 18, p_due_days: null,
+  });
+export type InvoiceAction = 'approve' | 'force_approve' | 'reject' | 'pay' | 'rematch';
+export const invoiceTransition = (id: string, action: InvoiceAction, comment?: string) =>
+  rpc<{ status: string }>('invoice_transition', { p_inv: id, p_action: action, p_comment: comment ?? null });
+export const poReceiveLines = (po: string, lines: { line_id: string; qty: number; refused: number }[], qc: 'accepted' | 'accepted_with_reserves' | 'refused', notes?: string) =>
+  rpc<{ status: string; stock_in: number }>('po_receive_lines', { p_po: po, p_lines: lines, p_qc: qc, p_notes: notes ?? null });

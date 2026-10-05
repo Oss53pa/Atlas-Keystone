@@ -300,6 +300,7 @@ export interface CompanyProfile {
   tenant_id?: string; legal_name: string; trade_name: string | null; legal_form: string | null; rccm: string | null; ncc: string | null;
   address: string | null; city: string | null; country: string; phone: string | null; email: string | null; website: string | null;
   bank_name: string | null; bank_account: string | null; payment_terms_days: number; purchase_terms: string | null; document_footer: string | null;
+  match_price_tolerance_pct?: number; match_amount_tolerance?: number;
 }
 export interface ApprovalThreshold { doc_type: string; step: 'budget' | 'direction'; min_amount: number; approver_label: string }
 export interface PoDocument {
@@ -494,4 +495,70 @@ export interface MaintKpi {
   availability_pct: number;
   sla_compliance_pct: number;
   sla_breaches: number;
+}
+
+/** Rapprochement BC / réception / facture fournisseur (migration 42). */
+export type SupplierInvoiceStatus = 'to_match' | 'matched' | 'discrepancy' | 'approved' | 'rejected' | 'paid';
+export type MatchCode = 'OK' | 'PRICE_UNDER' | 'PRICE_OVER' | 'QTY_OVER_RECEIVED' | 'NOT_RECEIVED' | 'UNORDERED';
+export interface SupplierInvoiceRow {
+  id: string; ref: string; supplier_ref: string; supplier: string | null; po_id: string; po_ref: string; invoice_date: string; due_date: string;
+  amount_ht: number; amount_ttc: number; expected_ht: number | null; variance_ht: number | null; status: SupplierInvoiceStatus;
+  issues: string[]; issue_labels: string[]; forced: boolean; overdue: boolean; days_to_due: number;
+  approved_at: string | null; paid_at: string | null; decision_comment: string | null; mine: boolean;
+}
+export interface MatchLine {
+  id: string; label: string; po_line_id: string | null; code: MatchCode; ordered: number | null; received: number | null; refused: number | null;
+  billed_before: number | null; billable: number; invoiced: number; po_price: number | null; unit_price: number; price_var_pct: number | null; total: number;
+}
+export interface SupplierInvoiceDetail {
+  id: string; ref: string; supplier_ref: string; supplier: string | null; po_ref: string; po_status: string; po_amount_ht: number;
+  invoice_date: string; due_date: string; amount_ht: number; tax_rate: number; amount_ttc: number; expected_ht: number | null; variance_ht: number | null;
+  status: SupplierInvoiceStatus; forced: boolean; decision_comment: string | null; payment_ref: string | null;
+  match: { lines: MatchLine[]; issues: { code: string; label: string }[]; tolerance_pct: number; tolerance_amount: number; at: string } | null;
+  receipts: { at: string; qc: string; notes: string | null }[] | null; approved_by: string | null; approved_at: string | null;
+}
+export interface PoLineStatus {
+  id: string; label: string; qty_ordered: number; qty_received: number; qty_refused: number; qty_to_receive: number;
+  qty_invoiced: number; qty_to_invoice: number; unit_price: number;
+}
+export interface ApSummary {
+  to_review: number; discrepancies: number; discrepancy_amount: number; to_pay: number; overdue: number; paid_month: number;
+  auto_match_rate: number | null; avoided: number; po_to_invoice: number;
+}
+
+/** Compteurs, sous-comptage & grilles CIE / SODECI (migration 42). */
+export type MeterAnomaly = 'NO_READING' | 'LATE_READING' | 'SPIKE' | 'DROP';
+export interface MeterRow {
+  id: string; code: string; name: string; site: string; carrier: 'electricity' | 'water'; unit: string; kind: 'main' | 'sub';
+  parent_id: string | null; parent_code: string | null; usage: string | null; space_code: string | null; lessee: string | null; lease_id: string | null;
+  tariff: string | null; subscribed_kva: number | null; provider_contract: string | null;
+  last_read_at: string | null; last_index: number | null; last_qty: number | null; avg_qty: number | null; variation_pct: number | null;
+  days_since: number | null; anomaly: MeterAnomaly | null; series: number[];
+}
+export interface BalanceRow {
+  main_id: string; main_code: string; site: string; carrier: string; unit: string; period: string; main_qty: number; sub_qty: number;
+  leased_qty: number; common_qty: number; unmetered_qty: number; loss_pct: number | null; status: 'ok' | 'watch' | 'alert' | 'inconsistent' | 'no_data';
+}
+export interface TariffBreakdown {
+  tariff: string; provider: string; name: string; unit: string; qty: number; kva: number | null;
+  lines: { label: string; qty: number; unit_price: number; amount: number }[]; energy: number; fixed: number; demand: number;
+  levies: { label: string; pct: number; amount: number }[]; ht: number; vat: number; ttc: number; avg_unit: number | null; indicative: boolean; source: string;
+}
+export interface BillCheckRow {
+  site: string; carrier: string; period: string; provider: string; invoiced_qty: number; invoiced_ht: number | null; computed_ht: number;
+  variance: number | null; variance_pct: number | null; status: 'ok' | 'watch' | 'alert' | 'no_amount'; breakdown: TariffBreakdown;
+}
+export interface RebillRow {
+  meter_id: string; meter_code: string; carrier: string; unit: string; space_code: string; lease_id: string; lease_ref: string; lessee_id: string; lessee: string;
+  qty: number; unit_cost: number | null; amount_ht: number | null; vat_amount: number | null; cost_basis: 'facture' | 'grille'; posted: boolean; schedule_due: string | null;
+}
+export interface TariffBand { id: string; slot: 'all' | 'offpeak' | 'full' | 'peak'; from_qty: number; to_qty: number | null; unit_price: number; label: string | null }
+export interface Tariff {
+  id: string; code: string; provider: string; country: string; carrier: 'electricity' | 'water'; name: string; unit: string;
+  fixed_monthly: number; demand_charge: number; default_profile: Record<string, number> | null; levies: { label: string; pct: number }[];
+  vat_rate: number; valid_from: string; is_indicative: boolean; source: string; meters: number; bands: TariffBand[] | null;
+}
+export interface UtilitiesSummary {
+  meters: number; sub_meters: number; anomalies: number; late_readings: number; elec_loss_pct: number | null; water_loss_pct: number | null;
+  bill_alerts: number; bill_overcharge: number; last_period: string | null;
 }

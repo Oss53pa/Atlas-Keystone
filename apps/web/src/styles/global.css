@@ -520,3 +520,49 @@ input.ki-input { width: 120px; font-family: var(--ks-font-mono); }
 .kp-tier { flex: 1 1 180px; display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--ks-line); border-radius: var(--ks-r-lg); background: var(--ks-surface-2); }
 .kp-tier__lvl { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: var(--ks-ink); color: #fff; font: 700 13px var(--ks-font-mono); }
 @media (max-width: 640px) { .kd-form { grid-template-columns: 1fr; } }
+
+/* ============================ Factures fournisseurs · rapprochement 3 voies (kq-*) ============================ */
+.kq-row { cursor: pointer; }
+.kq-row:hover td { background: var(--ks-surface-2); }
+.kq-codes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.kq-code { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: var(--ks-r-pill); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+.kq-code--ok { background: var(--ks-low-100); color: #2C6230; }
+.kq-code--warn { background: var(--ks-amber-100); color: var(--ks-amber-700); }
+.kq-code--bad { background: var(--ks-critical-100); color: #8E1E22; }
+.kq-drawer { width: min(760px, 100vw); }
+.kq-three { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.kq-three > div { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: var(--ks-r-lg); border: 1px solid var(--ks-line); background: var(--ks-surface); }
+.kq-three span { font-size: 11px; color: var(--ks-ink-3); font-weight: 600; }
+.kq-three b { font-size: 15px; }
+.kq-three--ok { border-color: var(--ks-low) !important; background: var(--ks-low-100) !important; }
+.kq-three--bad { border-color: var(--ks-critical) !important; background: var(--ks-critical-100) !important; color: #8E1E22; }
+.kq-issues { display: grid; gap: 6px; margin-bottom: 14px; }
+.kq-issues > div { display: flex; gap: 8px; align-items: flex-start; padding: 9px 12px; border-radius: var(--ks-r-md); background: var(--ks-critical-100); color: #8E1E22; font-size: 12.5px; font-weight: 600; }
+.kq-match td, .kq-match th { padding-left: 6px; padding-right: 6px; font-size: 12px; }
+.kq-bad { color: var(--ks-critical) !important; font-weight: 800; background: var(--ks-critical-100); }
+.kq-note { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--ks-amber); background: var(--ks-surface-2); border-radius: 0 var(--ks-r-md) var(--ks-r-md) 0; font-size: 12.5px; }
+.kq-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--ks-line); }
+.kq-line { display: flex; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--ks-line); }
+.kq-in--bad { border-color: var(--ks-critical) !important; background: var(--ks-critical-100) !important; }
+@media (max-width: 640px) { .kq-three { grid-template-columns: 1fr 1fr; } .kq-line { flex-wrap: wrap; } }
+
+/* ============================ Compteurs & tarifs (ku-*) ============================ */
+.ku-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--ks-line); flex-wrap: wrap; }
+.ku-carrier { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; }
+.ku-main td { background: var(--ks-surface-2); }
+.ku-sub td:first-child { padding-left: 26px; }
+.ku-reading { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 6px 4px; }
+.ku-reading .kx-lbl { flex: 1 1 140px; }
+.ku-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ks-ink-2); padding-bottom: 10px; }
+.ku-warn { width: 100%; font-size: 11.5px; color: var(--ks-amber-700); background: var(--ks-amber-50); border: 1px solid var(--ks-amber-100); border-radius: var(--ks-r-md); padding: 7px 10px; line-height: 1.45; }
+.ku-stack { display: flex; align-items: flex-end; gap: 10px; height: 190px; margin: 18px 0 8px; }
+.ku-stack__col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 4px; min-width: 0; }
+.ku-stack__track { display: flex; flex-direction: column; border-radius: 7px 7px 3px 3px; overflow: hidden; min-height: 4px; transform: scaleY(0); transform-origin: bottom; animation: ks-growy .7s var(--ks-ease) forwards; }
+.ku-stack__val { font-size: 11px; font-weight: 700; text-align: center; }
+.ku-stack__lbl { font-size: 11px; color: var(--ks-ink-3); text-align: center; text-transform: capitalize; }
+.ku-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 11.5px; color: var(--ks-ink-2); }
+.ku-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.ku-breakdown { display: grid; grid-template-columns: 1fr 220px; gap: 18px; padding: 6px 4px; }
+.ku-breakdown__side { padding: 12px; border-radius: var(--ks-r-lg); background: var(--ks-surface); border: 1px solid var(--ks-line); align-self: start; }
+.ku-bands td, .ku-bands th { padding-top: 6px; padding-bottom: 6px; }
+@media (max-width: 720px) { .ku-breakdown { grid-template-columns: 1fr; } .ku-stack { gap: 5px; } }

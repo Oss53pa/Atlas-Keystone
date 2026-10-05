@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
-  ShoppingCart, Package, AlertTriangle, Truck, RefreshCw, CheckCircle2, Bot, ClipboardList, Check, X, PackageCheck, Sparkles, ShieldAlert,
+  ShoppingCart, Package, AlertTriangle, Truck, RefreshCw, CheckCircle2, Bot, ClipboardList, Check, X, PackageCheck, Sparkles, ShieldAlert, Receipt, PackageOpen,
 } from 'lucide-react';
 import { Card, StatBig, TabBar } from '@keystone/ui';
 import { PurchaseOrderDoc } from '../documents/Documents.tsx';
+import { Invoices, ReceiveDrawer } from './Invoices.tsx';
 import { money, format } from '@keystone/domain';
 import type { StockRow, StockLevel, PurchaseRequestRow, PrStatus, PurchaseOrderRow, PoStatus, ProcurementSummary, BudgetCheck } from '@keystone/domain/db/keystone';
 import {
@@ -57,6 +58,8 @@ export function Procurement() {
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [poDoc, setPoDoc] = useState<string | null>(null);
+  const [receiving, setReceiving] = useState<PurchaseOrderRow | null>(null);
+  const notify = (m: string) => { setToast(m); setTimeout(() => setToast(null), 4500); };
 
   function load() {
     fetchStock().then(setStock).catch((e) => setErr(e instanceof Error ? e.message : String(e)));
@@ -84,7 +87,7 @@ export function Procurement() {
           <h1 className="kt-hero__title" style={{ fontSize: 34 }}>Achats &amp; stocks</h1>
           <div className="kt-hero__sub">
             <span className="ks-sync"><span className="ks-sync__dot" /> LIVE · Supabase</span>
-            <span className="ks-faint">couverture réelle · circuit DA à paliers · contrôle budgétaire · TVA 18 %</span>
+            <span className="ks-faint">couverture réelle · circuit DA à paliers · contrôle budgétaire · rapprochement BC / réception / facture</span>
           </div>
         </div>
         <button className="ks-btn ks-btn--ghost" onClick={load} style={{ alignSelf: 'end' }}><RefreshCw size={15} /> Rafraîchir</button>
@@ -113,6 +116,7 @@ export function Procurement() {
             { id: 'stock', label: 'Stocks', icon: <Package size={15} /> },
             { id: 'pr', label: `Demandes d’achat${prs ? ` · ${prs.length}` : ''}`, icon: <ClipboardList size={15} /> },
             { id: 'po', label: `Commandes${pos ? ` · ${pos.length}` : ''}`, icon: <Truck size={15} /> },
+            { id: 'invoices', label: 'Factures · rapprochement', icon: <Receipt size={15} /> },
           ]}
           active={tab}
           onChange={setTab}
@@ -268,6 +272,7 @@ export function Procurement() {
                         <>
                           <button className="ks-btn ks-btn--quiet ks-btn--sm" disabled={busy === o.id}
                             onClick={() => run(o.id, async () => { await poReceive(o.id, 'refused'); return `${o.ref} : livraison refusée au contrôle qualité`; })}>Refuser</button>
+                          <button className="ks-btn ks-btn--quiet ks-btn--sm" style={{ marginLeft: 6 }} onClick={() => setReceiving(o)}><PackageOpen size={13} /> Partielle</button>
                           <button className="ks-btn ks-btn--primary ks-btn--sm" disabled={busy === o.id} style={{ marginLeft: 6 }}
                             onClick={() => run(o.id, async () => { const r = await poReceive(o.id, 'accepted'); return `${o.ref} réceptionnée · +${r.stock_in} en stock`; })}>
                             <PackageCheck size={13} /> {busy === o.id ? '…' : 'Réceptionner'}
@@ -283,6 +288,8 @@ export function Procurement() {
           </div>
         </Card>
       )}
+      {tab === 'invoices' && <Invoices orders={pos ?? []} onToast={notify} onError={setErr} onChanged={load} />}
+      {receiving && <ReceiveDrawer order={receiving} onClose={() => setReceiving(null)} onDone={(m) => { notify(m); load(); }} onError={setErr} />}
       {poDoc && <PurchaseOrderDoc poId={poDoc} onClose={() => setPoDoc(null)} />}
     </div>
   );
