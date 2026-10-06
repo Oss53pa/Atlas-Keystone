@@ -1,20 +1,24 @@
--- Atlas Keystone · réparation du compte démo admin@keystone.demo
--- Constat (2026-10-06) : le compte Supabase Auth a disparu ; la fiche keystone.users subsiste avec l'ancien identifiant.
--- Étape 1 (tableau de bord Supabase › Authentication › Users › Add user) : recréer admin@keystone.demo,
---   cocher « Auto Confirm User », mot de passe = celui de VITE_DEMO_PASSWORD dans apps/web/.env.local.
--- Étape 2 : coller ce script. Il rattache la fiche, ses rôles, son périmètre, sa personne et ses notifications
---   au nouvel identifiant. Il échoue proprement (sans rien modifier) si l'étape 1 n'a pas été faite.
+-- Atlas Keystone · rattacher un compte Supabase Auth EXISTANT au profil administrateur Keystone du tenant démo
+-- Contexte (2026-10-06) : le compte admin@keystone.demo a été supprimé de Supabase Auth ; le profil keystone.users subsiste.
+-- Mode d'emploi : remplacez l'adresse ci-dessous (ligne v_email) par celle d'un compte qui existe déjà sur ce projet
+--   (par exemple le vôtre), puis exécutez. Le profil admin (tenant, rôles, périmètre, personne, notifications) lui est
+--   transféré. Échoue sans rien modifier si l'adresse n'existe pas dans Authentication › Users.
 BEGIN;
 DO $$
-DECLARE v_new uuid; v_old uuid;
+DECLARE
+  v_email text := 'admin@keystone.demo';   -- ← adresse du compte à rattacher
+  v_new uuid; v_old uuid;
 BEGIN
-  SELECT id INTO v_new FROM auth.users WHERE lower(email) = 'admin@keystone.demo';
-  IF v_new IS NULL THEN RAISE EXCEPTION 'Compte Auth admin@keystone.demo introuvable : faites d''abord l''étape 1.'; END IF;
-  SELECT id INTO v_old FROM keystone.users WHERE lower(email) = 'admin@keystone.demo' AND id <> v_new;
-  IF v_old IS NULL THEN RAISE NOTICE 'Déjà rattaché, rien à faire.'; RETURN; END IF;
+  SELECT id INTO v_new FROM auth.users WHERE lower(email) = lower(v_email);
+  IF v_new IS NULL THEN RAISE EXCEPTION 'Compte Auth % introuvable sur ce projet : vérifiez l''adresse.', v_email; END IF;
+  IF EXISTS (SELECT 1 FROM keystone.users WHERE id = v_new) THEN RAISE NOTICE 'Ce compte a déjà un profil Keystone, rien à faire.'; RETURN; END IF;
+  SELECT k.id INTO v_old FROM keystone.users k
+   WHERE k.tenant_id = 'a0000000-0000-4000-8000-000000000001' AND NOT EXISTS (SELECT 1 FROM auth.users a WHERE a.id = k.id)
+   ORDER BY k.created_at LIMIT 1;
+  IF v_old IS NULL THEN RAISE EXCEPTION 'Aucun profil Keystone orphelin à rattacher.'; END IF;
 
   INSERT INTO keystone.users(id, tenant_id, kind, person_id, contractor_id, email, full_name, is_active, invited_by, created_at, lessee_id)
-  SELECT v_new, tenant_id, kind, person_id, contractor_id, email || '.tmp', full_name, is_active, invited_by, created_at, lessee_id
+  SELECT v_new, tenant_id, kind, person_id, contractor_id, lower(v_email) || '.tmp', full_name, is_active, invited_by, created_at, lessee_id
   FROM keystone.users WHERE id = v_old;
   UPDATE keystone.user_roles SET user_id = v_new WHERE user_id = v_old;
   UPDATE keystone.user_scope SET user_id = v_new WHERE user_id = v_old;
@@ -23,7 +27,7 @@ BEGIN
   UPDATE keystone.notifications SET user_id = v_new WHERE user_id = v_old;
   UPDATE keystone.notification_outbox SET user_id = v_new WHERE user_id = v_old;
   DELETE FROM keystone.users WHERE id = v_old;
-  UPDATE keystone.users SET email = 'admin@keystone.demo' WHERE id = v_new;
-  RAISE NOTICE 'Compte démo rattaché : % → %', v_old, v_new;
+  UPDATE keystone.users SET email = lower(v_email) WHERE id = v_new;
+  RAISE NOTICE 'Profil administrateur Keystone rattaché à %', v_email;
 END $$;
 COMMIT;
