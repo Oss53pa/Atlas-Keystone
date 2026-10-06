@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useFocusTarget } from '../../lib/focus.tsx';
 import { Map, Maximize2, RefreshCw, CheckCircle2, Ruler, Building2, AlertTriangle } from 'lucide-react';
 import { Card, StatBig } from '@keystone/ui';
 import type { SpaceUnit, SpaceSummary, SpaceType } from '@keystone/domain/db/keystone';
@@ -31,6 +32,11 @@ export function SpaceManagement() {
   const [summary, setSummary] = useState<SpaceSummary | null>(null);
   const [sel, setSel] = useState<SpaceUnit | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const target = useFocusTarget(['space']);
+  useEffect(() => {
+    const u = target && units?.find((x) => x.id === target);
+    if (u) setSel(u);
+  }, [target, units]);
 
   function load() {
     fetchSpaceInventory().then(setUnits).catch((e) => setErr(e instanceof Error ? e.message : String(e)));
@@ -126,7 +132,7 @@ export function SpaceManagement() {
               <thead><tr><th>Code</th><th>Espace</th><th>Type</th><th>Surface</th><th>Statut</th><th>Validé</th></tr></thead>
               <tbody>
                 {list.map((u) => (
-                  <tr key={u.id} style={{ cursor: 'pointer', background: sel?.id === u.id ? 'var(--ks-amber-50)' : undefined }} onClick={() => setSel(u)}>
+                  <tr key={u.id} data-focus={`space:${u.id}`} style={{ cursor: 'pointer', background: sel?.id === u.id ? 'var(--ks-amber-50)' : undefined }} onClick={() => setSel(u)}>
                     <td className="ks-mono ks-faint" style={{ fontSize: 11.5 }}>{u.code}</td>
                     <td style={{ fontWeight: 600 }}>{u.name}</td>
                     <td><span className="ks-pill" style={{ color: TYPE[u.type].color }}>{TYPE[u.type].label}</span></td>

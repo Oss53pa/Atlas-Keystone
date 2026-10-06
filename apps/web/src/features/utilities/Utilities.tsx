@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   Gauge, Zap, Droplets, RefreshCw, CheckCircle2, ShieldAlert, X, Scale, FileSearch, ReceiptText, Calculator, AlertTriangle,
   CornerDownRight, PencilLine, Save, Info, Send,
@@ -31,6 +32,7 @@ const BAL: Record<BalanceRow['status'], { label: string; color: string }> = {
 
 export function Utilities() {
   const [tab, setTab] = useState('meters');
+  useFocus(['meter'], () => setTab('meters'));
   const [sum, setSum] = useState<UtilitiesSummary | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -111,7 +113,7 @@ function MetersTab({ rev, onOk, onErr }: { rev: number; onOk: (m: string) => voi
     const a = m.anomaly ? ANOMALY[m.anomaly] : null;
     return (
       <Fragment key={m.id}>
-        <tr className={sub ? 'ku-sub' : 'ku-main'}>
+        <tr className={sub ? 'ku-sub' : 'ku-main'} data-focus={`meter:${m.id}`}>
           <td>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {sub && <CornerDownRight size={13} className="ks-faint" />}

@@ -583,3 +583,10 @@ input.ki-input { width: 120px; font-family: var(--ks-font-mono); }
 .km-group { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ks-ink-3); margin: 14px 0 4px; }
 .km-acct { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: center; padding: 4px 0; }
 .km-acct .kx-in { height: 34px; }
+
+/* ============================ Cible ⌘K : ligne illuminée à l'arrivée ============================ */
+.ks-focus-flash { animation: ks-focus-flash 2.6s var(--ks-ease) both; position: relative; z-index: 1; }
+tr.ks-focus-flash > td { animation: ks-focus-flash-bg 2.6s var(--ks-ease) both; }
+@keyframes ks-focus-flash { 0%, 55% { box-shadow: 0 0 0 2px var(--ks-amber), 0 0 0 7px var(--ks-amber-100); border-radius: 8px; } 100% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes ks-focus-flash-bg { 0%, 55% { background: var(--ks-amber-50); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .ks-focus-flash, tr.ks-focus-flash > td { animation-duration: .01s; } }

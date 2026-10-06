@@ -92,7 +92,7 @@ export function Tickets() {
                   const overdueT = t.sla_due && new Date(t.sla_due) < new Date() && !['closed', 'rejected', 'resolved'].includes(t.status);
                   const convertible = ['new', 'triaged'].includes(t.status) && !t.work_order_id;
                   return (
-                    <tr key={t.id}>
+                    <tr key={t.id} data-focus={`ticket:${t.id}`}>
                       <td className="ks-mono ks-faint" style={{ fontSize: 11.5, whiteSpace: 'nowrap' }}>{t.ref}</td>
                       <td><span className="ks-pill" style={{ color: t.channel === 'qr_scan' ? 'var(--ks-info)' : undefined }}><Ci size={12} /> {C.label}</span></td>
                       <td>

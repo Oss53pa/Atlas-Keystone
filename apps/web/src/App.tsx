@@ -32,6 +32,7 @@ import { useSession, signOut } from './lib/auth.ts';
 import { useAal } from './lib/mfa.ts';
 import { MfaChallenge } from './features/auth/MfaChallenge.tsx';
 import { globalSearch } from './data/search.ts';
+import { FocusProvider, type Focus } from './lib/focus.tsx';
 import { isBackendConfigured } from './lib/supabase.ts';
 import { SITES } from './data/demo.ts';
 
@@ -112,6 +113,8 @@ export function App() {
   const [density, setDensity] = useState<Density>('office');
   const [site, setSite] = useState(SITES[0]);
   const [palette, setPalette] = useState(false);
+  const [focus, setFocus] = useState<Focus | null>(null);
+  const go = useCallback((id: string) => { setFocus(null); setActive(id); }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -132,21 +135,21 @@ export function App() {
         group: 'Aller à',
         hint: g.label,
         icon: it.icon,
-        run: () => setActive(it.id),
+        run: () => go(it.id),
       })),
     );
     const actions: Command[] = [
-      { id: 'a:incident', label: 'Signaler un incident / presque-accident', group: 'Actions', icon: <AlertTriangle size={17} />, run: () => setActive('hsse') },
-      { id: 'a:wo', label: 'Créer un ordre de travail', group: 'Actions', icon: <Plus size={17} />, run: () => setActive('work-orders') },
-      { id: 'a:permit', label: 'Demander un permis de travail', group: 'Actions', icon: <FileCheck2 size={17} />, run: () => setActive('permits') },
-      { id: 'a:report', label: 'Générer le rapport mensuel', group: 'Actions', icon: <FileText size={17} />, run: () => setActive('control-tower') },
-      { id: 'a:round', label: 'Lancer une ronde d’inspection', group: 'Actions', icon: <ListChecks size={17} />, run: () => setActive('inspections') },
-      { id: 'a:pm', label: 'Générer les OT préventifs à 14 jours', group: 'Actions', icon: <CalendarCheck2 size={17} />, run: () => setActive('preventive') },
-      { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => setActive('procurement') },
-      { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => setActive('assets') },
-      { id: 'a:rent', label: 'Encaisser un loyer / voir les impayés', group: 'Actions', icon: <KeyRound size={17} />, run: () => setActive('leases') },
-      { id: 'a:invoice', label: 'Rapprocher une facture fournisseur (BC / réception / facture)', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => setActive('procurement') },
-      { id: 'a:meter', label: 'Relever un compteur / contrôler une facture CIE-SODECI', group: 'Actions', icon: <Gauge size={17} />, run: () => setActive('utilities') },
+      { id: 'a:incident', label: 'Signaler un incident / presque-accident', group: 'Actions', icon: <AlertTriangle size={17} />, run: () => go('hsse') },
+      { id: 'a:wo', label: 'Créer un ordre de travail', group: 'Actions', icon: <Plus size={17} />, run: () => go('work-orders') },
+      { id: 'a:permit', label: 'Demander un permis de travail', group: 'Actions', icon: <FileCheck2 size={17} />, run: () => go('permits') },
+      { id: 'a:report', label: 'Générer le rapport mensuel', group: 'Actions', icon: <FileText size={17} />, run: () => go('control-tower') },
+      { id: 'a:round', label: 'Lancer une ronde d’inspection', group: 'Actions', icon: <ListChecks size={17} />, run: () => go('inspections') },
+      { id: 'a:pm', label: 'Générer les OT préventifs à 14 jours', group: 'Actions', icon: <CalendarCheck2 size={17} />, run: () => go('preventive') },
+      { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => go('procurement') },
+      { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => go('assets') },
+      { id: 'a:rent', label: 'Encaisser un loyer / voir les impayés', group: 'Actions', icon: <KeyRound size={17} />, run: () => go('leases') },
+      { id: 'a:invoice', label: 'Rapprocher une facture fournisseur (BC / réception / facture)', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => go('procurement') },
+      { id: 'a:meter', label: 'Relever un compteur / contrôler une facture CIE-SODECI', group: 'Actions', icon: <Gauge size={17} />, run: () => go('utilities') },
       { id: 'a:tech', label: 'Ouvrir l’app technicien (terrain)', group: 'Actions', icon: <Smartphone size={17} />, run: () => window.open('?technicien', '_blank', 'noopener') },
       { id: 'a:tenant', label: 'Ouvrir le portail locataire', group: 'Actions', icon: <Store size={17} />, run: () => window.open('?locataire', '_blank', 'noopener') },
       { id: 'a:portal', label: 'Ouvrir l’espace prestataire', group: 'Actions', icon: <HardHat size={17} />, run: () => window.open('?prestataire', '_blank', 'noopener') },
@@ -172,7 +175,7 @@ export function App() {
         group: 'Dans les données',
         hint: [k.label, h.subtitle].filter(Boolean).join(' · '),
         icon: k.icon,
-        run: () => setActive(h.module),
+        run: () => { setActive(h.module); setFocus({ kind: h.kind, id: h.id, nonce: Date.now() }); },
       };
     });
   }, []);
@@ -196,7 +199,7 @@ export function App() {
       <AppShell
         groups={GROUPS}
         activeId={active}
-        onNavigate={setActive}
+        onNavigate={go}
         density={density}
         onDensity={setDensity}
         site={site}
@@ -205,8 +208,9 @@ export function App() {
         user={{ name, initials, role: 'Exploitant · Admin' }}
         onCommand={() => setPalette(true)}
         onSignOut={isBackendConfigured ? () => void signOut() : undefined}
-        bell={isBackendConfigured ? <NotificationBell onOpenCenter={() => setActive('notifications')} /> : undefined}
+        bell={isBackendConfigured ? <NotificationBell onOpenCenter={() => go('notifications')} /> : undefined}
       >
+        <FocusProvider value={focus}>
         {active === 'control-tower' ? (
           <ControlTower site={site} />
         ) : active === 'work-orders' ? (
@@ -252,6 +256,7 @@ export function App() {
         ) : (
           <ModulePlaceholder title={findLabel(active)} />
         )}
+        </FocusProvider>
       </AppShell>
       <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} onSearch={onSearch} />
     </>

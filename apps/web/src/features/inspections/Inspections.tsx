@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   ClipboardCheck, Gauge, AlertOctagon, CalendarClock, RefreshCw, Play, X, Check, CheckCircle2, ShieldAlert, PenLine, Wrench, Timer, ListChecks,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ function cpOk(cp: Checkpoint, v: unknown): boolean | null {
 
 export function Inspections() {
   const [tab, setTab] = useState('rounds');
+  useFocus(['nc'], () => setTab('nc'));
   const [rounds, setRounds] = useState<InspectionRound[] | null>(null);
   const [hist, setHist] = useState<InspectionHistoryRow[] | null>(null);
   const [ncs, setNcs] = useState<NcRow[] | null>(null);
@@ -144,7 +146,7 @@ export function Inspections() {
               <div key={c.id} className="ki-col">
                 <div className="ki-col__head"><span>{c.label}</span><span className="ks-mono ks-faint">{list.length}</span></div>
                 {list.map((n) => (
-                  <div key={n.id} className={`ki-nc ki-nc--${n.severity}`}>
+                  <div key={n.id} className={`ki-nc ki-nc--${n.severity}`} data-focus={`nc:${n.id}`}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                       <span className="ks-mono ks-faint" style={{ fontSize: 11 }}>{n.ref}</span>
                       <span className={`ks-risk ks-risk--${SEV[n.severity].risk}`}>{SEV[n.severity].label}</span>

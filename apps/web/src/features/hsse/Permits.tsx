@@ -73,7 +73,7 @@ export function Permits() {
                 {rows.map((p) => {
                   const T = P_TYPE[p.type]; const Icon = T.icon; const st = P_STATUS[p.status];
                   return (
-                    <tr key={p.id}>
+                    <tr key={p.id} data-focus={`permit:${p.id}`}>
                       <td className="ks-mono ks-faint" style={{ fontSize: 11.5, whiteSpace: 'nowrap' }}>{p.ref}</td>
                       <td><span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 600 }}><Icon size={15} color="var(--ks-ink-2)" /> {T.label}</span></td>
                       <td><span className="ks-wo-pill" style={{ color: st.color, background: st.bg }}>{st.label}</span></td>

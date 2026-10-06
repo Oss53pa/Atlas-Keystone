@@ -84,7 +84,7 @@ export function Hsse() {
                 <thead><tr><th>Réf.</th><th>Type</th><th>Événement</th><th>Risque</th><th>Statut</th></tr></thead>
                 <tbody>
                   {events?.map((e) => (
-                    <tr key={e.id}>
+                    <tr key={e.id} data-focus={`hsse:${e.id}`}>
                       <td className="ks-mono ks-faint" style={{ fontSize: 11.5, whiteSpace: 'nowrap' }}>{e.ref}</td>
                       <td><span className="ks-pill">{EV_TYPE[e.type]}</span></td>
                       <td>

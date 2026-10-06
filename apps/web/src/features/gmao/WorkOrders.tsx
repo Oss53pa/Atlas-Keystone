@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import { Wrench, Lock, RefreshCw, AlertTriangle, AlertCircle, Database, Boxes, ShieldCheck, ClipboardList, Radar, TrendingUp, FileText } from 'lucide-react';
 import { WorkOrderDoc } from '../documents/Documents.tsx';
 import { Card, StatBig } from '@keystone/ui';
@@ -33,6 +34,7 @@ function slaText(due: string | null, open: boolean): { txt: string; over: boolea
 export function WorkOrders() {
   const [rows, setRows] = useState<WorkOrderRow[] | null>(null);
   const [doc, setDoc] = useState<string | null>(null);
+  useFocus(['wo'], (id) => setDoc(id));
   const [summary, setSummary] = useState<DemoSummary | null>(null);
   const [kpi, setKpi] = useState<MaintKpi | null>(null);
   const [preds, setPreds] = useState<PredictionRow[]>([]);
@@ -151,7 +153,7 @@ export function WorkOrders() {
                   const sla = slaText(w.sla_due, open);
                   const st = STATUS[w.status];
                   return (
-                    <tr key={w.id}>
+                    <tr key={w.id} data-focus={`wo:${w.id}`}>
                       <td className="ks-mono" style={{ color: 'var(--ks-ink-2)', whiteSpace: 'nowrap' }}>{w.ref}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

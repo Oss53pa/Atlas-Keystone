@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import { HardHat, Star, Smartphone, ShieldCheck, RefreshCw, AlertTriangle, CheckCircle2, Wallet, BadgeCheck } from 'lucide-react';
 import { Card, StatBig, TabBar } from '@keystone/ui';
 import { money, format } from '@keystone/domain';
@@ -23,6 +24,7 @@ export function Contractors() {
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [tab, setTab] = useState('perf');
+  useFocus(['contractor'], () => setTab('list'));
 
   function load() {
     fetchContractors().then(setCs).catch((e) => setErr(e instanceof Error ? e.message : String(e)));
@@ -88,7 +90,7 @@ export function Contractors() {
               <thead><tr><th>Prestataire</th><th>Statut</th><th>Note</th><th>Mobile Money</th><th>Habilitations</th><th>Factures ouvertes</th><th>Payé</th></tr></thead>
               <tbody>
                 {contractors.map((c) => (
-                  <tr key={c.id}>
+                  <tr key={c.id} data-focus={`contractor:${c.id}`}>
                     <td style={{ fontWeight: 600 }}>{c.name}</td>
                     <td>{c.prequalified ? <span className="ks-pill" style={{ color: 'var(--ks-low)' }}><BadgeCheck size={12} /> Préqualifié</span> : <span className="ks-pill" style={{ color: 'var(--ks-high)' }}>Non qualifié</span>}</td>
                     <td><span className="ks-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600 }}><Star size={13} color="var(--ks-amber)" /> {c.rating?.toFixed(1) ?? '—'}</span></td>

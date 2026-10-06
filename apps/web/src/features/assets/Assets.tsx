@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   Boxes, HeartPulse, ShieldAlert, Wallet, RefreshCw, AlertTriangle, CheckCircle2, Wrench, X, Gauge, Timer, Factory, CalendarClock, Sparkles, BarChart3, Library,
 } from 'lucide-react';
@@ -35,6 +36,12 @@ export function Assets() {
   const [cell, setCell] = useState<[number, number] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [pending, setPending] = useState<string | null>(null);
+  useFocus(['asset'], (id) => { setTab('parc'); setPending(id); });
+  useEffect(() => {
+    const a = pending && assets?.find((x) => x.id === pending);
+    if (a) { setSel(a); setPending(null); }
+  }, [pending, assets]);
 
   function load() {
     fetchAssets().then(setAssets).catch((e) => setErr(e instanceof Error ? e.message : String(e)));
@@ -111,7 +118,7 @@ export function Assets() {
             const c = CRIT[a.criticality];
             const lifePct = a.age_years != null && a.design_life_years ? Math.min(100, (a.age_years / a.design_life_years) * 100) : null;
             return (
-              <button key={a.id} className="ka-asset" onClick={() => setSel(a)}>
+              <button key={a.id} className="ka-asset" data-focus={`asset:${a.id}`} onClick={() => setSel(a)}>
                 <div className="ka-asset__top">
                   <div style={{ minWidth: 0 }}>
                     <div className="ks-mono ks-faint" style={{ fontSize: 11.5 }}>{a.tag} · {a.workcenter ?? a.category}</div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   ShoppingCart, Package, AlertTriangle, Truck, RefreshCw, CheckCircle2, Bot, ClipboardList, Check, X, PackageCheck, Sparkles, ShieldAlert, Receipt, PackageOpen,
 } from 'lucide-react';
@@ -50,6 +51,7 @@ function steps(level: number, status: PrStatus) {
 
 export function Procurement() {
   const [tab, setTab] = useState('stock');
+  useFocus(['part', 'pr', 'po', 'invoice'], (_id, kind) => setTab(kind === 'part' ? 'stock' : kind === 'invoice' ? 'invoices' : kind));
   const [stock, setStock] = useState<StockRow[] | null>(null);
   const [prs, setPrs] = useState<PurchaseRequestRow[] | null>(null);
   const [pos, setPos] = useState<PurchaseOrderRow[] | null>(null);
@@ -140,7 +142,7 @@ export function Procurement() {
                   const coverShort = s.days_cover != null && s.days_cover < s.lead_time_days;
                   const pct = Math.min(100, (s.qty / Math.max(1, s.max_qty)) * 100);
                   return (
-                    <tr key={s.id}>
+                    <tr key={s.id} data-focus={`part:${s.id}`}>
                       <td>
                         <div className="ks-mono ks-faint" style={{ fontSize: 11.5 }}>{s.ref}{s.is_critical && <span style={{ color: 'var(--ks-critical)', marginLeft: 6 }}>● critique</span>}</div>
                         <div style={{ fontWeight: 600 }}>{s.name}</div>
@@ -183,7 +185,7 @@ export function Procurement() {
             const next = NEXT[r.status];
             const b = BUDGET[r.budget_status];
             return (
-              <Card key={r.id}>
+              <Card key={r.id} data-focus={`pr:${r.id}`}>
                 <div className="kp-pr__head">
                   <div style={{ minWidth: 0 }}>
                     <div className="ks-mono ks-faint" style={{ fontSize: 11.5, display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -253,7 +255,7 @@ export function Procurement() {
               <thead><tr><th>BC</th><th>Fournisseur</th><th>HT</th><th>TTC (18 %)</th><th>Livraison prévue</th><th>Statut</th><th></th></tr></thead>
               <tbody>
                 {pos.map((o) => (
-                  <tr key={o.id}>
+                  <tr key={o.id} data-focus={`po:${o.id}`}>
                     <td><div className="ks-mono" style={{ fontWeight: 600, fontSize: 12.5 }}>{o.ref}</div><div className="ks-mono ks-faint" style={{ fontSize: 11 }}>{o.pr_ref}</div></td>
                     <td style={{ fontWeight: 600 }}>{o.supplier ?? '—'}</td>
                     <td className="ks-mono" style={{ fontSize: 12.5 }}>{fcfa(o.amount_ht)}</td>

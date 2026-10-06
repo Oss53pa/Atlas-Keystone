@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   Building2, Percent, Hourglass, Wallet, RefreshCw, AlertTriangle, CheckCircle2, X, Receipt, Send, TrendingUp, CalendarClock,
   Megaphone, ExternalLink, Banknote, Printer, Scale, FileSpreadsheet, Users,
@@ -28,6 +29,7 @@ const NEWS_KIND: Record<NewsItem['kind'], string> = { info: 'Information', event
 
 export function Leases() {
   const [tab, setTab] = useState('roll');
+  useFocus(['lease', 'lessee'], () => setTab('roll'));
   const [sum, setSum] = useState<RentSummary | null>(null);
   const [roll, setRoll] = useState<RentRollRow[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export function Leases() {
               <thead><tr><th>Locataire · bail</th><th>Lots</th><th>Loyer mensuel</th><th>Fin de bail</th><th>Révision</th><th>Impayé</th><th></th></tr></thead>
               <tbody>
                 {roll.map((r) => (
-                  <tr key={r.lease_id}>
+                  <tr key={r.lease_id} data-focus={`lease:${r.lease_id} lessee:${r.lessee_id}`}>
                     <td>
                       <div style={{ fontWeight: 700 }}>{r.trade_name ?? r.lessee}</div>
                       <div className="ks-faint" style={{ fontSize: 12 }}><span className="ks-mono">{r.ref}</span> · {r.sector ?? '—'}{r.status === 'notice' && <span className="ks-risk ks-risk--high" style={{ marginLeft: 6 }}>préavis</span>}</div>

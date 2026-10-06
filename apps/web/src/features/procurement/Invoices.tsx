@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useFocus } from '../../lib/focus.tsx';
 import {
   FileCheck2, FileWarning, Receipt, Banknote, X, Check, ShieldAlert, RefreshCw, Plus, Ban, CircleDollarSign, PackageCheck, Scale, Info,
 } from 'lucide-react';
@@ -53,6 +54,7 @@ export function Invoices({ orders, onToast, onError, onChanged }: {
   const [filter, setFilter] = useState('open');
   const [open, setOpen] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
+  useFocus(['invoice'], (id) => { setFilter('all'); setOpen(id); });
 
   function load() {
     fetchSupplierInvoices().then(setRows).catch((e) => onError(e instanceof Error ? e.message : String(e)));
@@ -98,7 +100,7 @@ export function Invoices({ orders, onToast, onError, onChanged }: {
                 const st = STATUS[r.status];
                 const v = r.variance_ht ?? 0;
                 return (
-                  <tr key={r.id} className="kq-row" onClick={() => setOpen(r.id)}>
+                  <tr key={r.id} className="kq-row" data-focus={`invoice:${r.id}`} onClick={() => setOpen(r.id)}>
                     <td>
                       <div className="ks-mono" style={{ fontWeight: 600, fontSize: 12.5 }}>{r.supplier_ref}</div>
                       <div className="ks-mono ks-faint" style={{ fontSize: 11 }}>{r.ref} · {date(r.invoice_date)}</div>
