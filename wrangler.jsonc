@@ -1,0 +1,13 @@
+// Déploiement Cloudflare Workers (site statique) — la commande « npx wrangler deploy » est lancée à la racine du monorepo :
+// ce fichier lui indique quoi publier, au lieu de la détection automatique qui échoue sur un workspace.
+// Le build (« npm run build ») produit l'application dans apps/web/dist.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "atlas-keystone",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./apps/web/dist",
+    // routes côté client (?locataire, ?prestataire…) : toute URL inconnue renvoie index.html
+    "not_found_handling": "single-page-application"
+  }
+}
