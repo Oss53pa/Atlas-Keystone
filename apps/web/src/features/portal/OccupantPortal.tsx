@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { QrCode, MapPin, Send, CheckCircle2, Search, Clock, AlertTriangle, Wrench } from 'lucide-react';
+import { BrandLogo } from '@keystone/ui';
 import type { TicketStatus } from '@keystone/domain/db/keystone';
 import { qrContext, createPublicTicket, trackTicket, type QrContext, type TicketTrack } from '../../data/portal.ts';
 
@@ -15,14 +16,9 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 18px 48px', position: 'relative' }}>
       <span className="kt-aurora kt-aurora--a" style={{ top: '4%', right: '8%' }} aria-hidden />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 22 }}>
-        <span className="ks-rail__logo" style={{ width: 38, height: 38 }} aria-hidden>
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M7 3h10l3 7-8 11-8-11 3-7Z" fill="currentColor" opacity=".9" /></svg>
-        </span>
-        <div>
-          <div className="ks-brand" style={{ fontSize: 24, lineHeight: 1 }}>Atlas Keystone</div>
-          <div className="ks-eyebrow" style={{ marginTop: 1 }}>Signalement occupant</div>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 22 }}>
+        <BrandLogo variant="vertical" height={64} />
+        <div className="ks-eyebrow">Signalement occupant</div>
       </div>
       <div className="ks-card ks-reveal" style={{ width: 'min(460px, 96vw)', padding: '26px 24px', boxShadow: 'var(--ks-shadow-2)' }}>
         {children}

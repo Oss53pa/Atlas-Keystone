@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
+import { BrandLogo } from '@keystone/ui';
 import { signIn } from '../../lib/auth.ts';
 
 export function Login() {
@@ -22,14 +23,9 @@ export function Login() {
       <span className="kt-aurora kt-aurora--a" style={{ top: '8%', right: '14%' }} aria-hidden />
       <span className="kt-aurora kt-aurora--b" style={{ bottom: '10%', left: '12%' }} aria-hidden />
       <div className="ks-card ks-reveal" style={{ width: 'min(420px, 94vw)', padding: '36px 34px', position: 'relative', boxShadow: 'var(--ks-shadow-3)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-          <span className="ks-rail__logo" style={{ width: 40, height: 40 }} aria-hidden>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 3h10l3 7-8 11-8-11 3-7Z" fill="currentColor" opacity=".9" /></svg>
-          </span>
-          <div>
-            <div className="ks-brand" style={{ fontSize: 26, lineHeight: 1 }}>Atlas Keystone</div>
-            <div className="ks-eyebrow" style={{ marginTop: 2 }}>Facility Management · HSSE</div>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 28 }}>
+          <BrandLogo variant="vertical" height={80} />
+          <div className="ks-eyebrow">Facility Management · HSSE</div>
         </div>
 
         <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-.02em' }}>Connexion</h1>

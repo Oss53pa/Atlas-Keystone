@@ -245,21 +245,20 @@ button { font-family: inherit; }
 
 .ks-rail {
   display: flex; flex-direction: column; gap: 4px;
-  width: 248px; padding: 16px 12px; border-right: 1px solid var(--ks-line);
+  width: 314px; padding: 16px 12px; border-right: 1px solid var(--ks-line);
   background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.35));
   backdrop-filter: blur(6px);
   transition: width var(--ks-dur) var(--ks-ease);
 }
 .ks-rail--collapsed { width: 72px; }
-.ks-rail__brand { display: flex; align-items: center; gap: 11px; padding: 8px 10px 16px; }
+/* Logo horizontal du kit Atlas Studio : 28 px de haut (≈ 289 px de large), le rail est dimensionné pour lui. */
+.ks-rail__brand { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 0 16px; }
 .ks-rail__logo {
   width: 34px; height: 34px; border-radius: 10px; flex: none;
   display: grid; place-items: center; color: #3D2705;
   background: linear-gradient(150deg, #F6B548, var(--ks-amber));
   box-shadow: 0 2px 8px -2px rgba(239,159,39,.7), inset 0 1px 0 rgba(255,255,255,.5);
 }
-.ks-rail__name { font-family: var(--ks-font-brand); font-size: 23px; line-height: 1; color: var(--ks-ink); }
-.ks-rail__name small { display: block; font-family: var(--ks-font-ui); font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ks-ink-3); }
 
 .ks-navgroup__label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ks-ink-3); padding: 14px 12px 6px; }
 .ks-nav {

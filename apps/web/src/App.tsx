@@ -4,7 +4,7 @@ import {
   FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
   Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone, SlidersHorizontal, Gauge, Package, Receipt, Truck, User,
 } from 'lucide-react';
-import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
+import { AppShell, BrandLogo, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
 import { WorkOrders } from './features/gmao/WorkOrders.tsx';
 import { Hsse } from './features/hsse/Hsse.tsx';
@@ -178,7 +178,12 @@ export function App() {
   }, []);
 
   if (isBackendConfigured && !ready) {
-    return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: 'var(--ks-ink-3)' }}>Chargement…</div>;
+    return (
+      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', alignContent: 'center', gap: 16, color: 'var(--ks-ink-3)' }}>
+        <BrandLogo variant="vertical" height={96} />
+        <span>Chargement…</span>
+      </div>
+    );
   }
   if (isBackendConfigured && !session) {
     return <Login />;

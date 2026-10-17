@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Search, PanelLeftClose, PanelLeft, Bell, LogOut } from 'lucide-react';
 import { Avatar, IconButton } from './primitives.tsx';
+import { BrandIcon, BrandLogo } from './Brand.tsx';
 
 export interface NavItem {
   id: string;
@@ -50,18 +51,7 @@ export function AppShell({
     <div className="ks-shell" data-density={density}>
       <nav className={`ks-rail${collapsed ? ' ks-rail--collapsed' : ''}`} aria-label="Navigation principale">
         <div className="ks-rail__brand">
-          <span className="ks-rail__logo" aria-hidden>
-            {/* clé de voûte / keystone */}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M7 3h10l3 7-8 11-8-11 3-7Z" fill="currentColor" opacity=".9" />
-            </svg>
-          </span>
-          {!collapsed && (
-            <span className="ks-rail__name">
-              Atlas Keystone
-              <small>Facility Management</small>
-            </span>
-          )}
+          {collapsed ? <BrandIcon size={40} /> : <BrandLogo variant="horizontal" height={28} />}
         </div>
 
         <div style={{ overflowY: 'auto', flex: 1, marginRight: -6, paddingRight: 6 }}>
