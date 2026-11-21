@@ -83,6 +83,10 @@ SUBSTITUTIONS = [
      'CREATE VIEW keystone.v_expenses_without_site AS',
      'CREATE VIEW keystone.v_expenses_without_site WITH (security_invoker = true) AS',
      'S13 : décision d’Oss53pa (21/11/2026) : règle de l’Annexe N retenue, avec security_invoker pour respecter la RLS par tenant'),
+    ('AnnexeS_Space_Management_Partie2#10',
+     "  rule_code text NOT NULL CHECK (rule_code IN ('low_utilization'",
+     "  site_id uuid NOT NULL REFERENCES atlas_core.sites(id) ON DELETE CASCADE,\n  rule_code text NOT NULL CHECK (rule_code IN ('low_utilization'",
+     'S15 : décision d’Oss53pa (21/11/2026) : colonne site_id ajoutée, employée par l’index ix_urd_active'),
 ]
 # Instructions en double strictement identiques à une définition antérieure : non rejouées (bloc, début de l'instruction).
 SKIP = [

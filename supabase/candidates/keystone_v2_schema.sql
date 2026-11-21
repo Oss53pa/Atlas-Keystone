@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1484 instructions réussies sur 1507 ; 23 écarts restants : docs/lot0 §6.
+-- 1485 instructions réussies sur 1507 ; 22 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -2176,6 +2176,7 @@ updated_at  timestamptz NOT NULL DEFAULT now(),
 created_by  uuid,          -- auth.uid(), nul pour le service
 updated_by  uuid,
 deleted_at  timestamptz,
+  site_id uuid NOT NULL REFERENCES atlas_core.sites(id) ON DELETE CASCADE,
   rule_code text NOT NULL CHECK (rule_code IN ('low_utilization','saturation','booked_not_used','oversized','flex_underused')),
   resource_id uuid REFERENCES keystone.bookable_resources(id) ON DELETE CASCADE,
   space_unit_id uuid REFERENCES atlas_core.spaces(id) ON DELETE CASCADE,
@@ -2184,6 +2185,9 @@ deleted_at  timestamptz,
   snooze_until date NOT NULL,                              -- dismissed_at plus 8 semaines par défaut
   CONSTRAINT ck_urd_target CHECK (resource_id IS NOT NULL OR space_unit_id IS NOT NULL)
 );
+
+-- AnnexeS_Space_Management_Partie2#10
+CREATE INDEX ix_urd_active ON keystone.utilization_recommendation_dismissals (tenant_id, site_id, rule_code, snooze_until);
 
 -- AnnexeS_Space_Management_Partie2#11
 CREATE TABLE keystone.space_chargeback_rules (

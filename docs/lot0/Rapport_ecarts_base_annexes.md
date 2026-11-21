@@ -100,7 +100,7 @@ Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blo
 | conventions | `-- colonnes A.0.2` (89 tables), `<communes>`, types non qualifiés | développées ; chemin de recherche `keystone` | Confirmé |
 | extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema sans `CREATE EXTENSION` | bouchons ; `pg_jsonschema` simulé : validation JSON non éprouvée | Confirmé |
 
-Essai final : 1 484 instructions sur 1 507, 573 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
+Essai final : 1 485 instructions sur 1 507, 573 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
 
 Correction d'un essai précédent : l'ancienne valeur `triaged` de `ticket_status` (base actuelle) contredit le corpus (`triage`, plus `cancelled`) ; l'ancienne base ne peut donc pas servir de référence de valeurs quand le corpus en donne.
 
@@ -170,7 +170,7 @@ Sont décrites en prose mais sans code : `keystone.object_visible(p_entity, p_id
    - `keystone.wo_transition_rules`, matrice des transitions d'OT (Annexe B §B.1.5), décrite en tableau seulement : à construire au lot 4 avec ses gardes ;
    - `keystone.vendor_can_see_presence` (Annexe P, A32), décrite partiellement : lot 3 ;
    - `compute_meter_consumption_daily()` et la vue `meter_consumption_daily` (Annexe B partie 3) : lot 4 ;
-   - index `ix_urd_active` sur une colonne `site_id` absente de `utilization_recommendation_dismissals` (Annexe S partie 2) : ajouter la colonne ou la retirer de l'index, décision d'Oss53pa.
+   - index `ix_urd_active` : colonne `site_id` ajoutée à `utilization_recommendation_dismissals` (S15, décision d'Oss53pa du 21/11/2026).
 2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre.
 3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter avec leur lot.
 4. Ensuite seulement : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
