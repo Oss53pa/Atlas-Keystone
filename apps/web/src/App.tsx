@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  Radar, Boxes, Wrench, ShieldCheck, Map, Sparkles, Car, AlertTriangle,
-  FileCheck2, ClipboardCheck, Ticket, Wallet, ShoppingCart, HardHat, Settings, Construction,
-  Plus, FileText, ArrowRightLeft, Leaf, ListChecks, CalendarCheck2, Recycle, KeyRound, Store, BellRing, ClipboardList, Smartphone, SlidersHorizontal, Gauge, Package, Receipt, Truck, User,
+  Boxes, Wrench, Map, AlertTriangle, FileCheck2, ListChecks, Ticket, HardHat, FileText, ArrowRightLeft, ClipboardList,
+  KeyRound, User, Truck, Receipt, Package, Gauge, ExternalLink, Maximize2, Minimize2, Printer,
 } from 'lucide-react';
-import { AppShell, CommandPalette, type Command, type Density, type NavGroup } from '@keystone/ui';
+import { CommandPalette, type Command } from '@keystone/ui';
 import { ControlTower } from './features/control-tower/ControlTower.tsx';
 import { WorkOrders } from './features/gmao/WorkOrders.tsx';
 import { Hsse } from './features/hsse/Hsse.tsx';
@@ -28,6 +27,10 @@ import { Settings as SettingsScreen } from './features/settings/Settings.tsx';
 import { NotificationBell } from './features/notifications/NotificationBell.tsx';
 import { Agents } from './features/admin/Agents.tsx';
 import { Login } from './features/auth/Login.tsx';
+import { ModulePage, exportCsv } from './features/module/ModulePage.tsx';
+import { Header } from './shell/Header.tsx';
+import { Sommaire } from './shell/Sommaire.tsx';
+import { Icon } from './shell/Icon.tsx';
 import { useSession, signOut } from './lib/auth.ts';
 import { useAal } from './lib/mfa.ts';
 import { MfaChallenge } from './features/auth/MfaChallenge.tsx';
@@ -35,62 +38,46 @@ import { globalSearch } from './data/search.ts';
 import { FocusProvider, type Focus } from './lib/focus.tsx';
 import { isBackendConfigured } from './lib/supabase.ts';
 import { SITES } from './data/demo.ts';
+import { AK_MODULES } from './data/modules.ts';
+import { chapters as buildChapters, findModule, PORTAL_HREF, type Declinaison } from './data/nav.ts';
 
-const I = (Icon: typeof Radar) => <Icon size={18} strokeWidth={1.9} />;
+const DECLINAISON: Declinaison = 'fm_provider';
 
-const GROUPS: NavGroup[] = [
-  { label: 'Pilotage', items: [{ id: 'control-tower', label: 'Tour de contrôle', icon: I(Radar) }] },
-  {
-    label: 'Hard FM',
-    items: [
-      { id: 'assets', label: 'Actifs & composants', icon: I(Boxes) },
-      { id: 'work-orders', label: 'GMAO · Ordres de travail', icon: I(Wrench) },
-      { id: 'preventive', label: 'Préventif & gammes', icon: I(CalendarCheck2) },
-      { id: 'wo-templates', label: 'Modèles d’OT', icon: I(ClipboardList) },
-      { id: 'crp', label: 'Contrôles réglementaires', icon: I(ShieldCheck), badge: 3 },
-      { id: 'spaces', label: 'Espaces & plans', icon: I(Map) },
-      { id: 'leases', label: 'Baux & loyers', icon: I(KeyRound) },
-    ],
-  },
-  {
-    label: 'Soft FM',
-    items: [
-      { id: 'soft-fm', label: 'Services généraux', icon: I(Sparkles) },
-      { id: 'parking', label: 'Parking', icon: I(Car) },
-    ],
-  },
-  {
-    label: 'HSSE',
-    items: [
-      { id: 'hsse', label: 'Incidents & CAPA', icon: I(AlertTriangle), badge: 2 },
-      { id: 'permits', label: 'Permis & consignation', icon: I(FileCheck2) },
-      { id: 'inspections', label: 'Inspections & NC', icon: I(ListChecks) },
-      { id: 'compliance', label: 'Audits & conformité', icon: I(ClipboardCheck) },
-    ],
-  },
-  {
-    label: 'Pilotage & support',
-    items: [
-      { id: 'tickets', label: 'Tickets & helpdesk', icon: I(Ticket) },
-      { id: 'budgets', label: 'Budgets OPEX/CAPEX', icon: I(Wallet) },
-      { id: 'procurement', label: 'Achats & stocks', icon: I(ShoppingCart) },
-      { id: 'energy', label: 'Énergie & carbone', icon: I(Leaf) },
-      { id: 'utilities', label: 'Compteurs & tarifs', icon: I(Gauge) },
-      { id: 'waste', label: 'Déchets & filières', icon: I(Recycle) },
-      { id: 'contractors', label: 'Prestataires', icon: I(HardHat) },
-    ],
-  },
-  {
-    label: 'Système',
-    items: [
-      { id: 'notifications', label: 'Notifications', icon: I(BellRing) },
-      { id: 'settings', label: 'Paramètres', icon: I(SlidersHorizontal) },
-      { id: 'admin', label: 'Agents autonomes', icon: I(Settings) },
-    ],
-  },
-];
+/** Écrans opérationnels existants (données Supabase), rattachés aux modules de la refonte v4. */
+function liveScreen(id: string, site: string): ReactNode | undefined {
+  switch (id) {
+    case 'control-tower': return <ControlTower site={site} />;
+    case 'work-orders': return <WorkOrders />;
+    case 'ref-maint': return <WoTemplates />;
+    case 'planning': return <Preventive />;
+    case 'assets': return <Assets />;
+    case 'meters': return <Utilities />;
+    case 'purchase-req': case 'orders': case 'stock': return <Procurement />;
+    case 'suppliers': return <Contractors />;
+    case 'crp': return <Crp />;
+    case 'energy': return <EnergyCarbon />;
+    case 'hsse-events': return <Hsse />;
+    case 'permits': return <Permits />;
+    case 'inspections': return <Inspections />;
+    case 'environment': return <Waste />;
+    case 'tickets': return <Tickets />;
+    case 'softfm': return <SoftFm />;
+    case 'spaces': return <SpaceManagement />;
+    case 'leases': return <Leases />;
+    case 'settings': return <SettingsScreen />;
+    case 'agents': return <Agents />;
+    case 'notifications': return <Notifications />;
+    default: return undefined;
+  }
+}
 
-const HIT: Record<string, { label: string; icon: React.ReactNode }> = {
+/** Identifiants de module renvoyés par la recherche serveur (`global_search`) → modules v4. */
+const LEGACY_MODULE: Record<string, string> = {
+  hsse: 'hsse-events', contractors: 'suppliers', procurement: 'purchase-req', utilities: 'meters',
+  'soft-fm': 'softfm', compliance: 'crp', preventive: 'planning', 'wo-templates': 'ref-maint', waste: 'environment', admin: 'agents',
+};
+
+const HIT: Record<string, { label: string; icon: ReactNode }> = {
   wo: { label: 'OT', icon: <Wrench size={17} /> }, asset: { label: 'Équipement', icon: <Boxes size={17} /> },
   ticket: { label: 'Ticket', icon: <Ticket size={17} /> }, hsse: { label: 'HSSE', icon: <AlertTriangle size={17} /> },
   nc: { label: 'Non-conformité', icon: <ListChecks size={17} /> }, permit: { label: 'Permis', icon: <FileCheck2 size={17} /> },
@@ -101,91 +88,111 @@ const HIT: Record<string, { label: string; icon: React.ReactNode }> = {
   meter: { label: 'Compteur', icon: <Gauge size={17} /> },
 };
 
-function findLabel(id: string): string {
-  for (const g of GROUPS) for (const it of g.items) if (it.id === id) return it.label;
-  return id;
+const fmtDateFull = (d: Date) => d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const fmtDay = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const fmtTime = (d: Date) => d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+const fmtPeriod = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+function initialPage(): string {
+  const h = decodeURIComponent(window.location.hash.slice(1));
+  return /^[a-z][a-z0-9-]{1,30}$/.test(h) ? h : 'control-tower';
 }
 
 export function App() {
   const { session, ready } = useSession();
   const { aal, refresh: refreshAal } = useAal(session);
-  const [active, setActive] = useState('control-tower');
-  const [density, setDensity] = useState<Density>('office');
+  const chs = useMemo(() => buildChapters(DECLINAISON), []);
+  const [page, setPage] = useState(() => (findModule(buildChapters(DECLINAISON), initialPage()) ? initialPage() : 'control-tower'));
+  const [history, setHistory] = useState<string[]>([]);
+  const pageRef = useRef(page);
+  pageRef.current = page;
+  const historyRef = useRef(history);
+  historyRef.current = history;
   const [site, setSite] = useState(SITES[0]);
+  const [sommaire, setSommaire] = useState(false);
   const [palette, setPalette] = useState(false);
+  const [full, setFull] = useState(false);
   const [focus, setFocus] = useState<Focus | null>(null);
-  const go = useCallback((id: string) => { setFocus(null); setActive(id); }, []);
+  const [toast, setToast] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date());
+
+  const showToast = useCallback((m: string) => {
+    setToast(m);
+    window.setTimeout(() => setToast((t) => (t === m ? null : t)), 2800);
+  }, []);
+
+  const go = useCallback((id: string) => {
+    if (id === 'print-center') { setSommaire(false); showToast('Centre d’impression : livré au lot 4'); return; }
+    if (!findModule(chs, id)) return;
+    setFocus(null);
+    setSommaire(false);
+    const cur = pageRef.current;
+    if (cur !== id) { setHistory((h) => [...h.slice(-30), cur]); setPage(id); }
+  }, [chs, showToast]);
+
+  const back = useCallback(() => {
+    const h = historyRef.current;
+    const prev = h[h.length - 1];
+    if (!prev) return;
+    setFocus(null);
+    setPage(prev);
+    setHistory(h.slice(0, -1));
+  }, []);
+
+  useEffect(() => { window.history.replaceState(null, '', `#${page}`); }, [page]);
+  useEffect(() => {
+    const onHash = () => { const h = initialPage(); if (h !== pageRef.current) go(h); };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [go]);
+  useEffect(() => { const t = window.setInterval(() => setNow(new Date()), 30_000); return () => window.clearInterval(t); }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setPalette((p) => !p);
-      }
+      const tg = (e.target as HTMLElement | null)?.tagName?.toLowerCase() ?? '';
+      const typing = tg === 'input' || tg === 'textarea' || tg === 'select';
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(false); setSommaire((s) => !s); return; }
+      if (e.key === 'Escape') { setSommaire(false); return; }
+      if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !typing) { e.preventDefault(); setFull((f) => !f); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const commands = useMemo<Command[]>(() => {
-    const nav: Command[] = GROUPS.flatMap((g) =>
-      g.items.map((it) => ({
-        id: `nav:${it.id}`,
-        label: it.label,
-        group: 'Aller à',
-        hint: g.label,
-        icon: it.icon,
-        run: () => go(it.id),
+    const nav: Command[] = chs.flatMap((ch) =>
+      ch.items.map((it) => ({
+        id: `nav:${it.id}`, label: it.label, group: 'Aller à', hint: `${it.code} · ${ch.title}`,
+        icon: <Icon name={it.icon} size={17} />, run: () => go(it.id),
       })),
     );
-    const actions: Command[] = [
-      { id: 'a:incident', label: 'Signaler un incident / presque-accident', group: 'Actions', icon: <AlertTriangle size={17} />, run: () => go('hsse') },
-      { id: 'a:wo', label: 'Créer un ordre de travail', group: 'Actions', icon: <Plus size={17} />, run: () => go('work-orders') },
-      { id: 'a:permit', label: 'Demander un permis de travail', group: 'Actions', icon: <FileCheck2 size={17} />, run: () => go('permits') },
-      { id: 'a:report', label: 'Générer le rapport mensuel', group: 'Actions', icon: <FileText size={17} />, run: () => go('control-tower') },
-      { id: 'a:round', label: 'Lancer une ronde d’inspection', group: 'Actions', icon: <ListChecks size={17} />, run: () => go('inspections') },
-      { id: 'a:pm', label: 'Générer les OT préventifs à 14 jours', group: 'Actions', icon: <CalendarCheck2 size={17} />, run: () => go('preventive') },
-      { id: 'a:reappro', label: 'Proposer les réapprovisionnements de stock', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => go('procurement') },
-      { id: 'a:amdec', label: 'Analyser la criticité (AMDEC)', group: 'Actions', icon: <Boxes size={17} />, run: () => go('assets') },
-      { id: 'a:rent', label: 'Encaisser un loyer / voir les impayés', group: 'Actions', icon: <KeyRound size={17} />, run: () => go('leases') },
-      { id: 'a:invoice', label: 'Rapprocher une facture fournisseur (BC / réception / facture)', group: 'Actions', icon: <ShoppingCart size={17} />, run: () => go('procurement') },
-      { id: 'a:meter', label: 'Relever un compteur / contrôler une facture CIE-SODECI', group: 'Actions', icon: <Gauge size={17} />, run: () => go('utilities') },
-      { id: 'a:tech', label: 'Ouvrir l’app technicien (terrain)', group: 'Actions', icon: <Smartphone size={17} />, run: () => window.open('?technicien', '_blank', 'noopener') },
-      { id: 'a:tenant', label: 'Ouvrir le portail locataire', group: 'Actions', icon: <Store size={17} />, run: () => window.open('?locataire', '_blank', 'noopener') },
-      { id: 'a:portal', label: 'Ouvrir l’espace prestataire', group: 'Actions', icon: <HardHat size={17} />, run: () => window.open('?prestataire', '_blank', 'noopener') },
-    ];
     const ctx: Command[] = SITES.filter((s) => s !== site).map((s) => ({
-      id: `site:${s}`,
-      label: `Basculer sur ${s}`,
-      group: 'Périmètre',
-      icon: <ArrowRightLeft size={17} />,
-      run: () => setSite(s),
+      id: `site:${s}`, label: `Basculer sur ${s}`, group: 'Périmètre', icon: <ArrowRightLeft size={17} />, run: () => setSite(s),
     }));
-    return [...nav, ...actions, ...ctx];
-  }, [site]);
+    return [...nav, ...ctx];
+  }, [chs, go, site]);
 
   const onSearch = useCallback(async (q: string): Promise<Command[]> => {
     if (!isBackendConfigured) return [];
     const hits = await globalSearch(q);
     return hits.map((h) => {
       const k = HIT[h.kind] ?? { label: h.kind, icon: <FileText size={17} /> };
+      const target = LEGACY_MODULE[h.module] ?? h.module;
       return {
         id: `s:${h.kind}:${h.id}`,
         label: h.ref ? `${h.ref} · ${h.title}` : h.title,
         group: 'Dans les données',
         hint: [k.label, h.subtitle].filter(Boolean).join(' · '),
         icon: k.icon,
-        run: () => { setActive(h.module); setFocus({ kind: h.kind, id: h.id, nonce: Date.now() }); },
+        run: () => { go(target); setFocus({ kind: h.kind, id: h.id, nonce: Date.now() }); },
       };
     });
-  }, []);
+  }, [go]);
 
   if (isBackendConfigured && !ready) {
-    return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: 'var(--ks-ink-3)' }}>Chargement…</div>;
+    return <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: 'var(--ink-3)' }}>Chargement…</div>;
   }
-  if (isBackendConfigured && !session) {
-    return <Login />;
-  }
+  if (isBackendConfigured && !session) return <Login />;
   if (isBackendConfigured && aal?.next === 'aal2' && aal.current !== 'aal2') {
     return <MfaChallenge email={session?.user?.email ?? ''} onDone={refreshAal} />;
   }
@@ -194,91 +201,94 @@ export function App() {
   const name = email ? email.split('@')[0] : 'Awa Toko';
   const initials = (name.slice(0, 2) || 'AT').toUpperCase();
 
-  return (
-    <>
-      <AppShell
-        groups={GROUPS}
-        activeId={active}
-        onNavigate={go}
-        density={density}
-        onDensity={setDensity}
-        site={site}
-        sites={SITES}
-        onSite={setSite}
-        user={{ name, initials, role: 'Exploitant · Admin' }}
-        onCommand={() => setPalette(true)}
-        onSignOut={isBackendConfigured ? () => void signOut() : undefined}
-        bell={isBackendConfigured ? <NotificationBell onOpenCenter={() => go('notifications')} /> : undefined}
-      >
-        <FocusProvider value={focus}>
-        {active === 'control-tower' ? (
-          <ControlTower site={site} />
-        ) : active === 'work-orders' ? (
-          <WorkOrders />
-        ) : active === 'hsse' ? (
-          <Hsse />
-        ) : active === 'permits' ? (
-          <Permits />
-        ) : active === 'tickets' ? (
-          <Tickets />
-        ) : active === 'spaces' ? (
-          <SpaceManagement />
-        ) : active === 'soft-fm' ? (
-          <SoftFm />
-        ) : active === 'contractors' ? (
-          <Contractors />
-        ) : active === 'settings' ? (
-          <SettingsScreen />
-        ) : active === 'wo-templates' ? (
-          <WoTemplates />
-        ) : active === 'notifications' ? (
-          <Notifications />
-        ) : active === 'leases' ? (
-          <Leases />
-        ) : active === 'preventive' ? (
-          <Preventive />
-        ) : active === 'waste' ? (
-          <Waste />
-        ) : active === 'inspections' ? (
-          <Inspections />
-        ) : active === 'utilities' ? (
-          <Utilities />
-        ) : active === 'energy' ? (
-          <EnergyCarbon />
-        ) : active === 'procurement' ? (
-          <Procurement />
-        ) : active === 'assets' ? (
-          <Assets />
-        ) : active === 'compliance' || active === 'crp' ? (
-          <Crp />
-        ) : active === 'admin' ? (
-          <Agents />
-        ) : (
-          <ModulePlaceholder title={findLabel(active)} />
-        )}
-        </FocusProvider>
-      </AppShell>
-      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} onSearch={onSearch} />
-    </>
-  );
-}
+  const found = findModule(chs, page) ?? findModule(chs, 'control-tower')!;
+  const def = AK_MODULES[page];
+  const live = liveScreen(page, site);
+  const portal = PORTAL_HREF[page];
+  const eyebrow = `${found.chapter.title}, ${found.item.label}, ${fmtPeriod(now)}`;
+  const title = def ? def.t : found.item.label;
+  const primaryLabel = def?.a ?? 'Générer le rapport mensuel';
+  const onPrimary = () => showToast(`${primaryLabel} : formulaire livré au lot 2 (moteur de formulaires)`);
 
-function ModulePlaceholder({ title }: { title: string }) {
   return (
-    <div className="ks-container" style={{ textAlign: 'center', paddingTop: 90 }}>
-      <div
-        style={{
-          width: 64, height: 64, borderRadius: 18, margin: '0 auto 20px', display: 'grid', placeItems: 'center',
-          background: 'var(--ks-amber-50)', color: 'var(--ks-amber-700)', border: '1px solid var(--ks-amber-100)',
-        }}
-      >
-        <Construction size={28} strokeWidth={1.8} />
-      </div>
-      <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em' }}>{title}</h1>
-      <p className="ks-dim" style={{ maxWidth: 460, margin: '12px auto 0', fontSize: 14 }}>
-        Module du périmètre Lot 0+. La Tour de contrôle est l’écran phare livré en premier — sélectionnez-la pour la
-        démonstration du design system Keystone UI.
-      </p>
+    <div className="ak-root">
+      {sommaire ? (
+        <Sommaire
+          chapters={chs}
+          current={page}
+          onGo={go}
+          onClose={() => setSommaire(false)}
+          user={{ name, initials, space: 'Exploitant' }}
+          siteSub={site}
+          today={fmtDay(now)}
+        />
+      ) : (
+        <>
+          {!full && (
+            <Header
+              onHome={() => go('control-tower')}
+              onSommaire={() => setSommaire(true)}
+              onBack={back}
+              canBack={history.length > 0}
+              site={site}
+              onCycleSite={() => setSite((s) => SITES[(SITES.indexOf(s) + 1) % SITES.length])}
+              dateFull={fmtDateFull(now)}
+              time={fmtTime(now)}
+              onSearch={() => setPalette(true)}
+              bell={isBackendConfigured ? <NotificationBell onOpenCenter={() => go('notifications')} /> : undefined}
+              onIncident={() => go('hsse-events')}
+              user={{ initials, title: `${name}, Exploitant` }}
+              onSignOut={isBackendConfigured ? () => void signOut() : undefined}
+            />
+          )}
+          <main className="ak-body">
+            <div className="ak-pagehead">
+              <div style={{ minWidth: 0 }}>
+                <div className="ak-eyebrow">{eyebrow}</div>
+                <h1>{title}</h1>
+                {portal && (
+                  <a className="ak-btn-ink" href={portal.href} target="_blank" rel="noopener noreferrer" style={{ marginTop: 10, height: 36, textDecoration: 'none' }}>
+                    {portal.label}<ExternalLink size={14} aria-hidden />
+                  </a>
+                )}
+              </div>
+              <div className="ak-pagehead__actions ak-noprint">
+                <button className="ak-btn-text" onClick={() => setFull((f) => !f)} title="Pleine page (F)">
+                  {full ? <Minimize2 size={14} aria-hidden /> : <Maximize2 size={14} aria-hidden />}
+                  {full ? 'Quitter la pleine page' : 'Pleine page'}<kbd>F</kbd>
+                </button>
+                <button className="ak-btn-text" onClick={() => window.print()}>
+                  <Printer size={14} aria-hidden /> Imprimer
+                </button>
+                {def && (
+                  <button
+                    className="ak-btn-text"
+                    style={{ marginRight: 8 }}
+                    onClick={() => {
+                      const cols = def.c.map((c) => { const i = c.lastIndexOf(':'); return { label: c.slice(0, i), type: c.slice(i + 1) as never }; });
+                      exportCsv(page, cols, def.r);
+                      showToast('Export CSV généré');
+                    }}
+                  >
+                    Exporter
+                  </button>
+                )}
+                <button className="ak-btn-brand" onClick={onPrimary}>{primaryLabel}</button>
+              </div>
+            </div>
+
+            <FocusProvider value={focus}>
+              {def ? (
+                <ModulePage key={page} id={page} def={def} live={live} liveFirst={isBackendConfigured} onPrimary={onPrimary} onToast={showToast} />
+              ) : (
+                <div className="ak-scroll ak-live" style={{ flex: 1, minHeight: 0 }}>{live}</div>
+              )}
+            </FocusProvider>
+          </main>
+        </>
+      )}
+      <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} onSearch={onSearch} />
+      {toast && <div className="ak-toast" role="status" aria-live="polite">{toast}</div>}
     </div>
   );
 }
