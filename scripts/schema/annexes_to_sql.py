@@ -51,6 +51,35 @@ SUBSTITUTIONS = [
      'security_log_id uuid REFERENCES keystone.security_log(id)',
      'security_log_id bigint REFERENCES keystone.security_log(id)',
      'S03 : security_log.id est bigint (Annexe U, journal chaîné) ; colonne alignée [interprétation validée par Oss53pa le 21/11/2026]'),
+    ('AnnexeCO_Atlas_Core#5',
+     "revert_deadline  timestamptz GENERATED ALWAYS AS (applied_at + interval '30 days') STORED,",
+     'revert_deadline  timestamptz,',
+     'S05 : timestamptz + interval non IMMUTABLE, refusé en colonne générée ; même valeur posée par trigger (C16)'),
+    ('Protection_Donnees#2',
+     "authority_due_at timestamptz GENERATED ALWAYS AS (aware_at + interval '72 hours') STORED,",
+     'authority_due_at timestamptz,',
+     'S06 : idem, délai de notification de 72 h ; même valeur posée par trigger (C16)'),
+    ('AnnexeAdmin_RBAC_Notifications#6',
+     "(tenant_id, COALESCE(site_id,'00000000-0000-0000-0000-000000000000'::uuid), COALESCE(surface::text,'*'))",
+     'NULLS NOT DISTINCT (tenant_id, site_id, surface)',
+     'S07 : cast enum vers text non IMMUTABLE en index ; NULLS NOT DISTINCT (PG 15+) est l’équivalent exact du COALESCE sentinelle'),
+    ('AnnexeAdmin_RBAC_Notifications#10',
+     "(tenant_id, COALESCE(user_id,'00000000-0000-0000-0000-000000000000'::uuid), COALESCE(event_key,'*'), COALESCE(category::text,'*'), channel)",
+     'NULLS NOT DISTINCT (tenant_id, user_id, event_key, category, channel)',
+     'S08 : idem S07'),
+    ('AnnexeAdmin_RBAC_Notifications#10',
+     "(tenant_id, email_lower, COALESCE(category::text,'*'))",
+     'NULLS NOT DISTINCT (tenant_id, email_lower, category)',
+     'S09 : idem S07'),
+    ('AnnexeQ_Reporting#5',
+     'CONSTRAINT uq_review_ref UNIQUE (tenant_id, ref),',
+     'CONSTRAINT uq_fm_review_ref UNIQUE (tenant_id, ref),',
+     'S10 : nom de contrainte déjà pris par l’Annexe P (index de même nom dans le schéma) ; renommée, règle inchangée'),
+]
+# Instructions en double strictement identiques à une définition antérieure : non rejouées (bloc, début de l'instruction).
+SKIP = [
+    ('AnnexeCL_Portail_Client#1', 'CREATE POLICY tickets_client_insert', 'S11 : identique à l’Annexe D'),
+    ('AnnexeCL_Portail_Client#1', 'CREATE POLICY tickets_client_select', 'S11 : identique à l’Annexe D'),
 ]
 
 
@@ -140,6 +169,8 @@ def main(src: str, out: str, post: str | None = None) -> None:
             # S04 (décision d'Oss53pa du 21/11/2026) : current_tenant() dans keystone, jamais dans le schéma auth réservé à Supabase.
             body = body.replace('auth.current_tenant(', 'keystone.current_tenant(')
             for s in split_sql(body):
+                if any(src_ == f'{name}#{i}' and s.lstrip().startswith(start) for src_, start, _w in SKIP):
+                    continue
                 stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
     if post:  # correctifs dépendant de types du corpus, rejoués avec lui
         for s in split_sql(pathlib.Path(post).read_text(encoding='utf-8')):

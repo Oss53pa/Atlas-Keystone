@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1458 instructions réussies sur 1503 ; 45 écarts restants : docs/lot0 §6.
+-- 1464 instructions réussies sur 1504 ; 40 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -5118,6 +5118,32 @@ CREATE TABLE keystone.privacy_request_events (
 );
 
 -- Protection_Donnees#2
+CREATE TABLE keystone.privacy_breaches (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL,
+  ref text NOT NULL, status keystone.breach_status NOT NULL DEFAULT 'detected',
+  aware_at        timestamptz NOT NULL,               -- prise de connaissance
+  authority_due_at timestamptz,
+  nature          text[] NOT NULL CHECK (nature <@ ARRAY['confidentiality','integrity','availability']),
+  description     text NOT NULL,
+  data_categories text[] NOT NULL, special_categories boolean NOT NULL DEFAULT false,
+  subjects_estimate integer, records_estimate integer,
+  countries       text[] NOT NULL,                    -- pays des sites touchés (CI, SN, CM, GA)
+  severity        keystone.breach_severity,
+  risk_unlikely   boolean, risk_unlikely_reason text,
+  containment     text, consequences text,
+  authority_notified_at timestamptz, authority_reference text,
+  subjects_notified_at timestamptz, subjects_notice text,
+  processor_informed_controller_at timestamptz,
+  closed_at timestamptz, lessons_learned text,
+  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+  created_by uuid, updated_by uuid,
+  CONSTRAINT ck_unlikely_reason CHECK (risk_unlikely IS NOT TRUE OR risk_unlikely_reason IS NOT NULL),
+  CONSTRAINT ck_close CHECK (status <> 'closed' OR (lessons_learned IS NOT NULL AND
+                             (authority_notified_at IS NOT NULL OR risk_unlikely IS TRUE))),
+  UNIQUE (tenant_id, ref)
+);
+
+-- Protection_Donnees#2
 CREATE TABLE keystone.dpia_assessments (               -- AIPD (art. 35), structure de la partie 2
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL,
   activity_code text NOT NULL,                        -- T04, T08
@@ -5196,6 +5222,21 @@ BEGIN
   FOR i IN 0..11 LOOP r := r || substr(a, (get_byte(b, i) % 32) + 1, 1); END LOOP;
   RETURN r;
 END $$;
+
+-- correctif_post
+-- C16 (avec S05 et S06) : échéances dérivées, auparavant colonnes générées refusées (timestamptz + interval n'est pas
+-- IMMUTABLE). Même valeur, recalculée à chaque écriture ; la colonne reste en lecture seule pour l'application.
+CREATE OR REPLACE FUNCTION keystone.tg_derived_deadlines() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_TABLE_NAME = 'operating_mode_changes' THEN NEW.revert_deadline := NEW.applied_at + interval '30 days';
+  ELSIF TG_TABLE_NAME = 'privacy_breaches' THEN NEW.authority_due_at := NEW.aware_at + interval '72 hours';
+  END IF;
+  RETURN NEW;
+END $$;
+
+-- correctif_post
+CREATE TRIGGER trg_breach_authority_due BEFORE INSERT OR UPDATE ON keystone.privacy_breaches
+  FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
 
 -- Referentiels_Transverses#2
 -- NULL hors de 1 à 25 ; la colonne appelante porte CHECK (score BETWEEN 1 AND 25)
@@ -6224,6 +6265,42 @@ CREATE TABLE keystone.report_runs (
 
 -- AnnexeQ_Reporting#3
 CREATE INDEX ix_report_runs_due ON keystone.report_runs (tenant_id, status, due_at);
+
+-- AnnexeQ_Reporting#5
+CREATE TABLE keystone.fm_management_reviews (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  ref text NOT NULL,                                 -- RDD-2026-01
+  scope_site_ids uuid[] NOT NULL DEFAULT '{}',       -- vide : tout le système FM
+  period_start date NOT NULL, period_end date NOT NULL,
+  planned_at timestamptz NOT NULL, held_at timestamptz,
+  chair_id uuid NOT NULL,                            -- direction
+  participants uuid[] NOT NULL DEFAULT '{}',
+  status fm_review_status NOT NULL DEFAULT 'planned',
+  conclusions text,                                  -- pertinence, adéquation, efficacité du système FM
+  minutes_document_id uuid REFERENCES keystone.ged_documents(id),
+  minutes_approved_by uuid, minutes_approved_at timestamptz,
+  report_run_id uuid REFERENCES keystone.report_runs(id),
+  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+  created_by uuid, updated_by uuid, deleted_at timestamptz,
+  CONSTRAINT uq_fm_review_ref UNIQUE (tenant_id, ref),
+  CONSTRAINT ck_review_held CHECK (status IN ('planned','in_preparation') OR (held_at IS NOT NULL AND conclusions IS NOT NULL))
+);
+
+-- AnnexeQ_Reporting#5
+CREATE TABLE keystone.fm_review_inputs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  review_id uuid NOT NULL REFERENCES keystone.fm_management_reviews(id) ON DELETE CASCADE,
+  input_code review_input_code NOT NULL,
+  summary text,                                      -- synthèse rédigée par le préparateur
+  data_refs jsonb NOT NULL DEFAULT '[]',             -- [{kpi_value_id}] [{table, id}] [{document_id}]
+  assigned_to uuid,                                  -- préparateur désigné
+  prepared_by uuid, prepared_at timestamptz,
+  is_applicable boolean NOT NULL DEFAULT true,       -- energy_performance : false sans périmètre énergie
+  CONSTRAINT uq_review_input UNIQUE (tenant_id, review_id, input_code),
+  CONSTRAINT ck_input_prepared CHECK (prepared_at IS NULL OR summary IS NOT NULL)
+);
 
 -- AnnexeA_Socle#14
 CREATE TABLE keystone.space_ext (
@@ -14156,6 +14233,21 @@ CREATE TABLE keystone.fm_requirements (              -- §4.2 b et c, §4.3
   created_by uuid, updated_by uuid, deleted_at timestamptz,
   CONSTRAINT ck_req_reason CHECK (decision = 'adopted' OR decision_reason IS NOT NULL),
   CONSTRAINT ck_req_compliance CHECK (NOT is_compliance_obligation OR compliance_requirement_id IS NOT NULL)
+);
+
+-- AnnexeQ_Reporting#5
+CREATE TABLE keystone.fm_review_outputs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  review_id uuid NOT NULL REFERENCES keystone.fm_management_reviews(id) ON DELETE CASCADE,
+  kind review_output_kind NOT NULL,
+  decision text NOT NULL,
+  no_change boolean NOT NULL DEFAULT false,          -- décision motivée « aucun changement nécessaire »
+  owner_id uuid, due_date date,
+  capa_id uuid REFERENCES keystone.capa_actions(id), -- décision tracée vers une CAPA
+  fm_objective_id uuid REFERENCES keystone.fm_objectives(id),
+  status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','in_progress','done','cancelled')),
+  CONSTRAINT ck_output_owner CHECK (kind = 'other_decision' OR no_change OR (owner_id IS NOT NULL AND due_date IS NOT NULL))
 );
 
 -- AnnexeN_Satisfaction_Cout#5

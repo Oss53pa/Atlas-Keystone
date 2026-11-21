@@ -44,3 +44,17 @@ ALTER TABLE keystone.clients
 -- mutuellement : la clé de work_orders est posée après la création des deux tables, sans changer sa règle [Confirmé].
 ALTER TABLE keystone.work_orders
   ADD CONSTRAINT fk_wo_purchase_request FOREIGN KEY (purchase_request_id) REFERENCES keystone.purchase_requests (id) ON DELETE RESTRICT;
+
+-- C16 (avec S05 et S06) : échéances dérivées, auparavant colonnes générées refusées (timestamptz + interval n'est pas
+-- IMMUTABLE). Même valeur, recalculée à chaque écriture ; la colonne reste en lecture seule pour l'application.
+CREATE OR REPLACE FUNCTION keystone.tg_derived_deadlines() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_TABLE_NAME = 'operating_mode_changes' THEN NEW.revert_deadline := NEW.applied_at + interval '30 days';
+  ELSIF TG_TABLE_NAME = 'privacy_breaches' THEN NEW.authority_due_at := NEW.aware_at + interval '72 hours';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER trg_omc_revert_deadline BEFORE INSERT OR UPDATE ON atlas_core.operating_mode_changes
+  FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
+CREATE TRIGGER trg_breach_authority_due BEFORE INSERT OR UPDATE ON keystone.privacy_breaches
+  FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
