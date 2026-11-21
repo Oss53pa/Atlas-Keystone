@@ -58,3 +58,42 @@ CREATE TRIGGER trg_omc_revert_deadline BEFORE INSERT OR UPDATE ON atlas_core.ope
   FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
 CREATE TRIGGER trg_breach_authority_due BEFORE INSERT OR UPDATE ON keystone.privacy_breaches
   FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
+
+-- C17 : keystone.object_visible, Annexe A partie 4 §A.22 : « STABLE, SECURITY INVOKER ; vrai si la ligne de work_orders
+-- ou assets est lisible sous la RLS de l'appelant » [Confirmé]. Toute autre entité : faux.
+CREATE OR REPLACE FUNCTION keystone.object_visible(p_entity text, p_id uuid) RETURNS boolean
+LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = keystone, pg_temp AS $$
+BEGIN
+  IF p_entity = 'work_orders' THEN RETURN EXISTS (SELECT 1 FROM keystone.work_orders WHERE id = p_id);
+  ELSIF p_entity = 'assets' THEN RETURN EXISTS (SELECT 1 FROM keystone.assets WHERE id = p_id);
+  END IF;
+  RETURN false;
+END $$;
+
+-- C18 : keystone.vendor_docs_ok_rate, Annexe P : « jours où ok est vrai divisés par p_days, lus dans vendor_doc_daily_status »
+-- [Confirmé]. Fenêtre : les p_days derniers jours jusqu'à hier inclus (la tâche nocturne écrit la veille).
+CREATE OR REPLACE FUNCTION keystone.vendor_docs_ok_rate(p_vendor uuid, p_days integer) RETURNS numeric
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = keystone, pg_temp AS $$
+  SELECT CASE WHEN p_days IS NULL OR p_days <= 0 THEN NULL ELSE
+    (SELECT count(*) FROM keystone.vendor_doc_daily_status d
+      WHERE d.tenant_id = keystone.current_tenant() AND d.vendor_id = p_vendor AND d.ok
+        AND d.day BETWEEN current_date - p_days AND current_date - 1)::numeric / p_days END
+$$;
+
+-- C19 : keystone.log_presence_access, Annexe S : « écrit une ligne de journal par session et par site (au plus une par
+-- 15 minutes) et renvoie vrai ». Interprétation : action 'layer_view', une ligne par utilisateur et site par 15 minutes
+-- (pas d'identifiant de session dans presence_access_log). SECURITY DEFINER pour écrire le journal sans droit d'écriture
+-- de l'appelant. Limite signalée : appelée depuis une politique de lecture, elle échoue en transaction en lecture seule.
+CREATE OR REPLACE FUNCTION keystone.log_presence_access(p_site uuid) RETURNS boolean
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+DECLARE v_user uuid := auth.uid(); v_tenant uuid := keystone.current_tenant();
+BEGIN
+  IF v_user IS NULL OR v_tenant IS NULL OR p_site IS NULL THEN RETURN false; END IF;
+  IF NOT EXISTS (SELECT 1 FROM keystone.presence_access_log
+                  WHERE tenant_id = v_tenant AND user_id = v_user AND site_id = p_site
+                    AND action = 'layer_view' AND at > now() - interval '15 minutes') THEN
+    INSERT INTO keystone.presence_access_log (tenant_id, user_id, site_id, action) VALUES (v_tenant, v_user, p_site, 'layer_view');
+  END IF;
+  RETURN true;
+END $$;
+REVOKE EXECUTE ON FUNCTION keystone.log_presence_access(uuid) FROM PUBLIC, anon;

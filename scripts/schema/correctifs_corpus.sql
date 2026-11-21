@@ -12,9 +12,8 @@ CREATE SCHEMA IF NOT EXISTS keystone;
 -- C01, cause 2 : type de la déclinaison. Propriétaire et nom : Référentiels transverses §1 (atlas_core.operating_mode) ;
 -- valeurs : Annexe CO, bloc 1 (commentaire « ('in_house','fm_provider') ») [Confirmé].
 -- Décision d'Oss53pa (21/11/2026) : atlas_core.operating_mode fait foi ; l'Annexe CO, qui emploie keystone.operating_mode,
--- est à corriger. Alias par domaine en attendant, à supprimer ensuite.
+-- est à corriger ; en attendant, l'assemblage réécrit keystone.operating_mode en atlas_core.operating_mode (S14).
 CREATE TYPE atlas_core.operating_mode AS ENUM ('in_house', 'fm_provider');
-CREATE DOMAIN keystone.operating_mode AS atlas_core.operating_mode;
 
 -- C02, cause 3 : types attribués aux Annexes C, D, R par les Référentiels transverses (§1) sans CREATE TYPE dans le corpus.
 -- [Confirmé] : valeurs écrites dans le corpus (Annexe C, matrices ; Référentiels transverses, tableau des propriétaires).
@@ -37,6 +36,8 @@ CREATE TYPE keystone.hsse_event_type AS ENUM ('near_miss','incident','accident',
 CREATE TYPE keystone.vendor_status AS ENUM ('prospect','active','under_watch','suspended','blacklisted');   -- Référentiels transverses, D14
 CREATE TYPE keystone.sla_clock AS ENUM ('response','resolution','client');                                  -- Annexe B
 CREATE TYPE keystone.presence_source AS ENUM ('gps','scan','beacon','work_order','manual');                 -- Annexe S
+CREATE TYPE keystone.sla_pause_reason AS ENUM ('occupant_access_refused','client_waiting','client_validated_part_wait',
+  'client_quote_pending','client_dispute');                                                                    -- Annexe B partie 2 (renvoi Référentiels §1.2)
 
 -- C15, cause 3 : rôle de base de l'IA, Annexe C (« le rôle de base proph3t_reader utilisé par PROPH3T ») [Confirmé].
 DO $$ BEGIN CREATE ROLE proph3t_reader NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
@@ -46,6 +47,6 @@ DO $$ BEGIN CREATE ROLE proph3t_reader NOLOGIN; EXCEPTION WHEN duplicate_object 
 CREATE TABLE keystone.json_schemas (id text PRIMARY KEY, schema json NOT NULL, version integer NOT NULL);
 CREATE FUNCTION keystone.json_schema(p_id text) RETURNS json LANGUAGE sql STABLE AS $$ SELECT schema FROM keystone.json_schemas WHERE id = p_id $$;
 
--- Restent sans définition, valeurs absentes du corpus : keystone.sla_pause_reason (liste tronquée en Annexe M),
+-- Restent sans définition dans le corpus :
 -- keystone.risk_assessments (table employée par l'Annexe C partie 2), keystone.compute_meter_consumption_daily(),
 -- keystone.processing_activities (renvoi PD1 §10.2). À compléter par Oss53pa dans l'annexe propriétaire.

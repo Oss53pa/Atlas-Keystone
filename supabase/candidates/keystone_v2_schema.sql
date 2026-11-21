@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1466 instructions réussies sur 1503 ; 37 écarts restants : docs/lot0 §6.
+-- 1484 instructions réussies sur 1507 ; 23 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -111,7 +111,7 @@ CREATE DOMAIN keystone.notification_event_key AS text
   CHECK (VALUE ~ '^[a-z][a-z_]*\.[a-z][a-z_]*$');
 
 -- AnnexeCO_Atlas_Core#1
--- keystone.operating_mode ('in_house','fm_provider') : défini dans les Référentiels transverses §1, renvoi.
+-- atlas_core.operating_mode ('in_house','fm_provider') : défini dans les Référentiels transverses §1, renvoi.
 -- atlas_core.subscription_status : propriétaire unique, la présente annexe ; les Référentiels transverses y renvoient.
 CREATE TYPE atlas_core.subscription_status AS ENUM ('trial','active','past_due','grace','suspended','cancelled');
 
@@ -145,7 +145,7 @@ CREATE TABLE atlas_core.tenants (
   display_name     text NOT NULL,
   country_code     char(2) NOT NULL REFERENCES atlas_core.country_config(country_code), -- pays du siège
   default_currency char(3) NOT NULL REFERENCES atlas_core.currencies(code),           -- devise de consolidation
-  operating_mode   keystone.operating_mode,                   -- projection de subscription_products (CO.3)
+  operating_mode   atlas_core.operating_mode,                   -- projection de subscription_products (CO.3)
   status           text NOT NULL DEFAULT 'active' CHECK (status IN ('active','purging','purged')),
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now()
@@ -240,7 +240,7 @@ CREATE TABLE atlas_core.subscription_products (
   tenant_id       uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
   subscription_id uuid NOT NULL REFERENCES atlas_core.subscriptions(id) ON DELETE RESTRICT,
   product_code    text NOT NULL CHECK (product_code IN ('keystone','trace','patrimoine','fna','trade','people')),
-  operating_mode  keystone.operating_mode,                    -- obligatoire pour keystone
+  operating_mode  atlas_core.operating_mode,                    -- obligatoire pour keystone
   options         text[] NOT NULL DEFAULT '{}',      -- 'parking' par exemple
   limits          jsonb NOT NULL DEFAULT '{}'::jsonb,-- plafonds contractuels, évolution, à valider
   status          text NOT NULL DEFAULT 'active' CHECK (status IN ('active','removed')),
@@ -306,6 +306,42 @@ CREATE TABLE keystone.tenant_provisioning (
   last_error  text,
   started_at  timestamptz, finished_at timestamptz,
   CONSTRAINT uq_provisioning_step UNIQUE (tenant_id, trigger_event_id, step)
+);
+
+-- AnnexeCO_Atlas_Core#5
+CREATE TABLE atlas_core.operating_mode_changes (
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id        uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  from_mode        atlas_core.operating_mode NOT NULL,
+  to_mode          atlas_core.operating_mode NOT NULL,
+  status           atlas_core.mode_change_status NOT NULL DEFAULT 'requested',
+  reason           text NOT NULL,
+  requested_by     uuid NOT NULL, requested_at timestamptz NOT NULL DEFAULT now(),
+  approved_by      uuid, approved_at timestamptz,          -- éditeur
+  buyer_accepted_at timestamptz,                           -- acceptation de l'acheteur
+  applied_at       timestamptz,
+  revert_deadline  timestamptz,
+  reverted_by      uuid, reverted_at timestamptz, revert_reason text,
+  closed_at        timestamptz,
+  precheck_report  jsonb, postcheck_report jsonb, failure_message text,
+  CONSTRAINT ck_mode_change_diff CHECK (from_mode <> to_mode),
+  CONSTRAINT ck_mode_change_revert CHECK (status <> 'reverted' OR revert_reason IS NOT NULL)
+);
+
+-- AnnexeCO_Atlas_Core#5
+CREATE UNIQUE INDEX uq_mode_change_open ON atlas_core.operating_mode_changes (tenant_id)
+  WHERE status IN ('requested','analyzed','prepared','approved','applied');
+
+-- AnnexeCO_Atlas_Core#5
+CREATE TABLE keystone.mode_change_plans (
+  change_id       uuid PRIMARY KEY REFERENCES atlas_core.operating_mode_changes(id) ON DELETE RESTRICT,
+  tenant_id       uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  new_clients     jsonb NOT NULL DEFAULT '[]'::jsonb,      -- vers fm_provider : [{ref, name, country_code, rccm, contact_email}]
+  site_client_map jsonb NOT NULL DEFAULT '[]'::jsonb,      -- [{site_id, client_id | new_client_ref}]
+  confirmations   jsonb NOT NULL DEFAULT '{}'::jsonb,      -- éléments masqués acceptés par l'acheteur
+  snapshot        jsonb,                                   -- état avant application, pour la réversibilité
+  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+  created_by uuid, updated_by uuid
 );
 
 -- AnnexeCO_Atlas_Core#6
@@ -1337,6 +1373,10 @@ CREATE TABLE keystone.tenant_branding (               -- A29 ; calcul : lot 1 §
   CONSTRAINT ck_branding_contrast CHECK (button_color IS NULL OR button_contrast >= 4.5)
 );
 
+-- AnnexeAdmin_RBAC_Notifications#6
+CREATE UNIQUE INDEX ux_branding_scope ON keystone.tenant_branding
+  (tenant_id, site_id, surface) NULLS NOT DISTINCT WHERE deleted_at IS NULL;
+
 -- AnnexeAdmin_RBAC_Notifications#7
 CREATE TABLE keystone.tenant_onboarding_steps (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL,
@@ -1488,6 +1528,10 @@ CREATE TABLE keystone.notification_preferences (
 );
 
 -- AnnexeAdmin_RBAC_Notifications#10
+CREATE UNIQUE INDEX ux_pref ON keystone.notification_preferences
+  (tenant_id, user_id, event_key, category, channel) NULLS NOT DISTINCT;
+
+-- AnnexeAdmin_RBAC_Notifications#10
 CREATE TABLE keystone.user_quiet_hours (              -- RG-NOT-07
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid NOT NULL,
   user_id    uuid NOT NULL REFERENCES keystone.users(id) ON DELETE CASCADE,
@@ -1554,6 +1598,9 @@ CREATE TABLE keystone.email_suppressions (
   lifted_at timestamptz, lifted_by uuid, lift_reason text,
   CONSTRAINT ck_unsub_category CHECK (reason <> 'unsubscribe' OR category IN ('operational','digest'))
 );
+
+-- AnnexeAdmin_RBAC_Notifications#10
+CREATE UNIQUE INDEX ux_suppression ON keystone.email_suppressions (tenant_id, email_lower, category) NULLS NOT DISTINCT WHERE lifted_at IS NULL;
 
 -- AnnexeAdmin_RBAC_Notifications#10
 CREATE TABLE keystone.notification_digests (
@@ -5235,8 +5282,45 @@ BEGIN
 END $$;
 
 -- correctif_post
+CREATE TRIGGER trg_omc_revert_deadline BEFORE INSERT OR UPDATE ON atlas_core.operating_mode_changes
+  FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
+
+-- correctif_post
 CREATE TRIGGER trg_breach_authority_due BEFORE INSERT OR UPDATE ON keystone.privacy_breaches
   FOR EACH ROW EXECUTE FUNCTION keystone.tg_derived_deadlines();
+
+-- correctif_post
+-- C17 : keystone.object_visible, Annexe A partie 4 §A.22 : « STABLE, SECURITY INVOKER ; vrai si la ligne de work_orders
+-- ou assets est lisible sous la RLS de l'appelant » [Confirmé]. Toute autre entité : faux.
+CREATE OR REPLACE FUNCTION keystone.object_visible(p_entity text, p_id uuid) RETURNS boolean
+LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = keystone, pg_temp AS $$
+BEGIN
+  IF p_entity = 'work_orders' THEN RETURN EXISTS (SELECT 1 FROM keystone.work_orders WHERE id = p_id);
+  ELSIF p_entity = 'assets' THEN RETURN EXISTS (SELECT 1 FROM keystone.assets WHERE id = p_id);
+  END IF;
+  RETURN false;
+END $$;
+
+-- correctif_post
+-- C19 : keystone.log_presence_access, Annexe S : « écrit une ligne de journal par session et par site (au plus une par
+-- 15 minutes) et renvoie vrai ». Interprétation : action 'layer_view', une ligne par utilisateur et site par 15 minutes
+-- (pas d'identifiant de session dans presence_access_log). SECURITY DEFINER pour écrire le journal sans droit d'écriture
+-- de l'appelant. Limite signalée : appelée depuis une politique de lecture, elle échoue en transaction en lecture seule.
+CREATE OR REPLACE FUNCTION keystone.log_presence_access(p_site uuid) RETURNS boolean
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+DECLARE v_user uuid := auth.uid(); v_tenant uuid := keystone.current_tenant();
+BEGIN
+  IF v_user IS NULL OR v_tenant IS NULL OR p_site IS NULL THEN RETURN false; END IF;
+  IF NOT EXISTS (SELECT 1 FROM keystone.presence_access_log
+                  WHERE tenant_id = v_tenant AND user_id = v_user AND site_id = p_site
+                    AND action = 'layer_view' AND at > now() - interval '15 minutes') THEN
+    INSERT INTO keystone.presence_access_log (tenant_id, user_id, site_id, action) VALUES (v_tenant, v_user, p_site, 'layer_view');
+  END IF;
+  RETURN true;
+END $$;
+
+-- correctif_post
+REVOKE EXECUTE ON FUNCTION keystone.log_presence_access(uuid) FROM PUBLIC, anon;
 
 -- Referentiels_Transverses#2
 -- NULL hors de 1 à 25 ; la colonne appelante porte CHECK (score BETWEEN 1 AND 25)
@@ -5257,7 +5341,7 @@ CREATE TABLE keystone.client_sectors (                -- L11-22, référentiel d
 );
 
 -- AnnexeCO_Atlas_Core#2
-CREATE OR REPLACE FUNCTION keystone.current_operating_mode() RETURNS keystone.operating_mode
+CREATE OR REPLACE FUNCTION keystone.current_operating_mode() RETURNS atlas_core.operating_mode
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = atlas_core, pg_temp AS $$
   SELECT p.operating_mode
   FROM atlas_core.subscription_products p
@@ -6301,6 +6385,17 @@ CREATE TABLE keystone.fm_review_inputs (
   CONSTRAINT uq_review_input UNIQUE (tenant_id, review_id, input_code),
   CONSTRAINT ck_input_prepared CHECK (prepared_at IS NULL OR summary IS NOT NULL)
 );
+
+-- correctif_post
+-- C18 : keystone.vendor_docs_ok_rate, Annexe P : « jours où ok est vrai divisés par p_days, lus dans vendor_doc_daily_status »
+-- [Confirmé]. Fenêtre : les p_days derniers jours jusqu'à hier inclus (la tâche nocturne écrit la veille).
+CREATE OR REPLACE FUNCTION keystone.vendor_docs_ok_rate(p_vendor uuid, p_days integer) RETURNS numeric
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = keystone, pg_temp AS $$
+  SELECT CASE WHEN p_days IS NULL OR p_days <= 0 THEN NULL ELSE
+    (SELECT count(*) FROM keystone.vendor_doc_daily_status d
+      WHERE d.tenant_id = keystone.current_tenant() AND d.vendor_id = p_vendor AND d.ok
+        AND d.day BETWEEN current_date - p_days AND current_date - 1)::numeric / p_days END
+$$;
 
 -- AnnexeA_Socle#14
 CREATE TABLE keystone.space_ext (
@@ -9762,6 +9857,13 @@ CREATE TABLE keystone.asset_spare_parts (            -- pièces de rechange reco
 CREATE POLICY bulk_ops_read ON keystone.bulk_operations FOR SELECT
   USING (tenant_id = keystone.current_tenant() AND (created_by = auth.uid() OR keystone.has_permission('audit_trail.read')));
 
+-- AnnexeA_Socle_Partie4#5
+CREATE POLICY ocom_read ON keystone.object_comments FOR SELECT USING (
+  tenant_id = keystone.current_tenant() AND deleted_at IS NULL
+  AND EXISTS (SELECT 1 FROM keystone.user_profiles up WHERE up.id = keystone.active_profile() AND up.kind = 'internal')
+  AND site_id IN (SELECT keystone.user_sites())
+  AND keystone.object_visible(entity, object_id));
+
 -- AnnexeA_Socle_Partie4#6
 CREATE TABLE keystone.undo_tokens (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -10849,6 +10951,34 @@ CREATE TABLE keystone.wo_reports (
   created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
   created_by uuid, updated_by uuid,
   CONSTRAINT ck_report_followup CHECK (outcome IS NULL OR outcome = 'repaired' OR recommendation IS NOT NULL) );
+
+-- AnnexeB_GMAO_Partie2#7
+-- keystone.sla_pause_reason ('occupant_access_refused','client_waiting','client_validated_part_wait',
+--   'client_quote_pending','client_dispute') et keystone.sla_clock ('response','resolution','client') :
+--   Référentiels transverses §1.2, non recréés ici.
+
+CREATE TABLE keystone.sla_pauses (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL,
+  work_order_id uuid NOT NULL REFERENCES keystone.work_orders(id) ON DELETE CASCADE,
+  reason sla_pause_reason NOT NULL,
+  clocks sla_clock[] NOT NULL,                  -- horloges encore courantes à l'ouverture
+  started_at timestamptz NOT NULL DEFAULT now(),
+  ended_at timestamptz,
+  source text NOT NULL CHECK (source IN ('hold','client_quote','client_dispute')),
+  client_quote_id uuid, client_dispute_id uuid, -- Annexe M
+  note text NOT NULL,
+  evidence_paths text[] NOT NULL DEFAULT '{}',   -- accès refusé : photo ou attestation
+  started_by uuid, ended_by uuid,
+  contested boolean NOT NULL DEFAULT false,     -- pause contestée par le client (Annexe M)
+  CONSTRAINT ck_pause_order CHECK (ended_at IS NULL OR ended_at >= started_at),
+  CONSTRAINT ck_pause_evidence CHECK (reason <> 'occupant_access_refused' OR cardinality(evidence_paths) >= 1) );
+
+-- AnnexeB_GMAO_Partie2#7
+CREATE UNIQUE INDEX uq_pause_open ON keystone.sla_pauses (work_order_id, reason) WHERE ended_at IS NULL;
+
+-- AnnexeB_GMAO_Partie2#7
+CREATE INDEX ix_pause_wo ON keystone.sla_pauses (tenant_id, work_order_id, started_at);
 
 -- AnnexeB_GMAO_Partie2#9
 CREATE TABLE keystone.asset_downtimes (
@@ -12275,6 +12405,48 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
   SELECT max(c.at) FROM keystone.ticket_comments c
    WHERE c.ticket_id = p_ticket AND c.tenant_id = keystone.current_tenant() AND c.is_reminder $$;
 
+-- AnnexeD_Tickets_Portails#10
+CREATE FUNCTION keystone.sla_effective_due(p_due timestamptz, p_wo uuid, p_clock keystone.sla_clock) RETURNS timestamptz
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+  -- échéance plus pauses de l'OT lié qui portent l'horloge (A07, sla_pauses de l'Annexe B)
+  SELECT p_due + coalesce(sum(coalesce(sp.ended_at, now()) - sp.started_at), interval '0')
+    FROM keystone.sla_pauses sp WHERE sp.work_order_id = p_wo AND p_clock = ANY (sp.clocks) $$;
+
+-- AnnexeD_Tickets_Portails#10
+CREATE VIEW keystone.v_ticket_queue WITH (security_invoker = true) AS
+SELECT t.id, t.ref, t.status, w.stage AS wo_stage, t.reject_reason, t.priority, t.title,
+       EXISTS (SELECT 1 FROM keystone.ticket_attachments a WHERE a.ticket_id = t.id) AS has_attachments,
+       keystone.sla_effective_due(t.sla_resolution_due, t.converted_wo_id, 'resolution') AS resolution_due_effective,
+       t.resolved_at,
+       EXISTS (SELECT 1 FROM keystone.sla_pauses sp WHERE sp.work_order_id = t.converted_wo_id AND sp.ended_at IS NULL) AS sla_paused,
+       keystone.sla_effective_due(t.sla_response_due, t.converted_wo_id, 'response') AS response_due_effective,
+       t.first_assigned_at, t.sla_ack_due, t.first_ack_at,
+       t.category_id, c.label AS category_label, c.icon AS category_icon,
+       t.location_id, l.name AS location_name,
+       t.assignee_id, p.first_name || ' ' || p.last_name AS assignee_name, t.team_id, tm.name AS team_name,
+       t.channel, t.site_id, s.name AS site_name,
+       t.requested_priority, t.priority_reason,
+       t.occupant_org_id, o.name AS occupant_org_name,
+       CASE WHEN t.channel = 'public' THEN NULL ELSE t.reporter_id END AS reporter_id,
+       (SELECT string_agg(sc.name, ', ') FROM keystone.sectors sc
+         WHERE sc.id IN (SELECT keystone.sectors_of_location(t.location_id, c.routing_zoning_type))) AS sector_labels,
+       t.converted_wo_id, w.ref AS wo_ref,
+       t.asset_id, a2.code AS asset_code, t.reopen_count,
+       (SELECT count(*) FROM keystone.ticket_followers f WHERE f.ticket_id = t.id) AS followers_count,
+       t.satisfaction_score, t.created_at,
+       t.client_id, cl.name AS client_name, t.client_sla_due
+  FROM keystone.tickets t
+  JOIN keystone.ticket_categories c ON c.id = t.category_id
+  JOIN keystone.locations l ON l.id = t.location_id
+  JOIN keystone.sites s ON s.id = t.site_id
+  LEFT JOIN keystone.persons p ON p.id = t.assignee_id
+  LEFT JOIN keystone.teams tm ON tm.id = t.team_id
+  LEFT JOIN keystone.occupant_organizations o ON o.id = t.occupant_org_id
+  LEFT JOIN keystone.work_orders w ON w.id = t.converted_wo_id
+  LEFT JOIN keystone.assets a2 ON a2.id = t.asset_id
+  LEFT JOIN keystone.clients cl ON cl.id = t.client_id
+ WHERE t.deleted_at IS NULL;
+
 -- AnnexeD_Tickets_Portails_Partie2#3
 CREATE VIEW keystone.v_occupant_tickets WITH (security_invoker = true) AS
 SELECT t.id, t.ref, t.site_id, t.title, t.description, t.category_id, t.location_id, t.asset_id,
@@ -13144,6 +13316,32 @@ CREATE TABLE keystone.move_work_orders (
   move_id uuid NOT NULL REFERENCES keystone.move_requests(id) ON DELETE CASCADE,
   work_order_id uuid NOT NULL REFERENCES keystone.work_orders(id), is_blocking boolean NOT NULL,
   PRIMARY KEY (move_id, work_order_id) );
+
+-- AnnexeP_Prestataires_Mobile#14
+CREATE VIEW keystone.v_supplier_delivery_kpis WITH (security_invoker = true) AS
+  WITH rec AS (
+    SELECT po.tenant_id, po.vendor_id,
+           count(*) AS lines_count,
+           round(avg((gr.received_at::date <= COALESCE(pl.confirmed_date, po.desired_date))::int)::numeric, 4) AS on_time_rate,
+           round(avg((grl.qty_refused = 0)::int)::numeric, 4) AS conformity_rate
+      FROM keystone.goods_receipt_lines grl
+      JOIN keystone.goods_receipts gr ON gr.id = grl.receipt_id
+      JOIN keystone.po_lines pl ON pl.id = grl.po_line_id
+      JOIN keystone.purchase_orders po ON po.id = gr.po_id
+     WHERE gr.received_at >= now() - interval '12 months' AND gr.deleted_at IS NULL
+     GROUP BY po.tenant_id, po.vendor_id),
+  ack AS (                                                -- EV-L8-42 : accusés dans le délai
+    SELECT po.tenant_id, po.vendor_id,
+           count(*) AS sent_count,
+           round(avg((po.supplier_ack_at IS NOT NULL AND po.supplier_ack_at <= po.supplier_ack_due)::int)::numeric, 4) AS ack_on_time_rate
+      FROM keystone.purchase_orders po
+     WHERE po.sent_at >= now() - interval '12 months' AND po.supplier_ack_due IS NOT NULL AND po.deleted_at IS NULL
+     GROUP BY po.tenant_id, po.vendor_id)
+  SELECT coalesce(rec.tenant_id, ack.tenant_id) AS tenant_id, coalesce(rec.vendor_id, ack.vendor_id) AS vendor_id,
+         coalesce(rec.lines_count, 0) AS lines_count, rec.on_time_rate, rec.conformity_rate,
+         coalesce(ack.sent_count, 0) AS sent_count, ack.ack_on_time_rate,
+         keystone.vendor_docs_ok_rate(coalesce(rec.vendor_id, ack.vendor_id), 365) AS docs_ok_rate
+    FROM rec FULL JOIN ack ON ack.tenant_id = rec.tenant_id AND ack.vendor_id = rec.vendor_id;
 
 -- AnnexeP_Prestataires_Mobile#16
 CREATE TABLE keystone.contractor_evaluations (

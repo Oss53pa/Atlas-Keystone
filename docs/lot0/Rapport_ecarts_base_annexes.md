@@ -90,11 +90,17 @@ Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blo
 | S11 | politiques `tickets_client_select` et `tickets_client_insert` définies à l'identique par les Annexes D et CL | une seule définition | Confirmé, technique |
 | S12 | `permit_type NOT IN ('general','energized')` : `energized` n'est pas une valeur du type (Annexe C) | littéral retiré, règle inchangée | Confirmé, technique |
 | S13 | vue `v_expenses_without_site` définie différemment par les Annexes E et N | règle de l'Annexe N avec `security_invoker = true` | décidé par Oss53pa le 21/11/2026 |
+| C17 | `object_visible` décrite en prose (Annexe A partie 4) | transcrite | Confirmé |
+| C18 | `vendor_docs_ok_rate` décrite en prose (Annexe P) | transcrite ; fenêtre des p_days jours jusqu'à la veille | Confirmé |
+| C19 | `log_presence_access` décrite en prose (Annexe S) | action `layer_view`, une ligne par utilisateur et site par 15 minutes ; échoue en transaction en lecture seule, car appelée depuis une politique de lecture | Interprétation |
+| C03 bis | `sla_pause_reason` : 5 valeurs écrites en commentaire (Annexe B partie 2) | transcrites | Confirmé |
+| S14 | l'alias par domaine de `keystone.operating_mode` perd les opérateurs de l'énumération (`from_mode <> to_mode` refusé) | ancien nom réécrit en `atlas_core.operating_mode` partout | Confirmé, suite de la décision C01 |
+| correction | S07 à S09 : `NULLS NOT DISTINCT` placé avant la liste de colonnes au lieu d'après : les trois index n'étaient pas créés | corrigé, index vérifiés | Confirmé |
 | S04 | `auth.current_tenant()` créée dans le schéma `auth`, réservé à Supabase (109 emplois) | `keystone.current_tenant()` partout | décidé par Oss53pa le 21/11/2026 |
 | conventions | `-- colonnes A.0.2` (89 tables), `<communes>`, types non qualifiés | développées ; chemin de recherche `keystone` | Confirmé |
 | extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema sans `CREATE EXTENSION` | bouchons ; `pg_jsonschema` simulé : validation JSON non éprouvée | Confirmé |
 
-Essai final : 1 466 instructions sur 1 503, 570 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
+Essai final : 1 484 instructions sur 1 507, 573 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
 
 Correction d'un essai précédent : l'ancienne valeur `triaged` de `ticket_status` (base actuelle) contredit le corpus (`triage`, plus `cancelled`) ; l'ancienne base ne peut donc pas servir de référence de valeurs quand le corpus en donne.
 
@@ -160,7 +166,11 @@ Sont décrites en prose mais sans code : `keystone.object_visible(p_entity, p_id
 
 ### 6.3 Suite
 
-1. Tranché par Oss53pa le 21/11/2026 : C01, S04, C10, C11, S03. Reste à fournir : valeurs de C02 bis, les deux valeurs manquantes de `sla_pause_reason`, l'ajout de `energized` à `permit_type`, les objets jamais définis.
+1. Tranché par Oss53pa le 21/11/2026 : C01, S04, C10, C11, S03, S13, C02 bis. Restent hors des fonctions décrites en prose :
+   - `keystone.wo_transition_rules`, matrice des transitions d'OT (Annexe B §B.1.5), décrite en tableau seulement : à construire au lot 4 avec ses gardes ;
+   - `keystone.vendor_can_see_presence` (Annexe P, A32), décrite partiellement : lot 3 ;
+   - `compute_meter_consumption_daily()` et la vue `meter_consumption_daily` (Annexe B partie 3) : lot 4 ;
+   - index `ix_urd_active` sur une colonne `site_id` absente de `utilization_recommendation_dismissals` (Annexe S partie 2) : ajouter la colonne ou la retirer de l'index, décision d'Oss53pa.
 2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre.
 3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter avec leur lot.
 4. Ensuite seulement : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).

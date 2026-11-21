@@ -61,15 +61,15 @@ SUBSTITUTIONS = [
      'S06 : idem, délai de notification de 72 h ; même valeur posée par trigger (C16)'),
     ('AnnexeAdmin_RBAC_Notifications#6',
      "(tenant_id, COALESCE(site_id,'00000000-0000-0000-0000-000000000000'::uuid), COALESCE(surface::text,'*'))",
-     'NULLS NOT DISTINCT (tenant_id, site_id, surface)',
+     '(tenant_id, site_id, surface) NULLS NOT DISTINCT',
      'S07 : cast enum vers text non IMMUTABLE en index ; NULLS NOT DISTINCT (PG 15+) est l’équivalent exact du COALESCE sentinelle'),
     ('AnnexeAdmin_RBAC_Notifications#10',
      "(tenant_id, COALESCE(user_id,'00000000-0000-0000-0000-000000000000'::uuid), COALESCE(event_key,'*'), COALESCE(category::text,'*'), channel)",
-     'NULLS NOT DISTINCT (tenant_id, user_id, event_key, category, channel)',
+     '(tenant_id, user_id, event_key, category, channel) NULLS NOT DISTINCT',
      'S08 : idem S07'),
     ('AnnexeAdmin_RBAC_Notifications#10',
      "(tenant_id, email_lower, COALESCE(category::text,'*'))",
-     'NULLS NOT DISTINCT (tenant_id, email_lower, category)',
+     '(tenant_id, email_lower, category) NULLS NOT DISTINCT',
      'S09 : idem S07'),
     ('AnnexeQ_Reporting#5',
      'CONSTRAINT uq_review_ref UNIQUE (tenant_id, ref),',
@@ -177,6 +177,9 @@ def main(src: str, out: str, post: str | None = None) -> None:
                     body = body.replace(old, new)
             # S04 (décision d'Oss53pa du 21/11/2026) : current_tenant() dans keystone, jamais dans le schéma auth réservé à Supabase.
             body = body.replace('auth.current_tenant(', 'keystone.current_tenant(')
+            # S14 (décision d'Oss53pa du 21/11/2026, C01) : atlas_core.operating_mode fait foi ; l'ancien nom keystone.operating_mode
+            # est réécrit (un domaine alias perdrait les opérateurs de l'énumération, ex. from_mode <> to_mode).
+            body = re.sub(r'keystone\.operating_mode\b', 'atlas_core.operating_mode', body)
             for s in split_sql(body):
                 if any(src_ == f'{name}#{i}' and s.lstrip().startswith(start) for src_, start, _w in SKIP):
                     continue
