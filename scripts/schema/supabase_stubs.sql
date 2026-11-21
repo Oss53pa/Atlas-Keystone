@@ -34,3 +34,6 @@ DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET search_path = keystone, atlas_
 -- BOUCHON qui accepte tout : la validation JSON des contraintes CHECK n'est PAS éprouvée par l'essai local.
 CREATE OR REPLACE FUNCTION extensions.jsonb_matches_schema(schema json, instance jsonb) RETURNS boolean
   LANGUAGE sql IMMUTABLE AS $$ SELECT true $$;
+-- Comme sur Supabase : les rôles de l'API lisent auth.uid(), auth.jwt(), auth.role().
+GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;

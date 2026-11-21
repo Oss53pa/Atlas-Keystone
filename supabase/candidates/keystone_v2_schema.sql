@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1485 instructions réussies sur 1507 ; 22 écarts restants : docs/lot0 §6.
+-- 1487 instructions réussies sur 1509 ; 22 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -5325,6 +5325,36 @@ END $$;
 
 -- correctif_post
 REVOKE EXECUTE ON FUNCTION keystone.log_presence_access(uuid) FROM PUBLIC, anon;
+
+-- correctif_post
+-- C20 : keystone.audit_pseudonymize, appelée par keystone.tg_audit (Annexe A) mais jamais définie. Spécification :
+-- CDC fonctionnel 08 partie 2 (« colonnes personnelles remplacées par un jeton psn:<uuid> (audit_pseudonymize) »),
+-- tables audit_personal_fields et pseudonym_map (Annexe A) [Confirmé]. Une même valeur d'une même personne garde
+-- le même jeton (contrainte unique de pseudonym_map) ; conservation bornée par retention_months ; l'effacement
+-- (privacy_erase_subject) vide pseudonym_map.value sans toucher à la chaîne d'audit.
+CREATE OR REPLACE FUNCTION keystone.audit_pseudonymize(p_tenant uuid, p_table name, p_row jsonb) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = keystone, extensions, pg_temp AS $$
+DECLARE f record; v text; s uuid; h char(64); tok uuid; out jsonb := p_row;
+BEGIN
+  IF p_row IS NULL THEN RETURN NULL; END IF;
+  FOR f IN SELECT column_name, subject_column, retention_months FROM keystone.audit_personal_fields WHERE table_name = p_table LOOP
+    v := p_row ->> f.column_name;
+    CONTINUE WHEN v IS NULL;
+    s := nullif(p_row ->> f.subject_column, '')::uuid;
+    CONTINUE WHEN s IS NULL;
+    h := encode(extensions.digest(convert_to(v, 'UTF8'), 'sha256'), 'hex');
+    INSERT INTO keystone.pseudonym_map (tenant_id, subject_id, table_name, column_name, value_sha256, value, retention_until)
+    VALUES (p_tenant, s, p_table, f.column_name, h, v, (current_date + make_interval(months => f.retention_months))::date)
+    ON CONFLICT (tenant_id, subject_id, table_name, column_name, value_sha256) DO NOTHING;
+    SELECT token INTO tok FROM keystone.pseudonym_map
+     WHERE tenant_id = p_tenant AND subject_id = s AND table_name = p_table AND column_name = f.column_name AND value_sha256 = h;
+    out := jsonb_set(out, ARRAY[f.column_name], to_jsonb('psn:' || tok::text));
+  END LOOP;
+  RETURN out;
+END $$;
+
+-- correctif_post
+REVOKE EXECUTE ON FUNCTION keystone.audit_pseudonymize(uuid, name, jsonb) FROM PUBLIC, anon, authenticated;
 
 -- Referentiels_Transverses#2
 -- NULL hors de 1 à 25 ; la colonne appelante porte CHECK (score BETWEEN 1 AND 25)
