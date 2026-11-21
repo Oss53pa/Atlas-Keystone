@@ -34,6 +34,11 @@ CREATE TYPE keystone.vendor_status AS ENUM ('prospect','active','under_watch','s
 CREATE TYPE keystone.sla_clock AS ENUM ('response','resolution','client');                                  -- Annexe B
 CREATE TYPE keystone.presence_source AS ENUM ('gps','scan','beacon','work_order','manual');                 -- Annexe S
 
+-- C13, cause 3 : registre des schémas JSON, décrit en prose (Annexe M §M.2 : « keystone.json_schemas(id text PRIMARY KEY,
+-- schema json NOT NULL, version integer NOT NULL) et lus par keystone.json_schema(p_id text) RETURNS json (STABLE) ») [Confirmé].
+CREATE TABLE keystone.json_schemas (id text PRIMARY KEY, schema json NOT NULL, version integer NOT NULL);
+CREATE FUNCTION keystone.json_schema(p_id text) RETURNS json LANGUAGE sql STABLE AS $$ SELECT schema FROM keystone.json_schemas WHERE id = p_id $$;
+
 -- Restent sans définition, valeurs absentes du corpus : keystone.sla_pause_reason (liste tronquée en Annexe M),
--- keystone.inspection_status, keystone.json_schema(text), keystone.new_qr_token(), keystone.compute_meter_consumption_daily(),
+-- keystone.inspection_status, keystone.risk_assessments (table employée par l'Annexe C partie 2), keystone.compute_meter_consumption_daily(),
 -- keystone.processing_activities (renvoi PD1 §10.2). À compléter par Oss53pa dans l'annexe propriétaire.

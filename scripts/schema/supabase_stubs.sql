@@ -30,3 +30,7 @@ CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA extensions;
 -- Chemin de recherche : celui de Supabase, plus keystone et atlas_core comme dans les migrations du dépôt
 -- (SET LOCAL search_path = keystone, public, extensions) : les annexes emploient des types non qualifiés (wo_type…).
 DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET search_path = keystone, atlas_core, public, extensions', current_database()); END $$;
+-- pg_jsonschema (fourni par Supabase, requis par l'Annexe Admin) : indisponible sur le Postgres local.
+-- BOUCHON qui accepte tout : la validation JSON des contraintes CHECK n'est PAS éprouvée par l'essai local.
+CREATE OR REPLACE FUNCTION extensions.jsonb_matches_schema(schema json, instance jsonb) RETURNS boolean
+  LANGUAGE sql IMMUTABLE AS $$ SELECT true $$;

@@ -61,59 +61,69 @@ Dans les deux cas : vérifier d’abord que le schéma des annexes s’exécute 
 
 ## 6. Essai d'exécution du schéma des annexes (Postgres 16 local, jetable)
 
-Outils (`scripts/schema/`) : `annexes_to_sql.py` assemble, dans l'ordre de l'Index, les blocs SQL des Référentiels transverses puis des 49 annexes, remplace `<communes>` et la ligne « -- colonnes A.0.2 » (89 tables) par les colonnes communes de l'Annexe A, écarte les 3 vrais gabarits (`keystone.<t>`…) ; `supabase_stubs.sql` simule Supabase (`auth`, `storage`, `vault`, rôles, extensions) ; `correctifs_corpus.sql` porte les correctifs tracés C00 à C03 ; `run_fixpoint.py` exécute chaque instruction seule et rejoue les échecs jusqu'à stabilité, l'ordre de lecture n'étant pas l'ordre des dépendances.
+Outils (`scripts/schema/`, mode d'emploi dans `README.md`) : `annexes_to_sql.py` assemble les blocs SQL des Référentiels transverses puis des 49 annexes dans l'ordre de l'Index, développe les conventions de colonnes communes, écarte les 3 vrais gabarits et applique 3 substitutions tracées (S01 à S03) ; `supabase_stubs.sql` simule Supabase ; `correctifs_corpus.sql` et `correctifs_post.sql` portent les correctifs C00 à C14 ; `run_fixpoint.py` rejoue les échecs jusqu'à stabilité.
 
 | Essai | Instructions réussies | Tables créées |
 |---|---|---|
 | corpus brut | 449 sur 1 445 | 67 sur 563 |
-| après correctifs C00 à C03, conventions `<communes>` et « colonnes A.0.2 », chemin de recherche | 806 sur 1484 | 268 sur 563 |
+| avec conventions, correctifs et substitutions | 1426 sur 1488 | 552 sur 563 |
 
-### 6.1 Causes racines corrigées en correctifs (à reporter au corpus)
+### 6.1 Correctifs et substitutions appliqués (à reporter au corpus et au Registre)
 
-| # | Constat | Correctif |
+| Réf. | Constat | Traitement | Certitude |
+|---|---|---|---|
+| C00 | aucun `CREATE SCHEMA` | schémas `atlas_core`, `atlas_public`, `keystone` | Confirmé |
+| C01 | type de déclinaison jamais créé, deux noms (`atlas_core.` et `keystone.operating_mode`) | `atlas_core.operating_mode` (Référentiels §1), alias `keystone.operating_mode` | Confirmé pour les valeurs, nom à trancher |
+| C02 | types attribués aux Annexes C et R sans `CREATE TYPE` | valeurs de l'ancienne base | Probable, et faux par endroits : l'Annexe D attend `ticket_status = 'triage'` (ancienne base : `triaged`) |
+| C03 | `vendor_status`, `sla_clock`, `presence_source` écrits en texte | transcrits | Confirmé |
+| C10 | `wo_stage_status_ok` jamais créée | transcription du tableau B.1.4, `cancelled` admis à toute étape avant la clôture (même paragraphe) | Confirmé, le point `cancelled` à valider |
+| C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648, aléa pgcrypto | Interprétation |
+| C12, S01 | `clients.sector_code` référence `client_sectors(code)`, unique seulement avec `tenant_id` | clé composite `(tenant_id, sector_code)` | Confirmé |
+| C13 | `json_schemas` et `json_schema()` décrits en prose | transcrits | Confirmé |
+| C14, S02 | dépendance circulaire `work_orders` et `purchase_requests` | clé de `work_orders` posée après coup | Confirmé |
+| S03 | `hsse_events.security_log_id uuid` vers `security_log.id bigint` | colonne alignée en `bigint` | Interprétation |
+| conventions | `-- colonnes A.0.2` (89 tables) et `<communes>` tiennent lieu des colonnes communes ; types non qualifiés (chemin de recherche `keystone`) | développées par le script | Confirmé |
+| extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema employées sans `CREATE EXTENSION` dans le prélude | bouchons ; `pg_jsonschema` simulé : la validation JSON n'est pas éprouvée localement | Confirmé |
+
+### 6.2 Écarts restants (62 instructions)
+
+| Nature | Nombre | Traitement attendu |
 |---|---|---|
-| 1 | aucun `CREATE SCHEMA` dans le corpus | C00 |
-| 2 | type de la déclinaison jamais créé, nommé `atlas_core.operating_mode` (Référentiels transverses) et `keystone.operating_mode` (Annexe CO) | C01 : `atlas_core.operating_mode` (propriétaire selon les Référentiels), alias `keystone.operating_mode` |
-| 3 | types attribués aux Annexes C et R sans `CREATE TYPE` ; 9 existent dans la base actuelle (anciennes migrations 01 à 25) | C02, valeurs de la base actuelle [Probable] |
-| 3 bis | types dont les valeurs sont écrites en texte (`vendor_status`, `sla_clock`, `presence_source`) | C03 [Confirmé] |
-| 4 | PostGIS, pgvector, pg_trgm, btree_gist employés sans `CREATE EXTENSION` déclaré par l'annexe propriétaire | bouchons, à porter au prélude de l'Annexe CO |
-| 5 | `auth.current_tenant()` créée dans le schéma `auth`, réservé à Supabase [Probable : refusé sur Supabase] | non corrigé : déplacer la fonction, décision d'Oss53pa |
-| 6 | types employés sans schéma (`wo_type`, `space_unit_type`…) : exigent `keystone` dans le chemin de recherche | chemin de recherche de la base de test ; à écrire dans les conventions de l'Annexe A |
+| cascade | 22 | disparaissent avec leur cause |
+| objet jamais défini | 14 | définition par l’annexe propriétaire (Oss53pa) |
+| fonction décrite en prose, à implémenter | 12 | à écrire au lot du domaine, d’après la description |
+| fonction non IMMUTABLE dans un index ou une colonne générée | 4 | réécrire l’index ou la colonne |
+| double définition | 4 | garder une seule définition |
+| signature seule (description de RPC) | 2 | à écrire au lot du domaine |
+| autre | 2 | relecture |
+| valeur d’énumération incompatible | 2 | valeurs exactes de l’annexe propriétaire |
 
-### 6.2 Causes racines restantes, non corrigées faute de règle dans le corpus
+Point non éprouvable localement : `auth.current_tenant()` est créée dans le schéma `auth` (Annexe A §A.1, 109 emplois) ; Supabase réserve ce schéma [Probable : création refusée]. À déplacer dans `keystone` ou `atlas_core`, décision d'Oss53pa.
 
-Objets employés sans définition : `keystone.new_qr_token()` (bloque `keystone.locations`, puis les actifs et les OT ; seule indication : « jeton opaque, 12 caractères base32 »), `keystone.wo_stage_status_ok(wo_stage, wo_status)` (bloque `keystone.work_orders` ; correspondance décrite en prose, Annexe B §327), `keystone.json_schema(text)`, `keystone.sla_pause_reason` (liste tronquée), `keystone.inspection_status`, `keystone.compute_meter_consumption_daily()`, `keystone.processing_activities`.
-
-Défauts de structure : `keystone.clients` référence `client_sectors` sans contrainte d'unicité correspondante ; dépendance circulaire `keystone.users` et `keystone.client_users` (à rompre par un `ALTER TABLE … ADD CONSTRAINT` différé) ; fonctions non `IMMUTABLE` dans des index et une colonne générée ; erreurs de syntaxe.
-
-Liste exhaustive (41 instructions racines ; les 637 autres échecs en découlent) :
-
+#### Objets jamais définis
 | Bloc | Erreur |
 |---|---|
-| AnnexeA_Socle#15 | function keystone.new_qr_token() does not exist |
-| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
-| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
-| AnnexeAdmin_RBAC_Notifications#6 | functions in index expression must be marked IMMUTABLE |
-| AnnexeB_GMAO#2 | function keystone.wo_stage_status_ok(wo_stage, wo_status) does not exist |
-| AnnexeB_GMAO#8 | syntax error at end of input |
+| AnnexeA_Socle_Partie4#5 | function keystone.object_visible(text, uuid) does not exist |
+| AnnexeB_GMAO#5 | type "keystone.wo_transition_rules" does not exist |
 | AnnexeB_GMAO_Partie2#7 | type "sla_pause_reason" does not exist |
-| AnnexeB_GMAO_Partie2#8 | syntax error at or near "keystone" |
 | AnnexeB_GMAO_Partie3#14 | function keystone.compute_meter_consumption_daily() does not exist |
 | AnnexeB_GMAO_Partie3#14 | relation "keystone.meter_consumption_daily" does not exist |
-| AnnexeB_GMAO_Partie3#16 | function keystone.json_schema(unknown) does not exist |
-| AnnexeB_GMAO_Partie3#4 | no function body specified |
-| AnnexeB_GMAO_Partie4#3 | invalid input value for enum permit_type: "energized" |
-| AnnexeB_GMAO_Partie4#4 | syntax error at or near "keystone" |
-| AnnexeCO_Atlas_Core#5 | generation expression is not immutable |
-| AnnexeC_HSSE#1 | syntax error at or near "tenant_id" |
-| AnnexeC_HSSE_Partie2#2 | syntax error at or near "tenant_id" |
+| AnnexeC_HSSE#6 | role "proph3t_reader" does not exist |
 | AnnexeC_HSSE_Partie3#2 | type "keystone.inspection_status" does not exist |
 | AnnexeC_HSSE_Partie4#2 | function keystone.tg_check_document_ids() does not exist |
+| AnnexeC_HSSE_Partie4#3 | role "proph3t_reader" does not exist |
 | AnnexeC_HSSE_Partie4#7 | relation "keystone.processing_activities" does not exist |
 | AnnexeEN_Energie#5 | relation "keystone.v_meter_consumption_daily" does not exist |
+| AnnexeP_Prestataires_Mobile#14 | function keystone.vendor_docs_ok_rate(uuid, integer) does not exist |
+| AnnexeS_Space_Management_Partie2#10 | column "site_id" does not exist |
+| AnnexeS_Space_Management_Partie2#3 | function keystone.log_presence_access(uuid) does not exist |
+
+#### Fonctions décrites en prose ou par leur seule signature
+| Bloc | Erreur |
+|---|---|
+| AnnexeB_GMAO#8 | syntax error at end of input |
 | AnnexeMO_Modeles_OT#3 | syntax error at end of input |
 | AnnexeMO_Modeles_OT#3 | syntax error at end of input |
-| AnnexeM_Mode_Prestataire#2 | there is no unique constraint matching given keys for referenced table "client_sectors" |
 | AnnexePK_Parking#6 | syntax error at end of input |
 | AnnexePK_Parking#6 | syntax error at end of input |
 | AnnexePK_Parking#6 | syntax error at end of input |
@@ -123,15 +133,28 @@ Liste exhaustive (41 instructions racines ; les 637 autres échecs en découlent
 | AnnexePL_Planning_Equipes#14 | syntax error at or near ".." |
 | AnnexeP_Prestataires_Mobile#11 | syntax error at end of input |
 | AnnexeP_Prestataires_Mobile_Partie2#2 | syntax error at end of input |
+| AnnexeB_GMAO_Partie2#8 | syntax error at or near "keystone" |
+| AnnexeB_GMAO_Partie4#4 | syntax error at or near "keystone" |
+
+#### Autres
+| Bloc | Erreur |
+|---|---|
+| AnnexeB_GMAO_Partie4#3 | invalid input value for enum permit_type: "energized" |
+| AnnexeD_Tickets_Portails#3 | invalid input value for enum ticket_status: "triage" |
+| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
+| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
+| AnnexeAdmin_RBAC_Notifications#6 | functions in index expression must be marked IMMUTABLE |
+| AnnexeCO_Atlas_Core#5 | generation expression is not immutable |
+| AnnexeCL_Portail_Client#1 | policy "tickets_client_select" for table "tickets" already exists |
+| AnnexeCL_Portail_Client#1 | policy "tickets_client_insert" for table "tickets" already exists |
+| AnnexeN_Satisfaction_Cout#5 | relation "v_expenses_without_site" already exists |
 | AnnexeQ_Reporting#5 | relation "uq_review_ref" already exists |
-| AnnexeS_Space_Management#2 | function keystone.json_schema(unknown) does not exist |
-| AnnexeS_Space_Management#7 | function keystone.json_schema(unknown) does not exist |
-| AnnexeS_Space_Management_Partie2#10 | column "site_id" does not exist |
-| AnnexeTA_Travaux_Amenagement#3 | function keystone.json_schema(text) does not exist |
-| AnnexeU_Surete_Accueil#5 | function keystone.json_schema(unknown) does not exist |
-| AnnexeU_Surete_Accueil#6 | function keystone.json_schema(unknown) does not exist |
-| AnnexeU_Surete_Accueil#6 | function keystone.json_schema(unknown) does not exist |
+| AnnexeB_GMAO_Partie3#4 | no function body specified |
+| AnnexeC_HSSE#1 | syntax error at or near "id" |
 
-### 6.3 Conséquence sur la décision « reconstruire »
+### 6.3 Suite
 
-La reconstruction reste la bonne voie, mais le schéma des annexes n'est pas exécutable en l'état. Ordre proposé : (1) Oss53pa tranche les causes 2 et 5 et fournit les règles des objets du §6.2 ; (2) les correctifs sont reportés dans les annexes propriétaires et au Registre ; (3) l'essai est relancé jusqu'à zéro échec ; (4) seulement alors, première migration vers une branche Supabase, puis la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
+1. Oss53pa tranche : nom du type de déclinaison (C01), emplacement de `current_tenant()`, interprétations C10 (`cancelled`), C11 et S03, valeurs exactes de `ticket_status` et `permit_type`, définitions des objets jamais définis.
+2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre ; les fichiers de correctifs se vident d'autant.
+3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter, qui se livrent avec leur lot.
+4. Seulement alors : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).

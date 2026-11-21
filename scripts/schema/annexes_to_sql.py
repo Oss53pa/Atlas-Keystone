@@ -2,7 +2,7 @@
 """Assemble le SQL des annexes back-end du cahier des charges et l'éprouve sur un Postgres de test.
 
 Usage :
-  python3 -I scripts/schema/annexes_to_sql.py <dossier 03_Annexes_back_end> <sortie.json>
+  python3 -I scripts/schema/annexes_to_sql.py <dossier 03_Annexes_back_end> <sortie.json> [correctifs_post.sql]
 Le dossier frère 02_Cadrage_et_referentiels est lu pour les Référentiels transverses (§1.0 : types partagés),
 exécutés avant les annexes (ordre de lecture de l'Index, étape 3).
 Produit la liste ordonnée des instructions SQL (une entrée par instruction : annexe, n° de bloc, texte).
@@ -35,6 +35,22 @@ PROPOSAL = {'AnnexeAdmin_RBAC_Notifications_Partie4', 'AnnexeAP_API_Publique'}
 PRELUDE = ['CREATE SCHEMA IF NOT EXISTS atlas_core', 'CREATE SCHEMA IF NOT EXISTS atlas_public', 'CREATE SCHEMA IF NOT EXISTS keystone']
 BLOCK = re.compile(r'^```sql\s*\n(.*?)^```', re.S | re.M)
 TOKEN = re.compile(r'<([a-z_]+)>')
+# Substitutions tracées (rapport du lot 0, §6) : (bloc, texte du corpus, remplacement, motif). Chaque substitution
+# doit trouver son texte exactement une fois, sinon l'assemblage échoue : le corpus a changé, la revoir.
+SUBSTITUTIONS = [
+    ('AnnexeM_Mode_Prestataire#2',
+     'sector_code text REFERENCES keystone.client_sectors(code),',
+     'sector_code text,',
+     'S01 : client_sectors est unique sur (tenant_id, code), pas sur code ; clé composite ajoutée par C12 (correctifs_post.sql)'),
+    ('AnnexeB_GMAO#2',
+     'purchase_request_id uuid REFERENCES keystone.purchase_requests(id) ON DELETE RESTRICT,',
+     'purchase_request_id uuid,',
+     'S02 : dépendance circulaire work_orders et purchase_requests (Annexe E) ; clé ajoutée après coup par C14'),
+    ('AnnexeC_HSSE#4',
+     'security_log_id uuid REFERENCES keystone.security_log(id)',
+     'security_log_id bigint REFERENCES keystone.security_log(id)',
+     'S03 : security_log.id est bigint (Annexe U, journal chaîné) ; colonne alignée [interprétation, à confirmer]'),
+]
 
 
 def code_only(sql: str) -> str:
@@ -78,7 +94,7 @@ def split_sql(sql: str) -> list[str]:
     return out
 
 
-def main(src: str, out: str) -> None:
+def main(src: str, out: str, post: str | None = None) -> None:
     d = pathlib.Path(src)
     files = {p.stem.replace('CDC_Atlas_Keystone_', ''): p for p in d.glob('*.md')}
     missing = sorted(set(files) - set(ORDER))
@@ -95,16 +111,26 @@ def main(src: str, out: str) -> None:
             n_blocks += 1
             if name == 'AnnexeA_Socle' and i == 1:
                 templates.append(f'{name}#{i}'); continue  # définition des colonnes communes
+            # <communes> dans un commentaire : rester sur une ligne, sinon les colonnes sortiraient du commentaire.
+            body = re.sub(r'^([^\n]*--[^\n]*)<communes>', lambda m: m.group(1) + ' '.join(communes.split()), body, flags=re.M)
             body = body.replace('<communes>', communes)
             # Convention « -- colonnes A.0.2 » (89 tables) : commentaire tenant lieu des colonnes communes.
             body = re.sub(r'^[ \t]*-- colonnes A\.0\.2[^\n]*$', communes + ',', body, flags=re.M)
             if TOKEN.search(code_only(body)):
                 templates.append(f'{name}#{i}'); continue
+            for src_, old, new, _why in SUBSTITUTIONS:
+                if src_ == f'{name}#{i}':
+                    if body.count(old) != 1:
+                        sys.exit(f'Substitution introuvable ou ambiguë dans {src_} : {old!r}')
+                    body = body.replace(old, new)
             for s in split_sql(body):
                 stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
+    if post:  # correctifs dépendant de types du corpus, rejoués avec lui
+        for s in split_sql(pathlib.Path(post).read_text(encoding='utf-8')):
+            stmts.append({'src': 'correctif_post', 'sql': s})
     pathlib.Path(out).write_text(json.dumps({'statements': stmts, 'templates': templates}, ensure_ascii=False), encoding='utf-8')
     print(f'{n_blocks} blocs, {len(templates)} gabarits non exécutés, {len(stmts)} instructions -> {out}')
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
