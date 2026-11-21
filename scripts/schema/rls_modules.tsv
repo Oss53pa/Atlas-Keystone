@@ -4,23 +4,23 @@ access_log	access	access.manage	haute	AnnexeA_Socle	0
 access_log_heads	access	access.manage	haute	AnnexeA_Socle	0
 access_rights	access	access.manage	haute	AnnexeU_Surete_Accueil	0
 access_zones	access	access.manage	haute	AnnexeU_Surete_Accueil	0
-account_access_review_items	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-account_access_reviews	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-action_items	À DÉFINIR	À DÉFINIR	aucune	AnnexeM_Mode_Prestataire_Partie2	0
+account_access_review_items	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+account_access_reviews	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+action_items	client	client.read	seconde passe (clé étrangère)	AnnexeM_Mode_Prestataire_Partie2	0
 agent_controls	ai	ai.read	haute	AnnexeH_PROPH3T_Agents	0
 agent_definitions	ai	ai.read	haute	AnnexeH_PROPH3T_Agents	0
 agent_runs	ai	ai.read	haute	AnnexeH_PROPH3T_Agents	0
 ai_data_routes	ai	ai.read	haute	AnnexeH_PROPH3T_Agents	0
-am_decision_criteria	À DÉFINIR	À DÉFINIR	aucune	AnnexeAM_AMDEC_Fiabilite	0
-am_objectives	À DÉFINIR	À DÉFINIR	aucune	AnnexeAM_AMDEC_Fiabilite	0
-anomalies	À DÉFINIR	À DÉFINIR	aucune	AnnexeH_PROPH3T_Agents	0
+am_decision_criteria	fmea	fmea.manage	seconde passe (annexe)	AnnexeAM_AMDEC_Fiabilite	0
+am_objectives	fmea	fmea.manage	seconde passe (annexe)	AnnexeAM_AMDEC_Fiabilite	0
+anomalies	ai	ai.read	seconde passe (clé étrangère)	AnnexeH_PROPH3T_Agents	0
 api_events	api	api.manage	haute	?	0
 api_tokens	api	api.manage	haute	?	1
 api_usage_hourly	api	api.manage	haute	?	0
-approval_delegations	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-approval_levels	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-approval_steps	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-area_classes	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
+approval_delegations	budget	budget.read	seconde passe (annexe)	AnnexeE_Budgets_Achats	0
+approval_levels	role	role.manage	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
+approval_steps	budget	budget.read	seconde passe (annexe)	AnnexeE_Budgets_Achats	0
+area_classes	space	space.read	seconde passe (annexe)	AnnexeS_Space_Management	0
 asset_action_links	asset	asset.read	haute	AnnexeA_Socle_Partie3	0
 asset_categories	asset	asset.read	haute	AnnexeA_Socle_Partie2	0
 asset_category_attributes	asset	asset.read	haute	AnnexeA_Socle_Partie3	0
@@ -42,7 +42,7 @@ asset_spare_parts	asset	asset.read	haute	AnnexeA_Socle_Partie3	0
 asset_status_history	asset	asset.read	haute	AnnexeA_Socle_Partie2	0
 asset_warranties	asset	asset.read	haute	AnnexeA_Socle_Partie3	0
 assets	asset	asset.read	haute	AnnexeA_Socle_Partie2	0
-atelier_drafts	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
+atelier_drafts	space	space.read	seconde passe (clé étrangère)	AnnexeS_Space_Management	0
 audit_anchors	audit	audit.manage	haute	?	0
 audit_criteria	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
 audit_findings	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
@@ -52,28 +52,28 @@ audit_programs	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
 audit_schedule_slots	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
 audit_team	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
 audit_trail	audit_trail	audit_trail.read	haute	AnnexeA_Socle	0
-auditees	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie3	0
+auditees	audit	audit.manage	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie3	0
 audits	audit	audit.manage	haute	AnnexeC_HSSE_Partie3	0
-bait_station_checks	À DÉFINIR	À DÉFINIR	aucune	AnnexeF_SoftFM	0
-bait_stations	À DÉFINIR	À DÉFINIR	aucune	AnnexeF_SoftFM	0
-billable_items	À DÉFINIR	À DÉFINIR	aucune	AnnexeM_Mode_Prestataire	0
+bait_station_checks	pest	pest.manage	seconde passe (clé étrangère)	AnnexeF_SoftFM	0
+bait_stations	site	site.read	seconde passe (clé étrangère)	AnnexeF_SoftFM	0
+billable_items	client	client.read	seconde passe (clé étrangère)	AnnexeM_Mode_Prestataire	0
 bookable_resources	booking	booking.approve	moyenne	AnnexeS_Space_Management_Partie2	0
 booking_policies	booking	booking.approve	moyenne	AnnexeS_Space_Management_Partie2	0
 booking_series	booking	booking.approve	moyenne	AnnexeS_Space_Management_Partie2	0
-bowtie_nodes	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
+bowtie_nodes	capa	capa.assign	seconde passe (clé étrangère)	AnnexeC_HSSE	0
 budget_categories	budget	budget.read	haute	AnnexeE_Budgets_Achats	0
 budget_commitments	budget	budget.read	haute	AnnexeE_Budgets_Achats_Partie2	1
 budget_period_closures	budget	budget.read	haute	AnnexeE_Budgets_Achats	0
 budget_revisions	budget	budget.read	haute	AnnexeE_Budgets_Achats	0
 budgets	budget	budget.read	haute	AnnexeE_Budgets_Achats	0
-bulk_operations	À DÉFINIR	À DÉFINIR	aucune	?	1
-business_calendar_days	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie2	0
-business_calendars	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie2	0
+bulk_operations	settings	settings.manage	seconde passe (sens du nom)	?	1
+business_calendar_days	site	site.read	seconde passe (annexe)	AnnexeA_Socle_Partie2	0
+business_calendars	site	site.read	seconde passe (annexe)	AnnexeA_Socle_Partie2	0
 capa_actions	capa	capa.assign	moyenne	AnnexeC_HSSE	0
 capex_plan_lines	capex	capex.approve	moyenne	AnnexeAM_AMDEC_Fiabilite	0
 capex_plans	capex	capex.approve	moyenne	AnnexeAM_AMDEC_Fiabilite	0
 capex_recommendations	capex	capex.approve	moyenne	AnnexeAM_AMDEC_Fiabilite	0
-checkpoints	À DÉFINIR	À DÉFINIR	aucune	AnnexeU_Surete_Accueil	0
+checkpoints	site	site.read	seconde passe (clé étrangère)	AnnexeU_Surete_Accueil	0
 client_acceptance_reserves	client	client.read	haute	AnnexeM_Mode_Prestataire_Partie2	0
 client_acceptances	client	client.read	haute	AnnexeM_Mode_Prestataire_Partie2	0
 client_disputes	client	client.read	haute	AnnexeM_Mode_Prestataire_Partie2	0
@@ -92,34 +92,34 @@ competency_refusals	person	person.read	haute	?	0
 competency_requirements	person	person.read	haute	?	0
 compliance_evaluations	compliance	compliance.manage	moyenne	AnnexeC_HSSE_Partie3	0
 compliance_requirements	compliance	compliance.manage	moyenne	AnnexeC_HSSE_Partie3	0
-confined_space_entries	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	0
+confined_space_entries	permit	permit.activate	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie2	0
 consultation_participants	consultation	consultation.manage	haute	AnnexeK_Formation_Environnement	0
 contractor_evaluations	contract	contract.manage	moyenne	AnnexeP_Prestataires_Mobile	0
 contractor_penalties	contract	contract.manage	moyenne	AnnexeP_Prestataires_Mobile	0
 contractor_review_actions	contract	contract.manage	moyenne	AnnexeP_Prestataires_Mobile	0
 contractor_review_scores	contract	contract.manage	moyenne	AnnexeP_Prestataires_Mobile	0
 contractor_reviews	contract	contract.manage	moyenne	AnnexeP_Prestataires_Mobile	0
-control_reserves	À DÉFINIR	À DÉFINIR	aucune	AnnexeR_Reglementaire_SSI	0
-controls	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	0
-copilot_messages	À DÉFINIR	À DÉFINIR	aucune	AnnexeH_PROPH3T_Agents	0
+control_reserves	crp	crp.manage	seconde passe (clé étrangère)	AnnexeR_Reglementaire_SSI	0
+controls	capa	capa.assign	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie2	0
+copilot_messages	ai	ai.read	seconde passe (clé étrangère)	AnnexeH_PROPH3T_Agents	0
 crisis_drill_findings	crisis_drill	crisis_drill.manage	haute	AnnexeU_Surete_Accueil_Partie2	1
 crisis_drills	crisis_drill	crisis_drill.manage	haute	AnnexeU_Surete_Accueil_Partie2	1
-cycle_count_lines	À DÉFINIR	À DÉFINIR	aucune	?	0
-cycle_counts	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie3	0
+cycle_count_lines	stock	stock.read	seconde passe (clé étrangère)	?	0
+cycle_counts	stock	stock.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie3	0
 dashboard_configs	dashboard	dashboard.read	haute	AnnexeQ_Reporting	0
-data_exports	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie2	0
-device_sessions	À DÉFINIR	À DÉFINIR	aucune	AnnexeP_Prestataires_Mobile_Partie2	0
-disposal_records	À DÉFINIR	À DÉFINIR	aucune	AnnexeG_GED	0
+data_exports	client	client.read	seconde passe (clé étrangère)	AnnexeA_Socle_Partie2	0
+device_sessions	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
+disposal_records	doc	doc.read	seconde passe (clé étrangère)	AnnexeG_GED	0
 doc_links	doc	doc.read	haute	AnnexeG_GED	0
 doc_qr_links	doc	doc.read	haute	AnnexeG_GED	0
 doc_versions	doc	doc.read	haute	AnnexeG_GED	0
-dpia_assessments	À DÉFINIR	À DÉFINIR	aucune	Protection_Donnees	0
-duer_versions	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	1
-email_suppressions	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-email_templates	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-embeddings	À DÉFINIR	À DÉFINIR	aucune	AnnexeH_PROPH3T_Agents	0
-emission_factors	À DÉFINIR	À DÉFINIR	aucune	?	0
-emissions	À DÉFINIR	À DÉFINIR	aucune	?	0
+dpia_assessments	privacy	privacy.manage	seconde passe (annexe)	Protection_Donnees	0
+duer_versions	permit	permit.request	seconde passe (annexe)	AnnexeC_HSSE_Partie2	1
+email_suppressions	settings	settings.manage	seconde passe (clé étrangère)	AnnexeAdmin_RBAC_Notifications	0
+email_templates	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+embeddings	ai	ai.read	seconde passe (annexe)	AnnexeH_PROPH3T_Agents	0
+emission_factors	env	env.manage	seconde passe (sens du nom)	?	0
+emissions	env	env.manage	seconde passe (sens du nom)	?	0
 energy_action_plans	energy	energy.manage	moyenne	AnnexeEN_Energie	0
 energy_actions	energy	energy.manage	moyenne	AnnexeEN_Energie	0
 energy_anomalies	energy	energy.manage	moyenne	AnnexeEN_Energie	0
@@ -157,17 +157,17 @@ fire_systems	fire	fire.record	moyenne	AnnexeR_Reglementaire_SSI	0
 fitout_condition_templates	fitout	fitout.approve	moyenne	AnnexeTA_Travaux_Amenagement	0
 fitout_deposits	fitout	fitout.approve	moyenne	AnnexeTA_Travaux_Amenagement	0
 fitout_requests	fitout	fitout.approve	moyenne	AnnexeTA_Travaux_Amenagement	0
-floor_measurements	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
-fm_context_issues	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_cost_periods	À DÉFINIR	À DÉFINIR	aucune	AnnexeN_Satisfaction_Cout	0
-fm_management_reviews	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_objective_actions	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_objectives	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_policies	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_requirements	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_review_inputs	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_review_outputs	À DÉFINIR	À DÉFINIR	aucune	AnnexeQ_Reporting	0
-fm_stakeholders	À DÉFINIR	À DÉFINIR	aucune	?	0
+floor_measurements	space	space.read	seconde passe (clé étrangère)	AnnexeS_Space_Management	0
+fm_context_issues	report	report.read	seconde passe (annexe)	AnnexeQ_Reporting	0
+fm_cost_periods	cost	cost.read	seconde passe (annexe)	AnnexeN_Satisfaction_Cout	0
+fm_management_reviews	report	report.read	seconde passe (clé étrangère)	AnnexeQ_Reporting	0
+fm_objective_actions	report	report.read	seconde passe (annexe)	AnnexeQ_Reporting	0
+fm_objectives	report	report.read	seconde passe (annexe)	AnnexeQ_Reporting	0
+fm_policies	report	report.read	seconde passe (annexe)	AnnexeQ_Reporting	0
+fm_requirements	compliance	compliance.manage	seconde passe (clé étrangère)	AnnexeQ_Reporting	0
+fm_review_inputs	report	report.read	seconde passe (annexe)	AnnexeQ_Reporting	0
+fm_review_outputs	capa	capa.assign	seconde passe (clé étrangère)	AnnexeQ_Reporting	0
+fm_stakeholders	client	client.read	seconde passe (clé étrangère)	?	0
 fmea_modes	fmea	fmea.manage	moyenne	AnnexeAM_AMDEC_Fiabilite	0
 fmea_reviews	fmea	fmea.manage	moyenne	AnnexeAM_AMDEC_Fiabilite	0
 fmea_scales	fmea	fmea.manage	moyenne	AnnexeAM_AMDEC_Fiabilite	0
@@ -175,14 +175,14 @@ fmea_studies	fmea	fmea.manage	moyenne	AnnexeAM_AMDEC_Fiabilite	0
 ged_classification	doc	doc.read	haute	AnnexeG_GED	0
 ged_documents	doc	doc.read	haute	AnnexeG_GED	0
 ged_retention_rules	doc	doc.read	haute	AnnexeG_GED	0
-goods_receipt_lines	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-goods_receipts	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
+goods_receipt_lines	budget	budget.read	seconde passe (annexe)	AnnexeE_Budgets_Achats	0
+goods_receipts	purchase	purchase.approve	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
 governance_meetings	governance	governance.manage	haute	AnnexeM_Mode_Prestataire_Partie2	0
-hazards	À DÉFINIR	À DÉFINIR	aucune	?	0
-holiday_rules	À DÉFINIR	À DÉFINIR	aucune	?	0
+hazards	risk	risk.manage	seconde passe (sens du nom)	?	0
+holiday_rules	calendar	calendar.read	seconde passe (sens du nom)	?	0
 hsse_events	event	event.read	haute	AnnexeC_HSSE	1
-hsse_objective_measures	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
-hsse_objectives	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
+hsse_objective_measures	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
+hsse_objectives	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
 import_batch_rows	import	import.run	moyenne	AnnexeA_Socle_Partie2	0
 import_batches	import	import.run	moyenne	AnnexeA_Socle_Partie2	0
 import_mappings	import	import.run	moyenne	AnnexeA_Socle_Partie2	0
@@ -197,40 +197,40 @@ integration_endpoints	integration	integration.read	haute	?	0
 integration_inbox	integration	integration.read	haute	AnnexeIF_Interfaces	0
 integration_mappings	integration	integration.read	haute	AnnexeIF_Interfaces	0
 integration_outbox	integration	integration.read	haute	AnnexeIF_Interfaces	0
-investigation_members	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
-investigation_timeline	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
-investigations	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
+investigation_members	event	event.read	seconde passe (annexe)	AnnexeC_HSSE	0
+investigation_timeline	event	event.read	seconde passe (annexe)	AnnexeC_HSSE	0
+investigations	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE	0
 iot_alerts	iot	iot.read	haute	AnnexeI_IoT	0
 iot_device_status_log	iot	iot.read	haute	AnnexeI_IoT	0
 iot_devices	iot	iot.read	haute	AnnexeI_IoT	0
 iot_gateway_points	iot	iot.read	haute	AnnexeI_IoT	0
 iot_gateways	iot	iot.read	haute	AnnexeI_IoT	0
 iot_thresholds	iot	iot.read	haute	AnnexeI_IoT	0
-job_positions	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
-leak_alerts	À DÉFINIR	À DÉFINIR	aucune	AnnexeEN_Energie	0
-legal_hold_documents	À DÉFINIR	À DÉFINIR	aucune	AnnexeG_GED	0
-legal_holds	À DÉFINIR	À DÉFINIR	aucune	AnnexeG_GED	0
-legal_obligations	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie3	0
-lessons_learned	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie3	0
-level_outlines	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
-loading_dock_bookings	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management_Partie2	0
-loading_docks	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management_Partie2	0
+job_positions	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
+leak_alerts	asset	asset.read	seconde passe (clé étrangère)	AnnexeEN_Energie	0
+legal_hold_documents	doc	doc.read	seconde passe (annexe)	AnnexeG_GED	0
+legal_holds	doc	doc.read	seconde passe (annexe)	AnnexeG_GED	0
+legal_obligations	inspection	inspection.manage	seconde passe (annexe)	AnnexeC_HSSE_Partie3	0
+lessons_learned	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie3	0
+level_outlines	space	space.read	seconde passe (clé étrangère)	AnnexeS_Space_Management	0
+loading_dock_bookings	occupant	occupant.manage	seconde passe (clé étrangère)	AnnexeS_Space_Management_Partie2	0
+loading_docks	site	site.read	seconde passe (clé étrangère)	AnnexeS_Space_Management_Partie2	0
 locations	site	site.read	haute	AnnexeA_Socle	0
-lockboxes	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	0
+lockboxes	permit	permit.request	seconde passe (annexe)	AnnexeC_HSSE_Partie2	0
 lone_worker_alerts	lone_worker	lone_worker.respond	haute	AnnexeP_Prestataires_Mobile_Partie2	0
 lone_worker_sessions	lone_worker	lone_worker.respond	haute	AnnexeP_Prestataires_Mobile_Partie2	0
-mail_parcels	À DÉFINIR	À DÉFINIR	aucune	AnnexeU_Surete_Accueil	0
-maintenance_contract_scope	À DÉFINIR	À DÉFINIR	aucune	?	0
-maintenance_contracts	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie3	0
-maintenance_levels	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-maintenance_plan_assets	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-maintenance_plan_skips	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-maintenance_plans	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-management_review_decisions	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
-management_review_participants	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
-management_reviews	À DÉFINIR	À DÉFINIR	aucune	AnnexeK_Formation_Environnement	0
-measurement_surveys	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
-medical_visits	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie4	1
+mail_parcels	occupant	occupant.manage	seconde passe (clé étrangère)	AnnexeU_Surete_Accueil	0
+maintenance_contract_scope	asset	asset.read	seconde passe (clé étrangère)	?	0
+maintenance_contracts	vendor	vendor.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie3	0
+maintenance_levels	person	person.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+maintenance_plan_assets	asset	asset.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+maintenance_plan_skips	wo	wo.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+maintenance_plans	asset	asset.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+management_review_decisions	capa	capa.assign	seconde passe (clé étrangère)	AnnexeK_Formation_Environnement	0
+management_review_participants	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
+management_reviews	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
+measurement_surveys	space	space.read	seconde passe (annexe)	AnnexeS_Space_Management	0
+medical_visits	event	event.read	seconde passe (annexe)	AnnexeC_HSSE_Partie4	1
 meter_reading_round_items	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
 meter_reading_round_run_items	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
 meter_reading_round_runs	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
@@ -241,22 +241,22 @@ mobilization_reserves	mobilization	mobilization.read	haute	?	0
 mobilization_staff_transfers	mobilization	mobilization.read	haute	AnnexeM_Mode_Prestataire	0
 mobilization_tasks	mobilization	mobilization.read	haute	AnnexeM_Mode_Prestataire	0
 mobilization_templates	mobilization	mobilization.read	haute	AnnexeM_Mode_Prestataire	0
-mode_change_plans	À DÉFINIR	À DÉFINIR	aucune	AnnexeCO_Atlas_Core	0
+mode_change_plans	settings	settings.manage	seconde passe (sens du nom)	AnnexeCO_Atlas_Core	0
 move_requests	move	move.approve	moyenne	AnnexeS_Space_Management_Partie2	0
 move_task_templates	move	move.approve	moyenne	AnnexeS_Space_Management_Partie2	0
-normalization_factors	À DÉFINIR	À DÉFINIR	aucune	AnnexeEN_Energie	0
+normalization_factors	energy	energy.manage	seconde passe (annexe)	AnnexeEN_Energie	0
 notification_digests	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 notification_preferences	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 notification_rules	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 notifications	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
-object_comments	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie4	1
-obligation_control_map	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie3	0
+object_comments	settings	settings.manage	seconde passe (annexe)	AnnexeA_Socle_Partie4	1
+obligation_control_map	inspection	inspection.manage	seconde passe (annexe)	AnnexeC_HSSE_Partie3	0
 occupant_headcount	occupant	occupant.manage	moyenne	AnnexeN_Satisfaction_Cout	0
 occupant_organizations	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
 occupant_site_codes	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
 occupant_users	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
-occupational_diseases	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie4	0
-occupational_exposures	À DÉFINIR	À DÉFINIR	aucune	?	0
+occupational_diseases	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie4	0
+occupational_exposures	wo	wo.read	seconde passe (clé étrangère)	?	0
 on_call	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 on_call_escalation_policies	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 on_call_pages	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
@@ -290,42 +290,42 @@ person_competencies	person	person.read	haute	AnnexeK_Formation_Environnement	0
 persons	person	person.read	haute	AnnexeA_Socle_Partie2	0
 pest_interventions	pest	pest.manage	moyenne	AnnexeF_SoftFM	0
 pest_quarterly_reports	pest	pest.manage	moyenne	AnnexeF_SoftFM	0
-physical_access_reviews	À DÉFINIR	À DÉFINIR	aucune	AnnexeU_Surete_Accueil	0
+physical_access_reviews	visitor	visitor.denylist_manage	seconde passe (annexe)	AnnexeU_Surete_Accueil	0
 plan_imports	plan	plan.manage	moyenne	AnnexeS_Space_Management	0
 planning_baseline_items	planning	planning.read	haute	AnnexeB_GMAO_Partie3	0
 planning_baselines	planning	planning.read	haute	AnnexeB_GMAO_Partie3	0
 planning_freezes	planning	planning.read	haute	AnnexeB_GMAO_Partie3	0
-pm_task_checkpoints	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-pm_task_failure_modes	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-pm_task_parts	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-pm_tasks	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
-po_change_proposals	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-po_lines	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-predictions	À DÉFINIR	À DÉFINIR	aucune	AnnexeH_PROPH3T_Agents	0
+pm_task_checkpoints	wo	wo.read	seconde passe (annexe)	AnnexeB_GMAO_Partie2	0
+pm_task_failure_modes	fmea	fmea.manage	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+pm_task_parts	wo	wo.read	seconde passe (annexe)	AnnexeB_GMAO_Partie2	0
+pm_tasks	person	person.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie2	0
+po_change_proposals	purchase	purchase.approve	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
+po_lines	purchase	purchase.approve	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
+predictions	ai	ai.read	seconde passe (clé étrangère)	AnnexeH_PROPH3T_Agents	0
 presence	presence	presence.view	moyenne	?	0
 presence_access_log	presence	presence.view	moyenne	AnnexeS_Space_Management_Partie2	0
-prevention_plan_risks	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	0
-prevention_plans	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE_Partie2	0
+prevention_plan_risks	permit	permit.request	seconde passe (annexe)	AnnexeC_HSSE_Partie2	0
+prevention_plans	fitout	fitout.approve	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie2	0
 privacy_breaches	privacy	privacy.erase	moyenne	Protection_Donnees	0
 privacy_formalities	privacy	privacy.erase	moyenne	Protection_Donnees	0
 privacy_request_events	privacy	privacy.erase	moyenne	Protection_Donnees	0
 privacy_requests	privacy	privacy.erase	moyenne	Protection_Donnees	0
 processing_activities	privacy	privacy.erase	moyenne	Protection_Donnees	0
-pseudonym_map	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle	0
-public_report_attempts	À DÉFINIR	À DÉFINIR	aucune	AnnexeD_Tickets_Portails_Partie2	0
-public_report_points	À DÉFINIR	À DÉFINIR	aucune	AnnexeD_Tickets_Portails_Partie2	0
+pseudonym_map	site	site.read	seconde passe (annexe)	AnnexeA_Socle	0
+public_report_attempts	occupant	occupant.manage	seconde passe (annexe)	AnnexeD_Tickets_Portails_Partie2	0
+public_report_points	site	site.read	seconde passe (clé étrangère)	AnnexeD_Tickets_Portails_Partie2	0
 purchase_comments	purchase	purchase.approve	moyenne	AnnexeE_Budgets_Achats_Partie2	0
 purchase_orders	purchase	purchase.approve	moyenne	AnnexeE_Budgets_Achats	0
 purchase_request_lines	purchase	purchase.approve	moyenne	AnnexeE_Budgets_Achats	0
 purchase_requests	purchase	purchase.approve	moyenne	AnnexeE_Budgets_Achats	0
-purchasing_category_thresholds	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-purchasing_settings	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-push_subscriptions	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
+purchasing_category_thresholds	budget	budget.read	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
+purchasing_settings	budget	budget.read	seconde passe (annexe)	AnnexeE_Budgets_Achats	0
+push_subscriptions	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
 qc_elements	qc	qc.record	moyenne	AnnexeF_SoftFM	0
 qc_profiles	qc	qc.record	moyenne	?	0
 qc_scores	qc	qc.record	moyenne	AnnexeF_SoftFM	0
 reception_log	reception	reception.manage	haute	AnnexeU_Surete_Accueil	0
-refrigerant_check_rules	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie3	0
+refrigerant_check_rules	asset	asset.read	seconde passe (annexe)	AnnexeA_Socle_Partie3	0
 regulatory_control_results	crp	crp.manage	moyenne	AnnexeR_Reglementaire_SSI	0
 regulatory_controls	crp	crp.manage	moyenne	AnnexeR_Reglementaire_SSI	0
 regulatory_derogations	crp	crp.manage	moyenne	AnnexeR_Reglementaire_SSI	0
@@ -335,7 +335,7 @@ report_publications	report	report.read	haute	AnnexeCL_Portail_Client	0
 report_runs	report	report.read	haute	AnnexeQ_Reporting	0
 report_schedules	report	report.read	haute	?	0
 report_templates	report	report.read	haute	AnnexeQ_Reporting	0
-retention_runs	À DÉFINIR	À DÉFINIR	aucune	Protection_Donnees	0
+retention_runs	privacy	privacy.manage	seconde passe (annexe)	Protection_Donnees	0
 rfq_criteria	rfq	rfq.manage	moyenne	AnnexeE_Budgets_Achats	0
 rfq_deadline_changes	rfq	rfq.manage	moyenne	AnnexeE_Budgets_Achats_Partie2	0
 rfq_invitations	rfq	rfq.manage	moyenne	AnnexeE_Budgets_Achats	0
@@ -352,14 +352,14 @@ risk_score_models	risk	risk.manage	moyenne	AnnexeC_HSSE_Partie2	0
 risk_scores	risk	risk.manage	moyenne	AnnexeC_HSSE_Partie2	0
 role_permissions	role	role.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 roles	role	role.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
-root_causes	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
-safety_alerts	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	0
-samp	À DÉFINIR	À DÉFINIR	aucune	AnnexeAM_AMDEC_Fiabilite	0
-saved_views	À DÉFINIR	À DÉFINIR	aucune	AnnexeW_Workspace_AdHoc	1
+root_causes	event	event.read	seconde passe (annexe)	AnnexeC_HSSE	0
+safety_alerts	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE	0
+samp	asset	asset.read	seconde passe (clé étrangère)	AnnexeAM_AMDEC_Fiabilite	0
+saved_views	planning	planning.read	seconde passe (clé étrangère)	AnnexeW_Workspace_AdHoc	1
 scim_events	scim	scim.manage	haute	AnnexeAdmin_RBAC_Notifications_Partie4	0
 scim_groups	scim	scim.manage	haute	AnnexeAdmin_RBAC_Notifications_Partie4	0
 scim_tokens	scim	scim.manage	haute	AnnexeAdmin_RBAC_Notifications_Partie4	0
-sectors	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
+sectors	asset	asset.read	seconde passe (clé étrangère)	AnnexeS_Space_Management	0
 security_events	security	security.kpi_read	haute	?	1
 security_handover	security	security.kpi_read	haute	AnnexeU_Surete_Accueil	0
 security_log	security	security.kpi_read	moyenne	?	0
@@ -369,14 +369,14 @@ service_contract_amendments	service_contract	service_contract.read	haute	AnnexeM
 service_contract_scope	service_contract	service_contract.read	haute	AnnexeM_Mode_Prestataire	0
 service_contracts	service_contract	service_contract.read	haute	AnnexeM_Mode_Prestataire	0
 service_types	service	service.execute	haute	AnnexeF_SoftFM	0
-session_profiles	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
+session_profiles	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
 settings	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 settings_history	settings	settings.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 shift_pattern_slots	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 shift_patterns	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 shifts	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
-shipment_notice_lines	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
-shipment_notices	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
+shipment_notice_lines	budget	budget.read	seconde passe (annexe)	AnnexeE_Budgets_Achats	0
+shipment_notices	purchase	purchase.approve	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
 site_announcements	site	site.read	haute	AnnexeD_Tickets_Portails_Partie2	0
 site_blackouts	site	site.read	haute	AnnexeA_Socle_Partie2	0
 site_business_hours	site	site.read	haute	AnnexeA_Socle_Partie2	0
@@ -384,8 +384,8 @@ site_directory	site	site.read	haute	AnnexeD_Tickets_Portails_Partie2	0
 site_ext	site	site.read	haute	AnnexeA_Socle	0
 site_fire_settings	site	site.read	haute	AnnexeR_Reglementaire_SSI	0
 site_regulatory_suspensions	site	site.read	haute	AnnexeR_Reglementaire_SSI	0
-sla_pauses	À DÉFINIR	À DÉFINIR	aucune	?	0
-sla_policies	À DÉFINIR	À DÉFINIR	aucune	AnnexeB_GMAO_Partie2	0
+sla_pauses	wo	wo.read	seconde passe (clé étrangère)	?	0
+sla_policies	wo	wo.read	seconde passe (annexe)	AnnexeB_GMAO_Partie2	0
 space_bookings	space	space.read	haute	AnnexeS_Space_Management_Partie2	0
 space_chargeback_rules	space	space.read	haute	AnnexeS_Space_Management_Partie2	0
 space_chargebacks	space	space.read	haute	AnnexeS_Space_Management_Partie2	0
@@ -396,30 +396,30 @@ space_plans	space	space.read	haute	AnnexeS_Space_Management	0
 space_scenarios	space	space.read	haute	AnnexeS_Space_Management_Partie2	0
 space_utilization_hourly	space	space.read	haute	AnnexeS_Space_Management_Partie2	0
 spare_parts	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
-ssi_inhibitions	À DÉFINIR	À DÉFINIR	aucune	AnnexeR_Reglementaire_SSI	0
+ssi_inhibitions	fire	fire.record	seconde passe (clé étrangère)	AnnexeR_Reglementaire_SSI	0
 sso_group_mappings	sso	sso.manage	haute	?	1
 stock_issue_refusals	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
 stock_movements	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
 stock_reservations	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
 stock_transfer_lines	stock	stock.read	haute	?	0
 stock_transfers	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
-supplier_catalog_items	À DÉFINIR	À DÉFINIR	aucune	AnnexeE_Budgets_Achats	0
+supplier_catalog_items	stock	stock.read	seconde passe (clé étrangère)	AnnexeE_Budgets_Achats	0
 survey_followups	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 survey_invitations	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 survey_questions	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 survey_responses	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 surveys	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
-sync_conflicts	À DÉFINIR	À DÉFINIR	aucune	AnnexeP_Prestataires_Mobile_Partie2	0
-sync_mutations	À DÉFINIR	À DÉFINIR	aucune	AnnexeP_Prestataires_Mobile_Partie2	0
+sync_conflicts	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
+sync_mutations	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
 team_members	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 teams	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
-telemetry_dashboards	À DÉFINIR	À DÉFINIR	aucune	AnnexeI_IoT	0
-tenant_branding	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-tenant_domains	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-tenant_lot_prefixes	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management	0
-tenant_onboarding_steps	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
-tenant_provisioning	À DÉFINIR	À DÉFINIR	aucune	AnnexeCO_Atlas_Core	0
-tenant_surfaces	À DÉFINIR	À DÉFINIR	aucune	AnnexeAdmin_RBAC_Notifications	0
+telemetry_dashboards	iot	iot.read	seconde passe (annexe)	AnnexeI_IoT	0
+tenant_branding	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+tenant_domains	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+tenant_lot_prefixes	space	space.read	seconde passe (annexe)	AnnexeS_Space_Management	0
+tenant_onboarding_steps	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
+tenant_provisioning	FERMÉE (plateforme)	aucune	décision : service_role seulement	AnnexeCO_Atlas_Core	0
+tenant_surfaces	settings	settings.manage	seconde passe (annexe)	AnnexeAdmin_RBAC_Notifications	0
 ticket_attachments	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
 ticket_categories	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
 ticket_comments	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
@@ -428,11 +428,11 @@ ticket_status_history	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
 ticket_templates	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
 ticket_work_orders	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	0
 tickets	ticket	ticket.read	haute	AnnexeD_Tickets_Portails	3
-time_off	À DÉFINIR	À DÉFINIR	aucune	AnnexePL_Planning_Equipes	0
+time_off	planning	planning.read	seconde passe (annexe)	AnnexePL_Planning_Equipes	0
 training_media	person	person.read	haute	AnnexeK_Formation_Environnement	0
 training_records	person	person.read	haute	AnnexeK_Formation_Environnement	0
 training_sessions	person	person.read	haute	AnnexeK_Formation_Environnement	0
-undo_tokens	À DÉFINIR	À DÉFINIR	aucune	AnnexeA_Socle_Partie4	1
+undo_tokens	settings	settings.manage	seconde passe (annexe)	AnnexeA_Socle_Partie4	1
 usage_daily	usage	usage.read	haute	AnnexeAdmin_RBAC_Notifications_Partie4	1
 user_preferences	user	user.manage	moyenne	AnnexeW_Workspace_AdHoc	1
 user_profiles	user	user.manage	moyenne	AnnexeAdmin_RBAC_Notifications	1
@@ -440,8 +440,8 @@ user_quiet_hours	user	user.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 user_roles	user	user.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 user_scope	user	user.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
 users	user	user.manage	moyenne	AnnexeAdmin_RBAC_Notifications	0
-utilization_recommendation_dismissals	À DÉFINIR	À DÉFINIR	aucune	AnnexeS_Space_Management_Partie2	0
-vehicles	À DÉFINIR	À DÉFINIR	aucune	?	0
+utilization_recommendation_dismissals	booking	booking.approve	seconde passe (clé étrangère)	AnnexeS_Space_Management_Partie2	0
+vehicles	parking	parking.manage	seconde passe (sens du nom)	?	0
 vendor_bank_changes	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_change_requests	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_contacts	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
@@ -455,17 +455,17 @@ vendor_site_restrictions	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_status_history	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_users	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendors	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
-video_requisitions	À DÉFINIR	À DÉFINIR	aucune	AnnexeU_Surete_Accueil	0
+video_requisitions	asset	asset.read	seconde passe (clé étrangère)	AnnexeU_Surete_Accueil	0
 visitor_denylist	visitor	visitor.denylist_manage	moyenne	AnnexeU_Surete_Accueil	0
 visitors	visitor	visitor.denylist_manage	moyenne	AnnexeU_Surete_Accueil	0
-visits	À DÉFINIR	À DÉFINIR	aucune	?	0
+visits	access	access.manage	seconde passe (clé étrangère)	?	0
 warehouses	stock	stock.read	haute	AnnexeB_GMAO_Partie3	0
 waste_records	waste	waste.manage	moyenne	AnnexeK_Formation_Environnement	0
 waste_streams	waste	waste.manage	moyenne	AnnexeK_Formation_Environnement	0
 waste_tracking_slips	waste	waste.manage	moyenne	AnnexeK_Formation_Environnement	0
 webhook_deliveries	webhook	webhook.manage	moyenne	AnnexeAP_API_Publique	1
 webhook_endpoints	webhook	webhook.manage	moyenne	AnnexeAP_API_Publique	1
-witness_statements	À DÉFINIR	À DÉFINIR	aucune	AnnexeC_HSSE	1
+witness_statements	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE	1
 wo_checkpoint_results	wo	wo.read	haute	AnnexeB_GMAO_Partie2	0
 wo_instructions	wo	wo.read	haute	AnnexeB_GMAO_Partie4	0
 wo_reports	wo	wo.read	haute	AnnexeB_GMAO_Partie2	0
