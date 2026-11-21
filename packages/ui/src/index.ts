@@ -3,3 +3,4 @@ export * from './AppShell.tsx';
 export * from './CommandPalette.tsx';
 export * from './charts.tsx';
 export * from './v4.tsx';
+export * from './form/Form.tsx';

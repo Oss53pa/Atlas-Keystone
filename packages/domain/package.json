@@ -13,5 +13,8 @@
   "scripts": {
     "test": "node --test --experimental-strip-types",
     "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "zod": "3.25.76"
   }
 }
