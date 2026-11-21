@@ -61,21 +61,77 @@ Dans les deux cas : vérifier d’abord que le schéma des annexes s’exécute 
 
 ## 6. Essai d'exécution du schéma des annexes (Postgres 16 local, jetable)
 
-Outils : `scripts/schema/annexes_to_sql.py` (assemble, dans l'ordre de l'Index, les blocs SQL des Référentiels transverses puis des 49 annexes ; remplace `<communes>` par les colonnes communes de l'Annexe A ; écarte les gabarits), `scripts/schema/supabase_stubs.sql` (bouchons Supabase : `auth`, `storage`, `vault`, rôles, extensions PostGIS, pgvector, pg_trgm, btree_gist, unaccent), `scripts/schema/run_fixpoint.py` (exécute chaque instruction seule et rejoue les échecs en passes successives jusqu'à stabilité, l'ordre de lecture n'étant pas l'ordre des dépendances).
+Outils (`scripts/schema/`) : `annexes_to_sql.py` assemble, dans l'ordre de l'Index, les blocs SQL des Référentiels transverses puis des 49 annexes, remplace `<communes>` et la ligne « -- colonnes A.0.2 » (89 tables) par les colonnes communes de l'Annexe A, écarte les 3 vrais gabarits (`keystone.<t>`…) ; `supabase_stubs.sql` simule Supabase (`auth`, `storage`, `vault`, rôles, extensions) ; `correctifs_corpus.sql` porte les correctifs tracés C00 à C03 ; `run_fixpoint.py` exécute chaque instruction seule et rejoue les échecs jusqu'à stabilité, l'ordre de lecture n'étant pas l'ordre des dépendances.
 
-Résultat : 1445 instructions, 449 exécutées, 996 en échec après 3 passes ; 14 blocs gabarits non exécutés. Seules 67 tables sur 563 se créent : les échecs sont en cascade depuis quelques causes racines.
+| Essai | Instructions réussies | Tables créées |
+|---|---|---|
+| corpus brut | 449 sur 1 445 | 67 sur 563 |
+| après correctifs C00 à C03, conventions `<communes>` et « colonnes A.0.2 », chemin de recherche | 806 sur 1484 | 268 sur 563 |
 
-### 6.1 Causes racines
+### 6.1 Causes racines corrigées en correctifs (à reporter au corpus)
 
-| # | Constat | Effet | Correction à porter au corpus |
-|---|---|---|---|
-| 1 | Aucun `CREATE SCHEMA` (`atlas_core`, `keystone`, `atlas_public`) dans tout le corpus | rien ne s'exécute sans prélude | ajouter le prélude à l'Annexe CO |
-| 2 | Le type de la déclinaison est déclaré `atlas_core.operating_mode` (propriétaire Annexe CO selon les Référentiels transverses §1.5), mais l'Annexe CO l'emploie sous le nom `keystone.operating_mode` et aucun fichier ne le crée | `atlas_core.tenants` ne se crée pas, puis 146 instructions qui en dépendent, puis presque tout le schéma | trancher le nom et ajouter le `CREATE TYPE` à l'Annexe CO |
-| 3 | 24 types et objets employés sans définition dans le corpus, dont 10 existent dans la base actuelle (anciennes migrations 01 à 25, absentes du dépôt) : `capa_status`, `capa_type`, `control_hierarchy`, `control_result`, `event_status`, `identifier_type`, `investigation_method`, `permit_status`, `ticket_status`, `wo_templates` ; autres jamais définis : `vendor_status`, `presence_source`, `sla_pause_reason`, `hsse_event_type`, `inspection_status`, `sla_clock`, `json_schema()`, `new_qr_token()`, `compute_meter_consumption_daily()`, `meter_consumption_daily`, `v_meter_consumption_daily`, `processing_activities` | les tables HSSE, permis, tickets, SLA, compteurs ne se créent pas | définir chaque objet dans l'annexe propriétaire (Référentiels transverses §1.0) ; les annexes ne doivent pas dépendre de l'ancien schéma |
-| 4 | Extensions employées sans `CREATE EXTENSION` : PostGIS (`geometry`, Annexe A, `atlas_core.sites`), pgvector (`vector`, Annexe H) | référentiel spatial et IA bloqués | déclarer les extensions dans le prélude |
-| 5 | `auth.current_tenant()` créée dans le schéma `auth` (Annexe A §A.1) et citée 109 fois | [Probable] refusé par Supabase, qui réserve le schéma `auth` à son service | déplacer la fonction (`keystone.current_tenant()` ou `atlas_core.current_tenant()`) |
-| 6 | 39 contraintes « column named in key does not exist », 14 erreurs de syntaxe | tables isolées | relecture ligne à ligne (liste complète produite par `run_fixpoint.py`) |
+| # | Constat | Correctif |
+|---|---|---|
+| 1 | aucun `CREATE SCHEMA` dans le corpus | C00 |
+| 2 | type de la déclinaison jamais créé, nommé `atlas_core.operating_mode` (Référentiels transverses) et `keystone.operating_mode` (Annexe CO) | C01 : `atlas_core.operating_mode` (propriétaire selon les Référentiels), alias `keystone.operating_mode` |
+| 3 | types attribués aux Annexes C et R sans `CREATE TYPE` ; 9 existent dans la base actuelle (anciennes migrations 01 à 25) | C02, valeurs de la base actuelle [Probable] |
+| 3 bis | types dont les valeurs sont écrites en texte (`vendor_status`, `sla_clock`, `presence_source`) | C03 [Confirmé] |
+| 4 | PostGIS, pgvector, pg_trgm, btree_gist employés sans `CREATE EXTENSION` déclaré par l'annexe propriétaire | bouchons, à porter au prélude de l'Annexe CO |
+| 5 | `auth.current_tenant()` créée dans le schéma `auth`, réservé à Supabase [Probable : refusé sur Supabase] | non corrigé : déplacer la fonction, décision d'Oss53pa |
+| 6 | types employés sans schéma (`wo_type`, `space_unit_type`…) : exigent `keystone` dans le chemin de recherche | chemin de recherche de la base de test ; à écrire dans les conventions de l'Annexe A |
 
-### 6.2 Conséquence sur la décision « reconstruire »
+### 6.2 Causes racines restantes, non corrigées faute de règle dans le corpus
 
-La reconstruction reste la bonne voie, mais le schéma des annexes n'est pas exécutable en l'état : il faut d'abord corriger les causes 1 à 5 dans le corpus (ou dans un fichier de correctifs tracé, chaque écart reporté au Registre), puis relancer l'essai jusqu'à zéro échec. Aucune migration ne part vers la base partagée avant cet essai sans erreur.
+Objets employés sans définition : `keystone.new_qr_token()` (bloque `keystone.locations`, puis les actifs et les OT ; seule indication : « jeton opaque, 12 caractères base32 »), `keystone.wo_stage_status_ok(wo_stage, wo_status)` (bloque `keystone.work_orders` ; correspondance décrite en prose, Annexe B §327), `keystone.json_schema(text)`, `keystone.sla_pause_reason` (liste tronquée), `keystone.inspection_status`, `keystone.compute_meter_consumption_daily()`, `keystone.processing_activities`.
+
+Défauts de structure : `keystone.clients` référence `client_sectors` sans contrainte d'unicité correspondante ; dépendance circulaire `keystone.users` et `keystone.client_users` (à rompre par un `ALTER TABLE … ADD CONSTRAINT` différé) ; fonctions non `IMMUTABLE` dans des index et une colonne générée ; erreurs de syntaxe.
+
+Liste exhaustive (41 instructions racines ; les 637 autres échecs en découlent) :
+
+| Bloc | Erreur |
+|---|---|
+| AnnexeA_Socle#15 | function keystone.new_qr_token() does not exist |
+| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
+| AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
+| AnnexeAdmin_RBAC_Notifications#6 | functions in index expression must be marked IMMUTABLE |
+| AnnexeB_GMAO#2 | function keystone.wo_stage_status_ok(wo_stage, wo_status) does not exist |
+| AnnexeB_GMAO#8 | syntax error at end of input |
+| AnnexeB_GMAO_Partie2#7 | type "sla_pause_reason" does not exist |
+| AnnexeB_GMAO_Partie2#8 | syntax error at or near "keystone" |
+| AnnexeB_GMAO_Partie3#14 | function keystone.compute_meter_consumption_daily() does not exist |
+| AnnexeB_GMAO_Partie3#14 | relation "keystone.meter_consumption_daily" does not exist |
+| AnnexeB_GMAO_Partie3#16 | function keystone.json_schema(unknown) does not exist |
+| AnnexeB_GMAO_Partie3#4 | no function body specified |
+| AnnexeB_GMAO_Partie4#3 | invalid input value for enum permit_type: "energized" |
+| AnnexeB_GMAO_Partie4#4 | syntax error at or near "keystone" |
+| AnnexeCO_Atlas_Core#5 | generation expression is not immutable |
+| AnnexeC_HSSE#1 | syntax error at or near "tenant_id" |
+| AnnexeC_HSSE_Partie2#2 | syntax error at or near "tenant_id" |
+| AnnexeC_HSSE_Partie3#2 | type "keystone.inspection_status" does not exist |
+| AnnexeC_HSSE_Partie4#2 | function keystone.tg_check_document_ids() does not exist |
+| AnnexeC_HSSE_Partie4#7 | relation "keystone.processing_activities" does not exist |
+| AnnexeEN_Energie#5 | relation "keystone.v_meter_consumption_daily" does not exist |
+| AnnexeMO_Modeles_OT#3 | syntax error at end of input |
+| AnnexeMO_Modeles_OT#3 | syntax error at end of input |
+| AnnexeM_Mode_Prestataire#2 | there is no unique constraint matching given keys for referenced table "client_sectors" |
+| AnnexePK_Parking#6 | syntax error at end of input |
+| AnnexePK_Parking#6 | syntax error at end of input |
+| AnnexePK_Parking#6 | syntax error at end of input |
+| AnnexePL_Planning_Equipes#11 | syntax error at or near ".." |
+| AnnexePL_Planning_Equipes#12 | syntax error at or near ".." |
+| AnnexePL_Planning_Equipes#13 | syntax error at or near ".." |
+| AnnexePL_Planning_Equipes#14 | syntax error at or near ".." |
+| AnnexeP_Prestataires_Mobile#11 | syntax error at end of input |
+| AnnexeP_Prestataires_Mobile_Partie2#2 | syntax error at end of input |
+| AnnexeQ_Reporting#5 | relation "uq_review_ref" already exists |
+| AnnexeS_Space_Management#2 | function keystone.json_schema(unknown) does not exist |
+| AnnexeS_Space_Management#7 | function keystone.json_schema(unknown) does not exist |
+| AnnexeS_Space_Management_Partie2#10 | column "site_id" does not exist |
+| AnnexeTA_Travaux_Amenagement#3 | function keystone.json_schema(text) does not exist |
+| AnnexeU_Surete_Accueil#5 | function keystone.json_schema(unknown) does not exist |
+| AnnexeU_Surete_Accueil#6 | function keystone.json_schema(unknown) does not exist |
+| AnnexeU_Surete_Accueil#6 | function keystone.json_schema(unknown) does not exist |
+
+### 6.3 Conséquence sur la décision « reconstruire »
+
+La reconstruction reste la bonne voie, mais le schéma des annexes n'est pas exécutable en l'état. Ordre proposé : (1) Oss53pa tranche les causes 2 et 5 et fournit les règles des objets du §6.2 ; (2) les correctifs sont reportés dans les annexes propriétaires et au Registre ; (3) l'essai est relancé jusqu'à zéro échec ; (4) seulement alors, première migration vers une branche Supabase, puis la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).

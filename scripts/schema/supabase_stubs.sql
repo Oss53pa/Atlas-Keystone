@@ -27,5 +27,6 @@ CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA extensions;
--- Chemin de recherche par défaut de Supabase.
-DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET search_path = "$user", public, extensions', current_database()); END $$;
+-- Chemin de recherche : celui de Supabase, plus keystone et atlas_core comme dans les migrations du dépôt
+-- (SET LOCAL search_path = keystone, public, extensions) : les annexes emploient des types non qualifiés (wo_type…).
+DO $$ BEGIN EXECUTE format('ALTER DATABASE %I SET search_path = keystone, atlas_core, public, extensions', current_database()); END $$;

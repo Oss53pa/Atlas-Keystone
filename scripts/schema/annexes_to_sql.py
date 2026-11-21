@@ -7,8 +7,8 @@ Le dossier frère 02_Cadrage_et_referentiels est lu pour les Référentiels tran
 exécutés avant les annexes (ordre de lecture de l'Index, étape 3).
 Produit la liste ordonnée des instructions SQL (une entrée par instruction : annexe, n° de bloc, texte).
   - Ordre : celui de l'Index (§2 et §3) ; le lot 12 (proposition à valider) en dernier.
-  - `<communes>` est remplacé par les colonnes communes de l'Annexe A §A.1 (bloc 1).
-  - Un bloc qui porte un autre jeton `<x>` est un gabarit : non exécuté, compté.
+  - `<communes>` et la ligne « -- colonnes A.0.2 » sont remplacés par les colonnes communes de l'Annexe A (bloc 1).
+  - Un bloc dont le code (hors commentaires et chaînes) porte un autre jeton `<x>` est un gabarit : non exécuté, compté.
   - Prélude ajouté : CREATE SCHEMA (absent du corpus au 14/11/2026, écart du rapport du lot 0).
 Aucune instruction n'est réécrite au-delà de ces deux substitutions.
 """
@@ -35,6 +35,14 @@ PROPOSAL = {'AnnexeAdmin_RBAC_Notifications_Partie4', 'AnnexeAP_API_Publique'}
 PRELUDE = ['CREATE SCHEMA IF NOT EXISTS atlas_core', 'CREATE SCHEMA IF NOT EXISTS atlas_public', 'CREATE SCHEMA IF NOT EXISTS keystone']
 BLOCK = re.compile(r'^```sql\s*\n(.*?)^```', re.S | re.M)
 TOKEN = re.compile(r'<([a-z_]+)>')
+
+
+def code_only(sql: str) -> str:
+    """Texte sans commentaires ni chaînes : un jeton <x> dans un commentaire ou une chaîne ne fait pas un gabarit."""
+    sql = re.sub(r'\$([A-Za-z_]*)\$.*?\$\1\$', ' ', sql, flags=re.S)
+    sql = re.sub(r"'(?:[^']|'')*'", "''", sql)
+    sql = re.sub(r'/\*.*?\*/', ' ', sql, flags=re.S)
+    return re.sub(r'--[^\n]*', ' ', sql)
 
 
 def split_sql(sql: str) -> list[str]:
@@ -88,7 +96,9 @@ def main(src: str, out: str) -> None:
             if name == 'AnnexeA_Socle' and i == 1:
                 templates.append(f'{name}#{i}'); continue  # définition des colonnes communes
             body = body.replace('<communes>', communes)
-            if TOKEN.search(body):
+            # Convention « -- colonnes A.0.2 » (89 tables) : commentaire tenant lieu des colonnes communes.
+            body = re.sub(r'^[ \t]*-- colonnes A\.0\.2[^\n]*$', communes + ',', body, flags=re.M)
+            if TOKEN.search(code_only(body)):
                 templates.append(f'{name}#{i}'); continue
             for s in split_sql(body):
                 stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
