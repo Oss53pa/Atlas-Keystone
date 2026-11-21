@@ -174,3 +174,24 @@ Sont décrites en prose mais sans code : `keystone.object_visible(p_entity, p_id
 2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre.
 3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter avec leur lot.
 4. Ensuite seulement : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
+
+## 7. Vérifications sur une branche Supabase (21/11/2026, branche supprimée après l'essai)
+
+Branche `keystone-v2-essai` du projet « Atlas Studio - Autres Applications », créée avec l'accord d'Oss53pa, sans données de production, supprimée après les vérifications pour arrêter la facturation.
+
+| Point | Résultat |
+|---|---|
+| Rejeu des migrations du projet partagé sur la branche | **échec** (`MIGRATIONS_FAILED`) : l'historique de migrations du projet, commun à toutes les applications Atlas, ne se reconstruit pas tel quel. Sans effet sur la production, mais une base neuve ne peut pas être recréée depuis cet historique. À signaler aux autres équipes. |
+| Création d'objets dans le schéma `auth` | **refusée** (`has_schema_privilege(... 'auth', 'CREATE') = false`) : confirme la décision S04, `keystone.current_tenant()` |
+| Extensions requises (pg_jsonschema, postgis, vector, pg_trgm, btree_gist, unaccent, pgcrypto) | toutes disponibles, PostgreSQL 17.12 |
+| Création de rôle (`proph3t_reader`, C15) | permise (`CREATEROLE`) |
+| Contrôle JSON réel (`jsonb_matches_schema` avec `json_schema()`, schéma `ack_delay/v1`) | valeur valide acceptée, valeur invalide refusée ; le bouchon local est donc sans incidence |
+| `NULLS NOT DISTINCT` (S07 à S09) | supporté |
+
+Application complète du schéma candidat : non faite par la session. Envoyer 830 ko de SQL par l'outil de requête coûterait environ 250 000 jetons, et le mot de passe de la base ne doit pas transiter par la session. Commande à lancer par Oss53pa sur une branche recréée (URL de connexion de la branche, tableau de bord Supabase, Connect) :
+
+```bash
+for f in scripts/schema/correctifs_corpus.sql supabase/candidates/keystone_v2_schema.sql supabase/candidates/keystone_v2_error_codes.sql; do psql "$BRANCH_DB_URL" -v ON_ERROR_STOP=1 -f "$f" || break; done
+```
+
+Prérequis sur la branche : `CREATE EXTENSION` de pg_jsonschema, postgis, vector, btree_gist, unaccent dans le schéma `extensions`.
