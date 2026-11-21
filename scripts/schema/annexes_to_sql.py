@@ -35,6 +35,7 @@ PROPOSAL = {'AnnexeAdmin_RBAC_Notifications_Partie4', 'AnnexeAP_API_Publique'}
 PRELUDE = ['CREATE SCHEMA IF NOT EXISTS atlas_core', 'CREATE SCHEMA IF NOT EXISTS atlas_public', 'CREATE SCHEMA IF NOT EXISTS keystone']
 BLOCK = re.compile(r'^```sql\s*\n(.*?)^```', re.S | re.M)
 TOKEN = re.compile(r'<([a-z_]+)>')
+COLDEF = re.compile(r'^\s*[a-z_]+\s+(uuid|text|timestamptz|bigint|integer|boolean|jsonb|date)\b')
 # Substitutions tracées (rapport du lot 0, §6) : (bloc, texte du corpus, remplacement, motif). Chaque substitution
 # doit trouver son texte exactement une fois, sinon l'assemblage échoue : le corpus a changé, la revoir.
 SUBSTITUTIONS = [
@@ -100,24 +101,37 @@ def main(src: str, out: str, post: str | None = None) -> None:
     missing = sorted(set(files) - set(ORDER))
     if missing:
         sys.exit(f'Annexes absentes de ORDER : {missing}')
-    ref = d.parent / '02_Cadrage_et_referentiels' / 'CDC_Atlas_Keystone_Referentiels_Transverses.md'
-    blocks = {'Referentiels_Transverses': BLOCK.findall(ref.read_text(encoding='utf-8'))}
+    cad = d.parent / '02_Cadrage_et_referentiels'
+    blocks = {'Referentiels_Transverses': BLOCK.findall((cad / 'CDC_Atlas_Keystone_Referentiels_Transverses.md').read_text(encoding='utf-8'))}
+    # Protection des données (ordre de lecture, étape 4) : registre des traitements, droits des personnes.
+    for part in ('Protection_Donnees', 'Protection_Donnees_Partie2'):
+        f = cad / f'CDC_Atlas_Keystone_{part}.md'
+        if f.exists():
+            blocks[part] = BLOCK.findall(f.read_text(encoding='utf-8'))
     blocks.update({name: BLOCK.findall(files[name].read_text(encoding='utf-8')) for name in ORDER})
     communes = blocks['AnnexeA_Socle'][0].strip().rstrip(',')
     stmts = [{'src': 'prelude', 'sql': s} for s in PRELUDE]
     templates, n_blocks = [], 0
-    for name in ['Referentiels_Transverses', *ORDER]:
+    for name in ['Referentiels_Transverses', *ORDER, 'Protection_Donnees', 'Protection_Donnees_Partie2']:
+        if name not in blocks:
+            continue
         for i, body in enumerate(blocks[name], 1):
             n_blocks += 1
-            if name == 'AnnexeA_Socle' and i == 1:
-                templates.append(f'{name}#{i}'); continue  # définition des colonnes communes
+            first = next((l for l in code_only(body).splitlines() if l.strip()), '')
+            if (name == 'AnnexeA_Socle' and i == 1) or COLDEF.match(first):
+                templates.append(f'{name}#{i}'); continue  # définition de convention (liste de colonnes), pas du SQL
             # <communes> dans un commentaire : rester sur une ligne, sinon les colonnes sortiraient du commentaire.
             body = re.sub(r'^([^\n]*--[^\n]*)<communes>', lambda m: m.group(1) + ' '.join(communes.split()), body, flags=re.M)
             body = body.replace('<communes>', communes)
             # Convention « -- colonnes A.0.2 » (89 tables) : commentaire tenant lieu des colonnes communes.
             body = re.sub(r'^[ \t]*-- colonnes A\.0\.2[^\n]*$', communes + ',', body, flags=re.M)
             if TOKEN.search(code_only(body)):
-                templates.append(f'{name}#{i}'); continue
+                # Gabarit : seules les instructions sans jeton s'exécutent (ex. la fonction d'un gabarit de trigger).
+                templates.append(f'{name}#{i}')
+                for s in split_sql(body):
+                    if not TOKEN.search(code_only(s)):
+                        stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
+                continue
             for src_, old, new, _why in SUBSTITUTIONS:
                 if src_ == f'{name}#{i}':
                     if body.count(old) != 1:

@@ -61,64 +61,65 @@ Dans les deux cas : vérifier d’abord que le schéma des annexes s’exécute 
 
 ## 6. Essai d'exécution du schéma des annexes (Postgres 16 local, jetable)
 
-Outils (`scripts/schema/`, mode d'emploi dans `README.md`) : `annexes_to_sql.py` assemble les blocs SQL des Référentiels transverses puis des 49 annexes dans l'ordre de l'Index, développe les conventions de colonnes communes, écarte les 3 vrais gabarits et applique 3 substitutions tracées (S01 à S03) ; `supabase_stubs.sql` simule Supabase ; `correctifs_corpus.sql` et `correctifs_post.sql` portent les correctifs C00 à C14 ; `run_fixpoint.py` rejoue les échecs jusqu'à stabilité.
+Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blocs SQL des Référentiels transverses, des 49 annexes puis de la Protection des données, développe les conventions de colonnes communes, écarte 4 blocs de convention ou gabarits (en gardant leurs instructions sans jeton) et applique 3 substitutions tracées ; les correctifs C00 à C15 comblent les objets employés sans définition ; les échecs sont rejoués jusqu'à stabilité.
 
 | Essai | Instructions réussies | Tables créées |
 |---|---|---|
 | corpus brut | 449 sur 1 445 | 67 sur 563 |
-| avec conventions, correctifs et substitutions | 1426 sur 1488 | 552 sur 563 |
+| avec conventions, correctifs et substitutions | 1458 sur 1503 | 565 (563 des annexes et 2 de la Protection des données) |
 
-### 6.1 Correctifs et substitutions appliqués (à reporter au corpus et au Registre)
+### 6.1 Correctifs et substitutions (à reporter au corpus et au Registre)
 
 | Réf. | Constat | Traitement | Certitude |
 |---|---|---|---|
-| C00 | aucun `CREATE SCHEMA` | schémas `atlas_core`, `atlas_public`, `keystone` | Confirmé |
-| C01 | type de déclinaison jamais créé, deux noms (`atlas_core.` et `keystone.operating_mode`) | `atlas_core.operating_mode` (Référentiels §1), alias `keystone.operating_mode` | Confirmé pour les valeurs, nom à trancher |
-| C02 | types attribués aux Annexes C et R sans `CREATE TYPE` | valeurs de l'ancienne base | Probable, et faux par endroits : l'Annexe D attend `ticket_status = 'triage'` (ancienne base : `triaged`) |
+| C00 | aucun `CREATE SCHEMA` | `atlas_core`, `atlas_public`, `keystone` | Confirmé |
+| C01 | type de déclinaison jamais créé, deux noms | `atlas_core.operating_mode`, alias `keystone.operating_mode` | valeurs confirmées, nom à trancher |
+| C02 | types des Annexes C, D, R sans `CREATE TYPE` | `capa_status`, `event_status`, `inspection_status`, `ticket_status` (9 valeurs, A53), `control_result` : valeurs écrites dans le corpus | Confirmé |
+| C02 bis | idem, renvoi « valeurs de l'Annexe C » sans liste | `capa_type`, `control_hierarchy`, `identifier_type`, `investigation_method`, `permit_status`, `hsse_event_type` (avec `good_practice`, A25) : valeurs de l'ancienne base | Probable |
 | C03 | `vendor_status`, `sla_clock`, `presence_source` écrits en texte | transcrits | Confirmé |
-| C10 | `wo_stage_status_ok` jamais créée | transcription du tableau B.1.4, `cancelled` admis à toute étape avant la clôture (même paragraphe) | Confirmé, le point `cancelled` à valider |
-| C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648, aléa pgcrypto | Interprétation |
-| C12, S01 | `clients.sector_code` référence `client_sectors(code)`, unique seulement avec `tenant_id` | clé composite `(tenant_id, sector_code)` | Confirmé |
-| C13 | `json_schemas` et `json_schema()` décrits en prose | transcrits | Confirmé |
-| C14, S02 | dépendance circulaire `work_orders` et `purchase_requests` | clé de `work_orders` posée après coup | Confirmé |
-| S03 | `hsse_events.security_log_id uuid` vers `security_log.id bigint` | colonne alignée en `bigint` | Interprétation |
-| conventions | `-- colonnes A.0.2` (89 tables) et `<communes>` tiennent lieu des colonnes communes ; types non qualifiés (chemin de recherche `keystone`) | développées par le script | Confirmé |
-| extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema employées sans `CREATE EXTENSION` dans le prélude | bouchons ; `pg_jsonschema` simulé : la validation JSON n'est pas éprouvée localement | Confirmé |
+| C10 | `wo_stage_status_ok` jamais créée | tableau B.1.4 ; `cancelled` admis à toute étape avant la clôture | Confirmé, le point `cancelled` à valider |
+| C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648 | Interprétation |
+| C12, S01 | `clients.sector_code` vers `client_sectors(code)`, unique seulement avec `tenant_id` | clé composite | Confirmé |
+| C13 | `json_schemas`, `json_schema()` décrits en prose (Annexe M) | transcrits | Confirmé |
+| C14, S02 | cycle `work_orders` et `purchase_requests` | clé posée après coup | Confirmé |
+| C15 | rôle `proph3t_reader` décrit (Annexe C) sans création | rôle créé | Confirmé |
+| S03 | `hsse_events.security_log_id uuid` vers `security_log.id bigint` | colonne en `bigint` | Interprétation |
+| conventions | `-- colonnes A.0.2` (89 tables), `<communes>`, types non qualifiés | développées ; chemin de recherche `keystone` | Confirmé |
+| extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema sans `CREATE EXTENSION` | bouchons ; `pg_jsonschema` simulé : validation JSON non éprouvée | Confirmé |
 
-### 6.2 Écarts restants (62 instructions)
+Correction d'un essai précédent : l'ancienne valeur `triaged` de `ticket_status` (base actuelle) contredit le corpus (`triage`, plus `cancelled`) ; l'ancienne base ne peut donc pas servir de référence de valeurs quand le corpus en donne.
+
+### 6.2 Écarts restants (45 instructions)
 
 | Nature | Nombre | Traitement attendu |
 |---|---|---|
-| cascade | 22 | disparaissent avec leur cause |
-| objet jamais défini | 14 | définition par l’annexe propriétaire (Oss53pa) |
+| conséquence d’un autre écart | 12 | disparaissent avec leur cause |
 | fonction décrite en prose, à implémenter | 12 | à écrire au lot du domaine, d’après la description |
-| fonction non IMMUTABLE dans un index ou une colonne générée | 4 | réécrire l’index ou la colonne |
+| objet jamais défini | 8 | définition par l’annexe propriétaire (Oss53pa) |
+| fonction non IMMUTABLE (index ou colonne générée) | 5 | réécrire l’index ou la colonne |
 | double définition | 4 | garder une seule définition |
 | signature seule (description de RPC) | 2 | à écrire au lot du domaine |
-| autre | 2 | relecture |
-| valeur d’énumération incompatible | 2 | valeurs exactes de l’annexe propriétaire |
+| autre | 1 | relecture |
+| valeur d’énumération incompatible | 1 | valeur à ajouter au type propriétaire |
 
-Point non éprouvable localement : `auth.current_tenant()` est créée dans le schéma `auth` (Annexe A §A.1, 109 emplois) ; Supabase réserve ce schéma [Probable : création refusée]. À déplacer dans `keystone` ou `atlas_core`, décision d'Oss53pa.
+Non éprouvable localement : `auth.current_tenant()` est créée dans le schéma `auth` (Annexe A §A.1, 109 emplois) ; Supabase réserve ce schéma [Probable : création refusée]. À déplacer, décision d'Oss53pa.
 
-#### Objets jamais définis
+#### Objets jamais définis ou valeurs manquantes
 | Bloc | Erreur |
 |---|---|
 | AnnexeA_Socle_Partie4#5 | function keystone.object_visible(text, uuid) does not exist |
 | AnnexeB_GMAO#5 | type "keystone.wo_transition_rules" does not exist |
 | AnnexeB_GMAO_Partie2#7 | type "sla_pause_reason" does not exist |
 | AnnexeB_GMAO_Partie3#14 | function keystone.compute_meter_consumption_daily() does not exist |
-| AnnexeB_GMAO_Partie3#14 | relation "keystone.meter_consumption_daily" does not exist |
-| AnnexeC_HSSE#6 | role "proph3t_reader" does not exist |
-| AnnexeC_HSSE_Partie3#2 | type "keystone.inspection_status" does not exist |
-| AnnexeC_HSSE_Partie4#2 | function keystone.tg_check_document_ids() does not exist |
-| AnnexeC_HSSE_Partie4#3 | role "proph3t_reader" does not exist |
-| AnnexeC_HSSE_Partie4#7 | relation "keystone.processing_activities" does not exist |
 | AnnexeEN_Energie#5 | relation "keystone.v_meter_consumption_daily" does not exist |
 | AnnexeP_Prestataires_Mobile#14 | function keystone.vendor_docs_ok_rate(uuid, integer) does not exist |
 | AnnexeS_Space_Management_Partie2#10 | column "site_id" does not exist |
 | AnnexeS_Space_Management_Partie2#3 | function keystone.log_presence_access(uuid) does not exist |
+| AnnexeB_GMAO_Partie4#3 | invalid input value for enum permit_type: "energized" |
 
-#### Fonctions décrites en prose ou par leur seule signature
+Sont décrites en prose mais sans code : `keystone.object_visible(p_entity, p_id)` (Annexe A partie 4), `keystone.vendor_docs_ok_rate(p_vendor, p_days)` (Annexe P), `keystone.log_presence_access(site_id)` (Annexe S) ; `sla_pause_reason` n'a que 3 de ses 5 valeurs écrites (Annexe M) ; `permit_type` ne contient pas `energized`, employé par l'Annexe B partie 4.
+
+#### Fonctions décrites en prose ou par leur seule signature (à écrire avec leur lot)
 | Bloc | Erreur |
 |---|---|
 | AnnexeB_GMAO#8 | syntax error at end of input |
@@ -135,26 +136,24 @@ Point non éprouvable localement : `auth.current_tenant()` est créée dans le s
 | AnnexeP_Prestataires_Mobile_Partie2#2 | syntax error at end of input |
 | AnnexeB_GMAO_Partie2#8 | syntax error at or near "keystone" |
 | AnnexeB_GMAO_Partie4#4 | syntax error at or near "keystone" |
+| AnnexeB_GMAO_Partie3#4 | no function body specified |
 
-#### Autres
+#### Défauts techniques du corpus
 | Bloc | Erreur |
 |---|---|
-| AnnexeB_GMAO_Partie4#3 | invalid input value for enum permit_type: "energized" |
-| AnnexeD_Tickets_Portails#3 | invalid input value for enum ticket_status: "triage" |
 | AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
 | AnnexeAdmin_RBAC_Notifications#10 | functions in index expression must be marked IMMUTABLE |
 | AnnexeAdmin_RBAC_Notifications#6 | functions in index expression must be marked IMMUTABLE |
 | AnnexeCO_Atlas_Core#5 | generation expression is not immutable |
+| Protection_Donnees#2 | generation expression is not immutable |
 | AnnexeCL_Portail_Client#1 | policy "tickets_client_select" for table "tickets" already exists |
 | AnnexeCL_Portail_Client#1 | policy "tickets_client_insert" for table "tickets" already exists |
 | AnnexeN_Satisfaction_Cout#5 | relation "v_expenses_without_site" already exists |
 | AnnexeQ_Reporting#5 | relation "uq_review_ref" already exists |
-| AnnexeB_GMAO_Partie3#4 | no function body specified |
-| AnnexeC_HSSE#1 | syntax error at or near "id" |
 
 ### 6.3 Suite
 
-1. Oss53pa tranche : nom du type de déclinaison (C01), emplacement de `current_tenant()`, interprétations C10 (`cancelled`), C11 et S03, valeurs exactes de `ticket_status` et `permit_type`, définitions des objets jamais définis.
-2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre ; les fichiers de correctifs se vident d'autant.
-3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter, qui se livrent avec leur lot.
-4. Seulement alors : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
+1. Oss53pa tranche : nom du type de déclinaison (C01), emplacement de `current_tenant()`, interprétations C10, C11, S03 ; fournit les valeurs de C02 bis, de `sla_pause_reason`, l'ajout de `energized` à `permit_type`.
+2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre.
+3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter avec leur lot.
+4. Ensuite seulement : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
