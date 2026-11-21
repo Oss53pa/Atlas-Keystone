@@ -108,7 +108,7 @@ cycle_count_lines	stock	stock.read	seconde passe (clé étrangère)	?	0
 cycle_counts	stock	stock.read	seconde passe (clé étrangère)	AnnexeB_GMAO_Partie3	0
 dashboard_configs	dashboard	dashboard.read	haute	AnnexeQ_Reporting	0
 data_exports	client	client.read	seconde passe (clé étrangère)	AnnexeA_Socle_Partie2	0
-device_sessions	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
+device_sessions	admin	admin.devices	seconde passe (annexe) ; corrigé (appareils, Annexe P.9)	AnnexeP_Prestataires_Mobile_Partie2	0
 disposal_records	doc	doc.read	seconde passe (clé étrangère)	AnnexeG_GED	0
 doc_links	doc	doc.read	haute	AnnexeG_GED	0
 doc_qr_links	doc	doc.read	haute	AnnexeG_GED	0
@@ -143,7 +143,7 @@ env_targets	env	env.manage	moyenne	AnnexeK_Formation_Environnement	0
 event_attachments	event	event.read	haute	AnnexeC_HSSE	0
 event_containment_measures	event	event.read	haute	AnnexeC_HSSE_Partie4	1
 event_declarations	event	event.read	haute	AnnexeC_HSSE	0
-event_person_health	event	event.read	haute	AnnexeC_HSSE	1
+event_person_health	event	event.medical_read	corrigée ; corrigé (santé : D26, A83, I04)	AnnexeC_HSSE	1
 event_persons	event	event.read	haute	AnnexeC_HSSE	0
 expense_lines	expense	expense.approve	moyenne	AnnexeE_Budgets_Achats	0
 expense_payments	expense	expense.approve	moyenne	AnnexeE_Budgets_Achats	0
@@ -230,7 +230,7 @@ management_review_decisions	capa	capa.assign	seconde passe (clé étrangère)	An
 management_review_participants	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
 management_reviews	person	person.read	seconde passe (annexe)	AnnexeK_Formation_Environnement	0
 measurement_surveys	space	space.read	seconde passe (annexe)	AnnexeS_Space_Management	0
-medical_visits	event	event.read	seconde passe (annexe)	AnnexeC_HSSE_Partie4	1
+medical_visits	event	event.medical_read	seconde passe (annexe) ; corrigé (santé : D26, A83, I04)	AnnexeC_HSSE_Partie4	1
 meter_reading_round_items	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
 meter_reading_round_run_items	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
 meter_reading_round_runs	meter	meter.manage	moyenne	AnnexeB_GMAO_Partie3	0
@@ -255,8 +255,8 @@ occupant_headcount	occupant	occupant.manage	moyenne	AnnexeN_Satisfaction_Cout	0
 occupant_organizations	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
 occupant_site_codes	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
 occupant_users	occupant	occupant.manage	moyenne	AnnexeD_Tickets_Portails_Partie2	0
-occupational_diseases	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE_Partie4	0
-occupational_exposures	wo	wo.read	seconde passe (clé étrangère)	?	0
+occupational_diseases	event	event.medical_read	seconde passe (clé étrangère) ; corrigé (santé : D26, A83, I04)	AnnexeC_HSSE_Partie4	0
+occupational_exposures	event	event.medical_read	seconde passe (clé étrangère) ; corrigé (santé : D26, A83, I04)	?	0
 on_call	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 on_call_escalation_policies	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 on_call_pages	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
@@ -409,8 +409,8 @@ survey_invitations	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 survey_questions	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 survey_responses	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
 surveys	survey	survey.read	haute	AnnexeN_Satisfaction_Cout	0
-sync_conflicts	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
-sync_mutations	wo	wo.read	seconde passe (annexe)	AnnexeP_Prestataires_Mobile_Partie2	0
+sync_conflicts	admin	admin.devices	seconde passe (annexe) ; corrigé (appareils, Annexe P.9)	AnnexeP_Prestataires_Mobile_Partie2	0
+sync_mutations	admin	admin.devices	seconde passe (annexe) ; corrigé (appareils, Annexe P.9)	AnnexeP_Prestataires_Mobile_Partie2	0
 team_members	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 teams	planning	planning.read	haute	AnnexePL_Planning_Equipes	0
 telemetry_dashboards	iot	iot.read	seconde passe (annexe)	AnnexeI_IoT	0
@@ -455,7 +455,7 @@ vendor_site_restrictions	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_status_history	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendor_users	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
 vendors	vendor	vendor.read	haute	AnnexeP_Prestataires_Mobile	0
-video_requisitions	asset	asset.read	seconde passe (clé étrangère)	AnnexeU_Surete_Accueil	0
+video_requisitions	security	security.video_requisition	seconde passe (clé étrangère) ; corrigé (sûreté, Lot 14)	AnnexeU_Surete_Accueil	0
 visitor_denylist	visitor	visitor.denylist_manage	moyenne	AnnexeU_Surete_Accueil	0
 visitors	visitor	visitor.denylist_manage	moyenne	AnnexeU_Surete_Accueil	0
 visits	access	access.manage	seconde passe (clé étrangère)	?	0
@@ -465,7 +465,7 @@ waste_streams	waste	waste.manage	moyenne	AnnexeK_Formation_Environnement	0
 waste_tracking_slips	waste	waste.manage	moyenne	AnnexeK_Formation_Environnement	0
 webhook_deliveries	webhook	webhook.manage	moyenne	AnnexeAP_API_Publique	1
 webhook_endpoints	webhook	webhook.manage	moyenne	AnnexeAP_API_Publique	1
-witness_statements	event	event.read	seconde passe (clé étrangère)	AnnexeC_HSSE	1
+witness_statements	event	event.investigate	seconde passe (clé étrangère) ; corrigé (enquête, I04 : témoignages hors IA)	AnnexeC_HSSE	1
 wo_checkpoint_results	wo	wo.read	haute	AnnexeB_GMAO_Partie2	0
 wo_instructions	wo	wo.read	haute	AnnexeB_GMAO_Partie4	0
 wo_reports	wo	wo.read	haute	AnnexeB_GMAO_Partie2	0
