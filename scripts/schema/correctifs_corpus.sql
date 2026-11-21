@@ -11,7 +11,8 @@ CREATE SCHEMA IF NOT EXISTS keystone;
 
 -- C01, cause 2 : type de la déclinaison. Propriétaire et nom : Référentiels transverses §1 (atlas_core.operating_mode) ;
 -- valeurs : Annexe CO, bloc 1 (commentaire « ('in_house','fm_provider') ») [Confirmé].
--- L'Annexe CO l'emploie sous le nom keystone.operating_mode : alias par domaine, à supprimer quand l'annexe sera corrigée.
+-- Décision d'Oss53pa (21/11/2026) : atlas_core.operating_mode fait foi ; l'Annexe CO, qui emploie keystone.operating_mode,
+-- est à corriger. Alias par domaine en attendant, à supprimer ensuite.
 CREATE TYPE atlas_core.operating_mode AS ENUM ('in_house', 'fm_provider');
 CREATE DOMAIN keystone.operating_mode AS atlas_core.operating_mode;
 

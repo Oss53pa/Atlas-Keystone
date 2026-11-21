@@ -21,10 +21,10 @@ RETURNS boolean LANGUAGE sql IMMUTABLE AS $$
 $$;
 -- Note : « Un OT annulé garde l'étape atteinte et prend status = 'cancelled' » (même paragraphe) : cancelled est
 -- donc admis à toutes les étapes avant la clôture, y compris in_progress, reported et received, que le tableau omet.
--- Interprétation à confirmer par Oss53pa.
+-- Interprétation validée par Oss53pa (21/11/2026).
 
 -- C11 : keystone.new_qr_token(), Annexe A (locations.qr_token) : « jeton opaque, 12 caractères base32 ».
--- Interprétation : alphabet RFC 4648 (A à Z, 2 à 7), 60 bits d'aléa cryptographique (pgcrypto). VOLATILE.
+-- Interprétation validée par Oss53pa (21/11/2026) : alphabet RFC 4648 (A à Z, 2 à 7), 60 bits d'aléa cryptographique (pgcrypto). VOLATILE.
 CREATE OR REPLACE FUNCTION keystone.new_qr_token() RETURNS text LANGUAGE plpgsql VOLATILE AS $$
 DECLARE
   a constant text := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';

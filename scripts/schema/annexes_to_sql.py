@@ -50,7 +50,7 @@ SUBSTITUTIONS = [
     ('AnnexeC_HSSE#4',
      'security_log_id uuid REFERENCES keystone.security_log(id)',
      'security_log_id bigint REFERENCES keystone.security_log(id)',
-     'S03 : security_log.id est bigint (Annexe U, journal chaîné) ; colonne alignée [interprétation, à confirmer]'),
+     'S03 : security_log.id est bigint (Annexe U, journal chaîné) ; colonne alignée [interprétation validée par Oss53pa le 21/11/2026]'),
 ]
 
 
@@ -137,6 +137,8 @@ def main(src: str, out: str, post: str | None = None) -> None:
                     if body.count(old) != 1:
                         sys.exit(f'Substitution introuvable ou ambiguë dans {src_} : {old!r}')
                     body = body.replace(old, new)
+            # S04 (décision d'Oss53pa du 21/11/2026) : current_tenant() dans keystone, jamais dans le schéma auth réservé à Supabase.
+            body = body.replace('auth.current_tenant(', 'keystone.current_tenant(')
             for s in split_sql(body):
                 stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
     if post:  # correctifs dépendant de types du corpus, rejoués avec lui

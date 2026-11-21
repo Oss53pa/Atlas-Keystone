@@ -73,17 +73,18 @@ Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blo
 | Réf. | Constat | Traitement | Certitude |
 |---|---|---|---|
 | C00 | aucun `CREATE SCHEMA` | `atlas_core`, `atlas_public`, `keystone` | Confirmé |
-| C01 | type de déclinaison jamais créé, deux noms | `atlas_core.operating_mode`, alias `keystone.operating_mode` | valeurs confirmées, nom à trancher |
+| C01 | type de déclinaison jamais créé, deux noms | `atlas_core.operating_mode`, alias `keystone.operating_mode` le temps de corriger l'Annexe CO | décidé par Oss53pa le 21/11/2026 |
 | C02 | types des Annexes C, D, R sans `CREATE TYPE` | `capa_status`, `event_status`, `inspection_status`, `ticket_status` (9 valeurs, A53), `control_result` : valeurs écrites dans le corpus | Confirmé |
 | C02 bis | idem, renvoi « valeurs de l'Annexe C » sans liste | `capa_type`, `control_hierarchy`, `identifier_type`, `investigation_method`, `permit_status`, `hsse_event_type` (avec `good_practice`, A25) : valeurs de l'ancienne base | Probable |
 | C03 | `vendor_status`, `sla_clock`, `presence_source` écrits en texte | transcrits | Confirmé |
-| C10 | `wo_stage_status_ok` jamais créée | tableau B.1.4 ; `cancelled` admis à toute étape avant la clôture | Confirmé, le point `cancelled` à valider |
-| C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648 | Interprétation |
+| C10 | `wo_stage_status_ok` jamais créée | tableau B.1.4 ; `cancelled` admis à toute étape avant la clôture | validé par Oss53pa le 21/11/2026 |
+| C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648 | validé par Oss53pa le 21/11/2026 |
 | C12, S01 | `clients.sector_code` vers `client_sectors(code)`, unique seulement avec `tenant_id` | clé composite | Confirmé |
 | C13 | `json_schemas`, `json_schema()` décrits en prose (Annexe M) | transcrits | Confirmé |
 | C14, S02 | cycle `work_orders` et `purchase_requests` | clé posée après coup | Confirmé |
 | C15 | rôle `proph3t_reader` décrit (Annexe C) sans création | rôle créé | Confirmé |
-| S03 | `hsse_events.security_log_id uuid` vers `security_log.id bigint` | colonne en `bigint` | Interprétation |
+| S03 | `hsse_events.security_log_id uuid` vers `security_log.id bigint` | colonne en `bigint` | validé par Oss53pa le 21/11/2026 |
+| S04 | `auth.current_tenant()` créée dans le schéma `auth`, réservé à Supabase (109 emplois) | `keystone.current_tenant()` partout | décidé par Oss53pa le 21/11/2026 |
 | conventions | `-- colonnes A.0.2` (89 tables), `<communes>`, types non qualifiés | développées ; chemin de recherche `keystone` | Confirmé |
 | extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema sans `CREATE EXTENSION` | bouchons ; `pg_jsonschema` simulé : validation JSON non éprouvée | Confirmé |
 
@@ -101,8 +102,6 @@ Correction d'un essai précédent : l'ancienne valeur `triaged` de `ticket_statu
 | signature seule (description de RPC) | 2 | à écrire au lot du domaine |
 | autre | 1 | relecture |
 | valeur d’énumération incompatible | 1 | valeur à ajouter au type propriétaire |
-
-Non éprouvable localement : `auth.current_tenant()` est créée dans le schéma `auth` (Annexe A §A.1, 109 emplois) ; Supabase réserve ce schéma [Probable : création refusée]. À déplacer, décision d'Oss53pa.
 
 #### Objets jamais définis ou valeurs manquantes
 | Bloc | Erreur |
@@ -153,7 +152,7 @@ Sont décrites en prose mais sans code : `keystone.object_visible(p_entity, p_id
 
 ### 6.3 Suite
 
-1. Oss53pa tranche : nom du type de déclinaison (C01), emplacement de `current_tenant()`, interprétations C10, C11, S03 ; fournit les valeurs de C02 bis, de `sla_pause_reason`, l'ajout de `energized` à `permit_type`.
+1. Tranché par Oss53pa le 21/11/2026 : C01, S04, C10, C11, S03. Reste à fournir : valeurs de C02 bis, les deux valeurs manquantes de `sla_pause_reason`, l'ajout de `energized` à `permit_type`, les objets jamais définis.
 2. Les correctifs retenus sont reportés dans les annexes propriétaires et au Registre.
 3. Essai relancé jusqu'à zéro échec hors fonctions à implémenter avec leur lot.
 4. Ensuite seulement : migration initiale sur une branche Supabase, puis sur la base partagée hors des heures d'utilisation (CLAUDE.md, règle 4).
