@@ -75,11 +75,20 @@ SUBSTITUTIONS = [
      'CONSTRAINT uq_review_ref UNIQUE (tenant_id, ref),',
      'CONSTRAINT uq_fm_review_ref UNIQUE (tenant_id, ref),',
      'S10 : nom de contrainte déjà pris par l’Annexe P (index de même nom dans le schéma) ; renommée, règle inchangée'),
+    ('AnnexeB_GMAO_Partie4#3',
+     "permit_type NOT IN ('general','energized')",
+     "permit_type NOT IN ('general')",
+     'S12 : energized n’est pas une valeur de permit_type (Annexe C : « régime de la rubrique electrical, pas une rubrique ») ; littéral refusé par Postgres, règle inchangée'),
+    ('AnnexeN_Satisfaction_Cout#5',
+     'CREATE VIEW keystone.v_expenses_without_site AS',
+     'CREATE VIEW keystone.v_expenses_without_site WITH (security_invoker = true) AS',
+     'S13 : décision d’Oss53pa (21/11/2026) : règle de l’Annexe N retenue, avec security_invoker pour respecter la RLS par tenant'),
 ]
 # Instructions en double strictement identiques à une définition antérieure : non rejouées (bloc, début de l'instruction).
 SKIP = [
     ('AnnexeCL_Portail_Client#1', 'CREATE POLICY tickets_client_insert', 'S11 : identique à l’Annexe D'),
     ('AnnexeCL_Portail_Client#1', 'CREATE POLICY tickets_client_select', 'S11 : identique à l’Annexe D'),
+    ('AnnexeE_Budgets_Achats#14', 'CREATE VIEW keystone.v_expenses_without_site', 'S13 : définition de l’Annexe E écartée, décision d’Oss53pa'),
 ]
 
 

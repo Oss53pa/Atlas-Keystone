@@ -75,7 +75,7 @@ Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blo
 | C00 | aucun `CREATE SCHEMA` | `atlas_core`, `atlas_public`, `keystone` | Confirmé |
 | C01 | type de déclinaison jamais créé, deux noms | `atlas_core.operating_mode`, alias `keystone.operating_mode` le temps de corriger l'Annexe CO | décidé par Oss53pa le 21/11/2026 |
 | C02 | types des Annexes C, D, R sans `CREATE TYPE` | `capa_status`, `event_status`, `inspection_status`, `ticket_status` (9 valeurs, A53), `control_result` : valeurs écrites dans le corpus | Confirmé |
-| C02 bis | idem, renvoi « valeurs de l'Annexe C » sans liste | `capa_type`, `control_hierarchy`, `identifier_type`, `investigation_method`, `permit_status`, `hsse_event_type` (avec `good_practice`, A25) : valeurs de l'ancienne base | Probable |
+| C02 bis | idem, renvoi « valeurs de l'Annexe C » sans liste | `capa_type`, `control_hierarchy`, `identifier_type`, `investigation_method`, `permit_status`, `hsse_event_type` (avec `good_practice`, A25) : valeurs de l'ancienne base | retenues par Oss53pa le 21/11/2026 |
 | C03 | `vendor_status`, `sla_clock`, `presence_source` écrits en texte | transcrits | Confirmé |
 | C10 | `wo_stage_status_ok` jamais créée | tableau B.1.4 ; `cancelled` admis à toute étape avant la clôture | validé par Oss53pa le 21/11/2026 |
 | C11 | `new_qr_token()` jamais créée | 12 caractères base32 RFC 4648 | validé par Oss53pa le 21/11/2026 |
@@ -88,13 +88,13 @@ Outils et mode d'emploi : `scripts/schema/README.md`. Le script assemble les blo
 | S07 à S09 | index uniques sur `COALESCE(enum::text, '*')` (non IMMUTABLE) | `NULLS NOT DISTINCT`, équivalent exact | Confirmé, technique |
 | S10 | contrainte `uq_review_ref` nommée deux fois (Annexes P et Q) | renommée `uq_fm_review_ref` dans l'Annexe Q | Confirmé, technique |
 | S11 | politiques `tickets_client_select` et `tickets_client_insert` définies à l'identique par les Annexes D et CL | une seule définition | Confirmé, technique |
+| S12 | `permit_type NOT IN ('general','energized')` : `energized` n'est pas une valeur du type (Annexe C) | littéral retiré, règle inchangée | Confirmé, technique |
+| S13 | vue `v_expenses_without_site` définie différemment par les Annexes E et N | règle de l'Annexe N avec `security_invoker = true` | décidé par Oss53pa le 21/11/2026 |
 | S04 | `auth.current_tenant()` créée dans le schéma `auth`, réservé à Supabase (109 emplois) | `keystone.current_tenant()` partout | décidé par Oss53pa le 21/11/2026 |
 | conventions | `-- colonnes A.0.2` (89 tables), `<communes>`, types non qualifiés | développées ; chemin de recherche `keystone` | Confirmé |
 | extensions | PostGIS, pgvector, pg_trgm, btree_gist, unaccent, pg_jsonschema sans `CREATE EXTENSION` | bouchons ; `pg_jsonschema` simulé : validation JSON non éprouvée | Confirmé |
 
-Essai final : 1 464 instructions sur 1 504, 569 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
-
-Conflit à trancher par Oss53pa : la vue `keystone.v_expenses_without_site` est définie différemment par l'Annexe E (propriétaire des dépenses, retenue) et l'Annexe N (écartée à l'essai).
+Essai final : 1 466 instructions sur 1 503, 570 tables ; le schéma candidat (`supabase/candidates/`) s'applique d'un bloc sur une base vierge, suivi des 616 codes d'erreur.
 
 Correction d'un essai précédent : l'ancienne valeur `triaged` de `ticket_status` (base actuelle) contredit le corpus (`triage`, plus `cancelled`) ; l'ancienne base ne peut donc pas servir de référence de valeurs quand le corpus en donne.
 

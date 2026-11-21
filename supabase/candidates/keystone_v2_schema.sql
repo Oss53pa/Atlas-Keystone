@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1464 instructions réussies sur 1504 ; 40 écarts restants : docs/lot0 §6.
+-- 1466 instructions réussies sur 1503 ; 37 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -11082,6 +11082,25 @@ CREATE UNIQUE INDEX uq_wo_tool_label ON keystone.wo_required_tools (work_order_i
 -- AnnexeB_GMAO_Partie4#3
 -- garde d'écriture : DUPLICATE_ENTRY
 
+CREATE TABLE keystone.wo_required_permits (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES atlas_core.tenants(id) ON DELETE RESTRICT,
+  work_order_id uuid NOT NULL REFERENCES keystone.work_orders(id) ON DELETE CASCADE,
+  permit_type permit_type,                     -- rubrique D09 (Annexe C.7.1) : hot_work, work_at_height, electrical,
+                                               -- confined_space, excavation, lifting ; ni 'general' ni 'energized'
+  authorization_label text,                    -- autre autorisation (accord du propriétaire, accès toiture)
+  position int NOT NULL CHECK (position >= 1),
+  created_at timestamptz NOT NULL DEFAULT now(), created_by uuid,
+  CONSTRAINT ck_wrp_one CHECK ((permit_type IS NOT NULL) <> (authorization_label IS NOT NULL)),
+  CONSTRAINT ck_wrp_rubric CHECK (permit_type IS NULL OR permit_type NOT IN ('general')),
+  CONSTRAINT ck_wrp_label CHECK (authorization_label IS NULL OR char_length(btrim(authorization_label)) BETWEEN 2 AND 120) );
+
+-- AnnexeB_GMAO_Partie4#3
+CREATE UNIQUE INDEX uq_wrp_type ON keystone.wo_required_permits (work_order_id, permit_type) WHERE permit_type IS NOT NULL;
+
+-- AnnexeB_GMAO_Partie4#3
+-- garde d'écriture : DUPLICATE_ENTRY
+
 CREATE TABLE keystone.wo_required_competencies (
   work_order_id uuid NOT NULL REFERENCES keystone.work_orders(id) ON DELETE CASCADE,
   competency_id uuid NOT NULL REFERENCES keystone.competencies(id) ON DELETE RESTRICT,   -- Annexe K
@@ -11867,11 +11886,6 @@ deleted_at  timestamptz,
   channel text NOT NULL CHECK (channel IN ('bank_transfer','mobile_money')),
   CONSTRAINT uq_expense_payment UNIQUE (tenant_id, fna_payment_ref)
 );
-
--- AnnexeE_Budgets_Achats#14
-CREATE VIEW keystone.v_expenses_without_site WITH (security_invoker = true) AS
-  SELECT id, tenant_id, ref, legal_entity_id, vendor_id, amount_ttc, currency, accounting_date, status
-  FROM keystone.expenses WHERE site_id IS NULL AND deleted_at IS NULL AND status NOT IN ('rejected','cancelled');
 
 -- AnnexeE_Budgets_Achats_Partie2#3
 CREATE TABLE keystone.rfq_deadline_changes (
@@ -12934,6 +12948,12 @@ CREATE TABLE keystone.survey_followups (
   CONSTRAINT ck_followup_done CHECK (status <> 'handled' OR (action_kind IS NOT NULL AND resolution_note IS NOT NULL)),
   CONSTRAINT ck_followup_link CHECK (action_kind NOT IN ('work_order','rework_order','capa') OR linked_id IS NOT NULL)
 );
+
+-- AnnexeN_Satisfaction_Cout#5
+CREATE VIEW keystone.v_expenses_without_site WITH (security_invoker = true) AS       -- file « Dépenses sans site »
+  SELECT e.* FROM keystone.expenses e
+  LEFT JOIN keystone.budgets b ON b.id = e.budget_id
+  WHERE e.status IN ('approved','paid') AND e.site_id IS NULL AND b.site_id IS NULL AND e.deleted_at IS NULL;
 
 -- AnnexeH_PROPH3T_Agents#6
 CREATE TABLE keystone.predictions (

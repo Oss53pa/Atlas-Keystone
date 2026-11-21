@@ -23,7 +23,8 @@ CREATE TYPE keystone.event_status AS ENUM ('reported','triage','under_investigat
 CREATE TYPE keystone.inspection_status AS ENUM ('scheduled','in_progress','completed','overdue','cancelled');                  -- Annexe C, A51
 CREATE TYPE keystone.ticket_status AS ENUM ('new','triage','assigned','in_progress','resolved','closed','reopened','rejected','cancelled'); -- A53
 CREATE TYPE keystone.control_result AS ENUM ('conform','conform_with_reserves','non_conform');                                -- Annexe R
--- [Probable] : renvoi à « valeurs de l'Annexe C » sans liste écrite ; valeurs de la base actuelle (migrations 01 à 25).
+-- Renvoi à « valeurs de l'Annexe C » sans liste écrite : valeurs de la base actuelle (migrations 01 à 25),
+-- retenues comme référence par Oss53pa le 21/11/2026 (à reporter dans l'Annexe C).
 CREATE TYPE keystone.capa_type AS ENUM ('corrective','preventive');
 CREATE TYPE keystone.control_hierarchy AS ENUM ('elimination','substitution','engineering','administrative','ppe');
 CREATE TYPE keystone.identifier_type AS ENUM ('qr','barcode','nfc','rfid');
