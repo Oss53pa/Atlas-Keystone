@@ -10,5 +10,6 @@ Fichiers **non appliqués**, rangés hors de `supabase/migrations` pour qu'aucun
 
 Ordre d'application sur une base de test : extensions, `scripts/schema/correctifs_corpus.sql`, `keystone_v2_schema.sql`,
 `keystone_v2_error_codes.sql`, `keystone_v2_seed_reference.sql`, `scripts/schema/conventions_socle.sql` (RLS d'isolation, audit chaîné,
-horodatage, droits), puis la recette `scripts/schema/recette_socle.sql`. Application à une base Supabase : seulement après zéro écart bloquant (docs/lot0 §6),
+horodatage, droits), `scripts/schema/rls_lecture.sql` (lecture par module), puis les recettes
+`scripts/schema/recette_socle.sql` et `scripts/schema/recette_permissions.sql`. Application à une base Supabase : seulement après zéro écart bloquant (docs/lot0 §6),
 avec l'accord d'Oss53pa, d'abord sur une branche, puis hors des heures d'utilisation (CLAUDE.md, règle 4).
