@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { AlertCircle, Camera, Check, ChevronsLeft, ChevronsRight, FileUp, Upload, X } from 'lucide-react';
 import {
   FORM_MESSAGES, fmt, formatBytes, groupDigits, isEmpty, isVisible, isoToFr, parseAmount, parseFrDate, requiredProgress,
-  sectionState, sniffMime, submittedValues, validateForm,
+  sectionState, sniffMime, submittedValues, toAppError, validateForm,
   type FieldSpec, type FileValue, type FormSpec, type FormValues, type SignatureValue,
 } from '@keystone/domain';
 
@@ -318,7 +318,7 @@ export interface FormSheetProps {
   initial?: FormValues;
   signer: string;
   primaryLabel: string;
-  /** Envoi : lève une erreur portant `code` (A69) pour afficher le bandeau serveur. */
+  /** Envoi : en cas d'échec, l'erreur (PostgREST ou autre) est traduite par le catalogue des messages (A69). */
   onSubmit: (values: FormValues) => Promise<void>;
   onClose: () => void;
   now?: () => Date;
@@ -386,8 +386,9 @@ export function FormSheet({ spec, eyebrow, draftKey, initial, signer, primaryLab
       if (draftKey) await drafts.del(draftKey);
       setDirty(false); onClose();
     } catch (e) {
-      const err = e as { message?: string; code?: string };
-      setServerErr({ message: err.message || 'L’enregistrement a échoué. Votre saisie est conservée sur cet appareil.', code: err.code });
+      // Traduction par le catalogue (A69) : jamais le message technique brut à l'écran.
+      const app = toAppError(e);
+      setServerErr({ message: app.message, code: app.code });
       if (draftKey) void drafts.set(draftKey, values);
     } finally { setSaving(false); }
   };

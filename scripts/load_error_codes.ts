@@ -26,6 +26,18 @@ function cells(line: string): string[] {
   return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
 }
 
+/** Texte affichable : contenu du premier « … » de premier niveau (guillemets imbriqués gardés), sinon la cellule. */
+export function displayText(cell: string): string {
+  const start = cell.indexOf('«');
+  if (start < 0) return cell.trim();
+  let depth = 0;
+  for (let i = start; i < cell.length; i++) {
+    if (cell[i] === '«') depth++;
+    else if (cell[i] === '»' && --depth === 0) return cell.slice(start + 1, i).trim();
+  }
+  return cell.slice(start + 1).trim();
+}
+
 function annexOf(text: string): string | null {
   const m = /Annexe\s+([A-Z]{1,2}[a-z]*|Admin|CO|NF|AP)\b/.exec(text);
   return m ? `Annexe ${m[1]}` : null;
@@ -96,10 +108,11 @@ function main() {
   const values = (rs: Row[]) => rs.map((r) => `  (${q(r.code)}, ${r.http}, ${q(r.category)}, ${q(r.aliasOf)}, ${q(r.owner)})`).join(',\n');
   const ins = (rs: Row[]) => rs.length ? `INSERT INTO keystone.error_codes (code, http_status, category, alias_of, owner_annex) VALUES\n${values(rs)}\nON CONFLICT (code) DO UPDATE SET http_status = EXCLUDED.http_status, category = EXCLUDED.category,\n  alias_of = EXCLUDED.alias_of, owner_annex = EXCLUDED.owner_annex;\n` : '';
   writeFileSync(outSql, `-- Généré par scripts/load_error_codes.ts depuis le catalogue des messages (A96). Ne pas modifier à la main.\n-- ${official.length} codes officiels, ${aliases.length} alias.\n${ins(official)}${ins(aliases)}`);
-  const i18n: Record<string, { message: string; surfaces: string; action: string }> = {};
-  for (const r of rows) if (!r.aliasOf && /^[A-Z]/.test(r.code)) i18n[r.code] = { message: r.message, surfaces: r.surfaces, action: r.action };
-  writeFileSync(outJson, JSON.stringify({ errors: i18n }, null, 1));
+  const i18n: Record<string, { text: string; http: number | null; message: string; surfaces: string; action: string }> = {};
+  for (const r of rows) if (!r.aliasOf && /^[A-Z]/.test(r.code)) i18n[r.code] = { text: displayText(r.message), http: r.http, message: r.message, surfaces: r.surfaces, action: r.action };
+  const aliasMap = Object.fromEntries(rows.filter((r) => r.aliasOf).map((r) => [r.code, r.aliasOf]));
+  writeFileSync(outJson, JSON.stringify({ errors: i18n, aliases: aliasMap }, null, 1));
   console.log(`${rows.length} lignes lues, ${official.length} codes chargés, ${aliases.length} alias, ${Object.keys(i18n).length} clés i18n.`);
 }
 
-main();
+if (process.argv[1]?.endsWith('load_error_codes.ts')) main();
