@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""Assemble le SQL des annexes back-end du cahier des charges et l'éprouve sur un Postgres de test.
+
+Usage :
+  python3 -I scripts/schema/annexes_to_sql.py <dossier 03_Annexes_back_end> <sortie.json>
+Le dossier frère 02_Cadrage_et_referentiels est lu pour les Référentiels transverses (§1.0 : types partagés),
+exécutés avant les annexes (ordre de lecture de l'Index, étape 3).
+Produit la liste ordonnée des instructions SQL (une entrée par instruction : annexe, n° de bloc, texte).
+  - Ordre : celui de l'Index (§2 et §3) ; le lot 12 (proposition à valider) en dernier.
+  - `<communes>` est remplacé par les colonnes communes de l'Annexe A §A.1 (bloc 1).
+  - Un bloc qui porte un autre jeton `<x>` est un gabarit : non exécuté, compté.
+  - Prélude ajouté : CREATE SCHEMA (absent du corpus au 14/11/2026, écart du rapport du lot 0).
+Aucune instruction n'est réécrite au-delà de ces deux substitutions.
+"""
+import json
+import pathlib
+import re
+import sys
+
+ORDER = [
+    'AnnexeCO_Atlas_Core', 'AnnexeA_Socle', 'AnnexeA_Socle_Partie2', 'AnnexeA_Socle_Partie3', 'AnnexeA_Socle_Partie4',
+    'AnnexeAdmin_RBAC_Notifications', 'AnnexeAdmin_RBAC_Notifications_Partie2', 'AnnexeAdmin_RBAC_Notifications_Partie3',
+    'AnnexeNF_Non_Fonctionnel', 'AnnexeG_GED', 'AnnexeS_Space_Management', 'AnnexeS_Space_Management_Partie2',
+    'AnnexeP_Prestataires_Mobile', 'AnnexeK_Formation_Environnement', 'AnnexePL_Planning_Equipes', 'AnnexePL_Planning_Equipes_Partie2',
+    'AnnexeB_GMAO', 'AnnexeB_GMAO_Partie2', 'AnnexeB_GMAO_Partie3', 'AnnexeB_GMAO_Partie4', 'AnnexeMO_Modeles_OT', 'AnnexeAM_AMDEC_Fiabilite',
+    'AnnexeC_HSSE', 'AnnexeC_HSSE_Partie2', 'AnnexeE_Budgets_Achats', 'AnnexeE_Budgets_Achats_Partie2',
+    'AnnexeC_HSSE_Partie3', 'AnnexeC_HSSE_Partie4', 'AnnexeR_Reglementaire_SSI',
+    'AnnexeD_Tickets_Portails', 'AnnexeD_Tickets_Portails_Partie2', 'AnnexeP_Prestataires_Mobile_Partie2', 'AnnexeTA_Travaux_Amenagement',
+    'AnnexeM_Mode_Prestataire', 'AnnexeM_Mode_Prestataire_Partie2', 'AnnexeCL_Portail_Client', 'AnnexeIF_Interfaces',
+    'AnnexeF_SoftFM', 'AnnexeU_Surete_Accueil', 'AnnexeU_Surete_Accueil_Partie2', 'AnnexePK_Parking',
+    'AnnexeI_IoT', 'AnnexeEN_Energie', 'AnnexeQ_Reporting', 'AnnexeN_Satisfaction_Cout', 'AnnexeW_Workspace_AdHoc', 'AnnexeH_PROPH3T_Agents',
+    'AnnexeAdmin_RBAC_Notifications_Partie4', 'AnnexeAP_API_Publique',
+]
+PROPOSAL = {'AnnexeAdmin_RBAC_Notifications_Partie4', 'AnnexeAP_API_Publique'}
+PRELUDE = ['CREATE SCHEMA IF NOT EXISTS atlas_core', 'CREATE SCHEMA IF NOT EXISTS atlas_public', 'CREATE SCHEMA IF NOT EXISTS keystone']
+BLOCK = re.compile(r'^```sql\s*\n(.*?)^```', re.S | re.M)
+TOKEN = re.compile(r'<([a-z_]+)>')
+
+
+def split_sql(sql: str) -> list[str]:
+    """Découpe en instructions : respecte les chaînes '…', les identifiants "…", les corps $tag$…$tag$ et les commentaires."""
+    out, buf, i, n = [], [], 0, len(sql)
+    while i < n:
+        c = sql[i]
+        if sql.startswith('--', i):
+            j = sql.find('\n', i); j = n if j < 0 else j
+            buf.append(sql[i:j]); i = j; continue
+        if sql.startswith('/*', i):
+            j = sql.find('*/', i + 2); j = n if j < 0 else j + 2
+            buf.append(sql[i:j]); i = j; continue
+        if c in "'\"":
+            j = i + 1
+            while j < n:
+                if sql[j] == c:
+                    if j + 1 < n and sql[j + 1] == c: j += 2; continue
+                    break
+                j += 1
+            buf.append(sql[i:j + 1]); i = j + 1; continue
+        m = re.match(r'\$[A-Za-z_]*\$', sql[i:])
+        if m:
+            tag = m.group(0); j = sql.find(tag, i + len(tag)); j = n if j < 0 else j + len(tag)
+            buf.append(sql[i:j]); i = j; continue
+        if c == ';':
+            s = ''.join(buf).strip()
+            if s and not all(l.strip().startswith('--') or not l.strip() for l in s.splitlines()): out.append(s)
+            buf = []; i += 1; continue
+        buf.append(c); i += 1
+    s = ''.join(buf).strip()
+    if s and not all(l.strip().startswith('--') or not l.strip() for l in s.splitlines()): out.append(s)
+    return out
+
+
+def main(src: str, out: str) -> None:
+    d = pathlib.Path(src)
+    files = {p.stem.replace('CDC_Atlas_Keystone_', ''): p for p in d.glob('*.md')}
+    missing = sorted(set(files) - set(ORDER))
+    if missing:
+        sys.exit(f'Annexes absentes de ORDER : {missing}')
+    ref = d.parent / '02_Cadrage_et_referentiels' / 'CDC_Atlas_Keystone_Referentiels_Transverses.md'
+    blocks = {'Referentiels_Transverses': BLOCK.findall(ref.read_text(encoding='utf-8'))}
+    blocks.update({name: BLOCK.findall(files[name].read_text(encoding='utf-8')) for name in ORDER})
+    communes = blocks['AnnexeA_Socle'][0].strip().rstrip(',')
+    stmts = [{'src': 'prelude', 'sql': s} for s in PRELUDE]
+    templates, n_blocks = [], 0
+    for name in ['Referentiels_Transverses', *ORDER]:
+        for i, body in enumerate(blocks[name], 1):
+            n_blocks += 1
+            if name == 'AnnexeA_Socle' and i == 1:
+                templates.append(f'{name}#{i}'); continue  # définition des colonnes communes
+            body = body.replace('<communes>', communes)
+            if TOKEN.search(body):
+                templates.append(f'{name}#{i}'); continue
+            for s in split_sql(body):
+                stmts.append({'src': f'{name}#{i}', 'proposal': name in PROPOSAL, 'sql': s})
+    pathlib.Path(out).write_text(json.dumps({'statements': stmts, 'templates': templates}, ensure_ascii=False), encoding='utf-8')
+    print(f'{n_blocks} blocs, {len(templates)} gabarits non exécutés, {len(stmts)} instructions -> {out}')
+
+
+if __name__ == '__main__':
+    main(sys.argv[1], sys.argv[2])
