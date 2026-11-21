@@ -340,6 +340,8 @@ export function FormSheet({ spec, eyebrow, draftKey, initial, signer, primaryLab
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [railOpen, setRailOpen] = useState(true);
   const [current, setCurrent] = useState(spec.sections[0]?.id);
+  const [secPanel, setSecPanel] = useState(false);
+  const navLock = useRef(0);
   const body = useRef<HTMLDivElement>(null);
   const errSum = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
@@ -361,14 +363,16 @@ export function FormSheet({ spec, eyebrow, draftKey, initial, signer, primaryLab
   // Section courante suivant le défilement.
   useEffect(() => {
     const root = body.current; if (!root) return;
-    const io = new IntersectionObserver((es) => { const vis = es.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]; if (vis) setCurrent(vis.target.id.replace('aks-', '')); }, { root, rootMargin: '0px 0px -60% 0px' });
+    const io = new IntersectionObserver((es) => { if (Date.now() < navLock.current) return; const vis = es.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]; if (vis) setCurrent(vis.target.id.replace('aks-', '')); }, { root, rootMargin: '0px 0px -60% 0px' });
     root.querySelectorAll('section[id^="aks-"]').forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const onScroll = () => { if (Date.now() < navLock.current) return; if (root.scrollTop + root.clientHeight >= root.scrollHeight - 4) { const last = root.querySelectorAll('section[id^="aks-"]'); const el = last[last.length - 1]; if (el) setCurrent(el.id.replace('aks-', '')); } };
+    root.addEventListener('scroll', onScroll, { passive: true });
+    return () => { io.disconnect(); root.removeEventListener('scroll', onScroll); };
   }, [sections.length]);
 
   const set = (k: string, v: unknown) => { setValues((s) => ({ ...s, [k]: v })); setDirty(true); setServerErr(null); };
   const touch = (k: string) => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
-  const goSection = (id: string) => { const el = document.getElementById(`aks-${id}`); el?.scrollIntoView({ block: 'start' }); (el?.querySelector('h3') as HTMLElement | null)?.focus(); };
+  const goSection = (id: string) => { navLock.current = Date.now() + 700; setCurrent(id); const el = document.getElementById(`aks-${id}`); el?.scrollIntoView({ block: 'start' }); (el?.querySelector('h3') as HTMLElement | null)?.focus(); };
   const goField = (k: string) => { document.getElementById(`akw-${k}`)?.scrollIntoView({ block: 'center' }); document.getElementById(`akf-${k}`)?.focus({ preventScroll: true }); };
   const close = () => (dirty ? setGuard(true) : onClose());
 
@@ -398,6 +402,20 @@ export function FormSheet({ spec, eyebrow, draftKey, initial, signer, primaryLab
   });
 
   const STATE_LABEL = { complete: 'Complet', incomplete: '', error: '', optional: 'Facultatif' } as const;
+  const completeN = sections.filter((x) => sectionState(x, values, errors.byKey, shown).state === 'complete').length;
+  const curIdx = Math.max(0, sections.findIndex((x) => x.id === current));
+  const railItems = (full: boolean) => sections.map((s, i) => {
+              const st = sectionState(s, values, errors.byKey, shown);
+              const sub = st.state === 'error' ? `${st.errors} erreur${st.errors > 1 ? 's' : ''}` : st.state === 'incomplete' ? `${st.done} sur ${st.total} obligatoires` : STATE_LABEL[st.state];
+              return (
+                <a key={s.id} href={`#aks-${s.id}`} className="akf-rail__item" data-state={st.state} aria-current={current === s.id ? 'location' : undefined}
+                  aria-label={`${s.title}, ${st.state === 'complete' ? 'complète' : st.state === 'optional' ? 'facultative' : st.state === 'error' ? `en erreur, ${st.errors} champ${st.errors > 1 ? 's' : ''}` : `incomplète, ${st.total - st.done} champ${st.total - st.done > 1 ? 's' : ''} obligatoire${st.total - st.done > 1 ? 's' : ''} restant${st.total - st.done > 1 ? 's' : ''}`}`}
+                  onClick={(e) => { e.preventDefault(); setSecPanel(false); goSection(s.id); }} title={s.title}>
+                  <span className="akf-pastille">{st.state === 'complete' ? <Check size={11} aria-hidden /> : st.state === 'error' ? <AlertCircle size={11} aria-hidden /> : i + 1}</span>
+                  {full && <span style={{ minWidth: 0 }}><span className="akf-rail__t">{s.title}</span><span className="akf-rail__s">{sub}</span></span>}
+                </a>
+              );
+            });
 
   return (
     <div className="akf-overlay" role="dialog" aria-modal="true" aria-labelledby="akf-title">
@@ -418,22 +436,20 @@ export function FormSheet({ spec, eyebrow, draftKey, initial, signer, primaryLab
                 {railOpen ? <ChevronsLeft size={14} aria-hidden /> : <ChevronsRight size={14} aria-hidden />}
               </button>
             </div>
-            {sections.map((s, i) => {
-              const st = sectionState(s, values, errors.byKey, shown);
-              const sub = st.state === 'error' ? `${st.errors} erreur${st.errors > 1 ? 's' : ''}` : st.state === 'incomplete' ? `${st.done} sur ${st.total} obligatoires` : STATE_LABEL[st.state];
-              return (
-                <a key={s.id} href={`#aks-${s.id}`} className="akf-rail__item" data-state={st.state} aria-current={current === s.id ? 'location' : undefined}
-                  aria-label={`${s.title}, ${st.state === 'complete' ? 'complète' : st.state === 'optional' ? 'facultative' : st.state === 'error' ? `en erreur, ${st.errors} champ${st.errors > 1 ? 's' : ''}` : `incomplète, ${st.total - st.done} champ${st.total - st.done > 1 ? 's' : ''} obligatoire${st.total - st.done > 1 ? 's' : ''} restant${st.total - st.done > 1 ? 's' : ''}`}`}
-                  onClick={(e) => { e.preventDefault(); goSection(s.id); }} title={s.title}>
-                  <span className="akf-pastille">{st.state === 'complete' ? <Check size={11} aria-hidden /> : st.state === 'error' ? <AlertCircle size={11} aria-hidden /> : i + 1}</span>
-                  {railOpen && <span style={{ minWidth: 0 }}><span className="akf-rail__t">{s.title}</span><span className="akf-rail__s">{sub}</span></span>}
-                </a>
-              );
-            })}
+            {railItems(railOpen)}
             {railOpen && <div className="akf-rail__note">Les champs marqués <span className="akf-req">*</span> sont obligatoires. Le brouillon est conservé sur cet appareil.</div>}
           </nav>
 
           <div ref={body} className="akf-body ak-scroll">
+            <div className="akf-secbar">
+              <button type="button" className="akf-secbar__btn akf-secbar__btn--md" aria-expanded={secPanel} onClick={() => setSecPanel((o) => !o)}>
+                Sections ({completeN} sur {sections.length} complètes)
+              </button>
+              <button type="button" className="akf-secbar__btn akf-secbar__btn--sm" aria-expanded={secPanel} onClick={() => setSecPanel((o) => !o)}>
+                Section {curIdx + 1} sur {sections.length} : {sections[curIdx]?.title}
+              </button>
+              {secPanel && <nav aria-label="Sections du formulaire" className="akf-secpanel">{railItems(true)}</nav>}
+            </div>
             {draftOffer && (
               <div className="akf-banner akf-banner--info" role="status">
                 <span>Un brouillon du {new Date(draftOffer.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} est disponible.</span>
