@@ -65,3 +65,22 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA keystone TO authenticated;
 -- Journal d'audit : lecture seule pour l'application, écrit uniquement par tg_audit (SECURITY DEFINER).
 REVOKE INSERT, UPDATE, DELETE ON keystone.audit_trail, keystone.audit_heads FROM authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA keystone REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
+-- 5. Retraits APRÈS l'octroi global du point 4 (qui sinon les annulerait) :
+--    fonctions de trigger (un trigger se déclenche sans droit EXECUTE de l'appelant), fonctions internes d'audit et de
+--    pseudonymisation, et toute fonction dont le schéma retire explicitement l'exécution à authenticated.
+DO $$
+DECLARE f record; n int := 0;
+BEGIN
+  FOR f IN
+    SELECT p.oid::regprocedure AS sig
+    FROM pg_proc p JOIN pg_namespace ns ON ns.oid = p.pronamespace
+    WHERE ns.nspname IN ('keystone', 'atlas_core')
+      AND (p.prorettype = 'trigger'::regtype
+           OR p.proname IN ('audit_pseudonymize', 'audit_hash', 'tg_audit', 'tg_audit_immutable'))
+  LOOP
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM authenticated', f.sig);
+    n := n + 1;
+  END LOOP;
+  RAISE NOTICE 'conventions du socle : exécution retirée à authenticated sur % fonctions internes', n;
+END $$;
