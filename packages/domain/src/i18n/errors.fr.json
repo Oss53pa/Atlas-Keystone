@@ -1,0 +1,3284 @@
+{
+ "errors": {
+  "SESSION_EXPIRED": {
+   "message": "« Votre session a expiré. Reconnectez-vous, votre saisie est conservée. »",
+   "surfaces": "=",
+   "action": "« Se reconnecter »"
+  },
+  "DEVICE_SESSION_EXPIRED": {
+   "message": "« Reconnectez-vous pour continuer à saisir. Vos éléments en attente sont conservés. »",
+   "surfaces": "T : « Reconnectez-vous. Vos saisies sont gardées. »",
+   "action": "« Se reconnecter »"
+  },
+  "DEVICE_REVOKED": {
+   "message": "« Cet appareil n'a plus accès au compte. Ses données locales sont effacées. »",
+   "surfaces": "=",
+   "action": "« Se connecter sur cet appareil »"
+  },
+  "NETWORK_UNAVAILABLE": {
+   "message": "« Pas de connexion. Vérifiez le réseau puis réessayez. »",
+   "surfaces": "T, O : « Hors ligne. Votre saisie part au retour du réseau. »",
+   "action": "« Réessayer »"
+  },
+  "REQUEST_TIMEOUT": {
+   "message": "« Le réseau est lent. Réessayez dans un instant. »",
+   "surfaces": "T, O : élément mis en file, toast de la partie 4 §5",
+   "action": "« Réessayer »"
+  },
+  "SERVER_ERROR": {
+   "message": "« Une erreur technique empêche l'opération. Réessayez ; si elle revient, contactez le support. »",
+   "surfaces": "=",
+   "action": "« Réessayer », « Contacter le support »"
+  },
+  "SERVICE_UNAVAILABLE": {
+   "message": "« Keystone est en maintenance jusqu'à {heure}. Vos données sont en sécurité. »",
+   "surfaces": "T : saisie hors ligne possible",
+   "action": "« Réessayer »"
+  },
+  "VERSION_CONFLICT": {
+   "message": "« {nom} a modifié cet élément à {heure}. Comparez les deux versions avant d'enregistrer. »",
+   "surfaces": "T : élément « À revoir » ; actif : « Cet actif a changé depuis son ouverture. Rechargez-le, votre saisie est conservée à côté. »",
+   "action": "« Comparer les versions »"
+  },
+  "CLIENT_VERSION_UNSUPPORTED": {
+   "message": "« Cette version n'est plus prise en charge. Mettez à jour, vos éléments en attente sont conservés. »",
+   "surfaces": "=",
+   "action": "« Mettre à jour l'application »"
+  },
+  "BATCH_TOO_LARGE": {
+   "message": "« Trop d'éléments envoyés d'un coup. L'envoi reprend par lots plus petits. »",
+   "surfaces": "T : envoi relancé automatiquement par lots de 200",
+   "action": "aucun"
+  },
+  "MUTATION_NOT_ROUTABLE": {
+   "message": "« {objet} ne peut pas être envoyé par cette version de l'application. Mettez à jour, la saisie reste à revoir. »",
+   "surfaces": "T : élément « À revoir »",
+   "action": "« Mettre à jour l'application »"
+  },
+  "SYNC_REJECTED": {
+   "message": "« {objet} n'est pas enregistré : {message du code d'origine} »",
+   "surfaces": "T : liste « À revoir »",
+   "action": "« Voir l'élément »"
+  },
+  "CLOCK_SKEW": {
+   "message": "aucun message à l'utilisateur ; responsable : « {n} saisies de {nom} ont plus de 24 heures d'écart avec leur réception. Vérifiez-les. »",
+   "surfaces": "C seulement",
+   "action": "« Voir les saisies »"
+  },
+  "FILE_TOO_LARGE": {
+   "message": "« Ce fichier fait {taille}, la limite est {limite}. Réduisez-le ou choisissez-en un autre. »",
+   "surfaces": "T : photo recompressée automatiquement",
+   "action": "« Choisir un autre fichier »"
+  },
+  "FILE_TYPE_NOT_ALLOWED": {
+   "message": "« Ce format n'est pas accepté. Formats acceptés : {formats}. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre fichier »"
+  },
+  "FILE_LIMIT_EXCEEDED": {
+   "message": "« {limite} fichiers au plus pour cette demande. Retirez-en un pour en ajouter un autre. »",
+   "surfaces": "Q : « Une photo au plus. »",
+   "action": "« Retirer un fichier »"
+  },
+  "STORAGE_QUOTA_EXCEEDED": {
+   "message": "« L'appareil manque d'espace. Synchronisez ou videz le cache des plans. »",
+   "surfaces": "T",
+   "action": "« Ouvrir Appareil »"
+  },
+  "LOCAL_UNLOCK_FAILED": {
+   "message": "« Code incorrect. Il vous reste {n} essais. »",
+   "surfaces": "T",
+   "action": "« Utiliser la biométrie »"
+  },
+  "LOCAL_UNLOCK_LOCKED": {
+   "message": "« Déverrouillage bloqué après {n} essais. Reconnectez-vous avec votre mot de passe ; vos saisies sont gardées. »",
+   "surfaces": "T",
+   "action": "« Se reconnecter »"
+  },
+  "EXPORT_FAILED": {
+   "message": "« L'export n'a pas abouti. Réessayez. »",
+   "surfaces": "=",
+   "action": "« Réessayer »"
+  },
+  "NOT_FOUND": {
+   "message": "« Cet élément n'existe pas ou n'est pas dans votre périmètre. Vérifiez la référence. »",
+   "surfaces": "Q : « Ce code QR n'est plus actif. Signalez-le à l'accueil. »",
+   "action": "« Retour à la liste »"
+  },
+  "PERMISSION_DENIED": {
+   "message": "« Vous n'avez pas le droit de faire cette action. Demandez-le à l'administrateur de votre compte. »",
+   "surfaces": "C : ajoute « Droit nécessaire : {droit}. »",
+   "action": "« Demander l'accès »"
+  },
+  "INVALID_TRANSITION": {
+   "message": "« Cette action n'est plus possible : {objet} est au statut « {statut} ». Actualisez pour voir son état. »",
+   "surfaces": "T : élément « À revoir »",
+   "action": "« Actualiser »"
+  },
+  "SEGREGATION_OF_DUTIES": {
+   "message": "« Vous avez {rôle tenu} cet élément : une autre personne habilitée le valide. »",
+   "surfaces": "=",
+   "action": "« Envoyer à un valideur »"
+  },
+  "REQUIRED_FIELD": {
+   "message": "sous le champ : « Renseignez {champ}. »",
+   "surfaces": "T : plus pictogramme d'alerte",
+   "action": "focus sur le champ"
+  },
+  "REASON_REQUIRED": {
+   "message": "« Indiquez le motif. Il apparaît dans l'historique. »",
+   "surfaces": "=",
+   "action": "focus sur « Motif »"
+  },
+  "INVALID_ARGUMENT": {
+   "message": "« La valeur de {champ} n'est pas valable : {regle}. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "PURPOSE_REQUIRED": {
+   "message": "« Indiquez pourquoi vous consultez cette information. Votre accès est tracé. »",
+   "surfaces": "=",
+   "action": "« Indiquer le motif »"
+  },
+  "RATE_LIMITED": {
+   "message": "« Trop de tentatives. Réessayez dans {duree}. »",
+   "surfaces": "Q, O : « Plusieurs signalements sont déjà partis. Réessayez dans {duree} ou adressez-vous à l'accueil. »",
+   "action": "compte à rebours en texte"
+  },
+  "MFA_REQUIRED": {
+   "message": "« Cette action demande une vérification supplémentaire. Saisissez le code de votre application ou reçu par SMS. »",
+   "surfaces": "sans double authentification configurée : « Activez la double authentification pour continuer. »",
+   "action": "« Vérifier mon identité » ou « Activer la double authentification »"
+  },
+  "SELF_MODIFICATION_FORBIDDEN": {
+   "message": "« Vous ne modifiez pas vos propres droits. Un autre administrateur le fait. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "LAST_ADMIN_REQUIRED": {
+   "message": "« {nom} est le dernier administrateur. Nommez-en un autre avant de retirer ce rôle. »",
+   "surfaces": "O : « {nom} est le dernier administrateur de votre organisation. Nommez-en un autre avant de retirer ce rôle. »",
+   "action": "« Nommer un administrateur »"
+  },
+  "PROVIDER_MODE_REQUIRED": {
+   "message": "« Cette fonction ne fait pas partie de votre offre. »",
+   "surfaces": "C, Admin : ajoute « Elle appartient à la déclinaison Société de services FM ; l'éditeur change la déclinaison sur demande. »",
+   "action": "Admin : « Contacter l'éditeur »"
+  },
+  "SUBSCRIPTION_EXPIRED": {
+   "message": "grâce : « L'abonnement a pris fin le {date}. Le compte reste consultable et exportable jusqu'au {fin}. » ; suspension : « L'accès au compte est suspendu depuis le {date}. Contactez le responsable de l'abonnement. »",
+   "surfaces": "F, O, K : « Ce service est momentanément indisponible. Contactez {marque}. »",
+   "action": "Admin : « Renouveler l'abonnement », « Exporter les données »"
+  },
+  "FILE_REJECTED": {
+   "message": "« Ce fichier est bloqué : il contient un élément dangereux et n'est pas enregistré. » ; logo : « Ce logo dépasse le format ou le poids permis : {regle}. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre fichier »"
+  },
+  "CURRENCY_MISMATCH": {
+   "message": "« Ces montants sont en {devise 1} et en {devise 2}. Ils ne s'additionnent pas sans conversion. »",
+   "surfaces": "=",
+   "action": "« Choisir une ligne de même devise »"
+  },
+  "AUDIT_IMMUTABLE": {
+   "message": "« Le journal d'audit ne se modifie pas. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "ALLOCATION_ZERO_WEIGHT": {
+   "message": "« La répartition n'a aucune base : renseignez au moins une clé supérieure à zéro. »",
+   "surfaces": "=",
+   "action": "focus sur les clés"
+  },
+  "ALLOCATION_NEGATIVE_WEIGHT": {
+   "message": "« Une clé de répartition est négative. Les clés sont positives ou nulles. »",
+   "surfaces": "=",
+   "action": "focus sur la clé"
+  },
+  "CALENDAR_NO_BUSINESS_HOURS": {
+   "message": "« Le calendrier de {site} n'a aucune heure ouvrée. Renseignez ses heures d'ouverture. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le calendrier »"
+  },
+  "CALENDAR_HORIZON_EXCEEDED": {
+   "message": "« Cette échéance dépasse l'horizon de calcul de 400 jours. Réduisez le délai. »",
+   "surfaces": "=",
+   "action": "focus sur le délai"
+  },
+  "HOLIDAY_CONFIRMATION_REQUIRED": {
+   "message": "« Confirmez la date de ce jour férié : elle dépend de l'annonce officielle. »",
+   "surfaces": "=",
+   "action": "« Confirmer la date »"
+  },
+  "IMPORT_CONFIRMATION_REQUIRED": {
+   "message": "« {n} lignes sont rejetées. Confirmez l'import des {m} lignes valides. »",
+   "surfaces": "=",
+   "action": "« Importer les lignes valides », « Télécharger le rapport »"
+  },
+  "DUPLICATE_NAME": {
+   "message": "« Un élément porte déjà le nom {nom}. Choisissez un autre nom. »",
+   "surfaces": "C : « Un tableau porte déjà ce nom. » pour un tableau de bord",
+   "action": "focus sur « Nom »"
+  },
+  "SIGNATURE_NAME_MISMATCH": {
+   "message": "« Le nom saisi ne correspond pas à votre nom. Saisissez-le tel qu'il figure sur votre profil. »",
+   "surfaces": "=",
+   "action": "focus sur le nom"
+  },
+  "DUPLICATE_CODE": {
+   "message": "« Le code {code} est déjà utilisé par {objet}. Choisissez un autre code. »",
+   "surfaces": "=",
+   "action": "« Voir {objet} »"
+  },
+  "CODE_LOCKED": {
+   "message": "« Ce code est figé : une étiquette est déjà imprimée. Créez un nouvel élément pour changer de code. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "CAPEX_RULE": {
+   "message": "« Cet actif ne respecte pas la règle d'immobilisation : {regle}. Corrigez la valeur ou la nature. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "CRP_REQUIRED": {
+   "message": "« Cet équipement est soumis à contrôle réglementaire. Choisissez son régime de contrôle pour l'enregistrer. »",
+   "surfaces": "mobilisation : « Des contrôles réglementaires de {site} sont échus. Mettez-les à jour avant la mise en service. »",
+   "action": "« Choisir le régime »"
+  },
+  "DUPLICATE_IDENTIFIER": {
+   "message": "« Cet identifiant est déjà attribué à {actif}. Utilisez une autre étiquette ou retirez-la de {actif}. »",
+   "surfaces": "T : « Étiquette déjà utilisée par {actif}. »",
+   "action": "« Voir {actif} »"
+  },
+  "ASSET_CYCLE": {
+   "message": "« {actif} ne peut pas dépendre de {parent} : {parent} dépend déjà de lui. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre parent »"
+  },
+  "COMPONENT_CYCLE": {
+   "message": "« Ce composant crée une boucle dans l'arbre de {actif}. Choisissez un autre parent. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre parent »"
+  },
+  "CATEGORY_CYCLE": {
+   "message": "« Cette famille ne peut pas être rangée sous sa propre sous-famille. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre parent »"
+  },
+  "CATEGORY_IN_USE": {
+   "message": "« {n} actifs utilisent cette famille. Désactivez-la au lieu de la supprimer. »",
+   "surfaces": "=",
+   "action": "« Désactiver »"
+  },
+  "LOCATION_HIERARCHY_MISMATCH": {
+   "message": "« Le secteur et l'espace choisis ne sont pas sur le même niveau. »",
+   "surfaces": "=",
+   "action": "focus sur l'espace"
+  },
+  "LOCATION_IN_USE": {
+   "message": "« Ce lieu porte {n} actifs en service. Déplacez-les ou mettez-les hors service d'abord. »",
+   "surfaces": "=",
+   "action": "« Voir les actifs »"
+  },
+  "SPATIAL_VERSION_CONFLICT": {
+   "message": "« Le plan de ce niveau a été republié à {heure}. Rechargez-le avant d'enregistrer. »",
+   "surfaces": "=",
+   "action": "« Recharger le plan »"
+  },
+  "OPEN_WORK_ORDERS": {
+   "message": "« {objet} a {n} OT ouverts. Clôturez-les ou réaffectez-les avant de continuer. »",
+   "surfaces": "=",
+   "action": "« Voir les OT ouverts »"
+  },
+  "ASSET_NOT_VALIDATED": {
+   "message": "« {actif} n'est pas encore validé : il n'entre ni au planning ni dans les OT. Faites valider sa fiche. »",
+   "surfaces": "T : « Actif non validé. Créez l'OT sur le lieu. »",
+   "action": "« Ouvrir la fiche »"
+  },
+  "ASSET_DATA_INCOMPLETE": {
+   "message": "« {n, plural, one {# champ obligatoire est vide} other {# champs obligatoires sont vides}}. Renseignez-les avant de continuer. »",
+   "surfaces": "=",
+   "action": "« Aller au premier champ »"
+  },
+  "ASSET_RECORD_LOCKED": {
+   "message": "« Cette fiche attend sa validation depuis le {date}. Demandez un renvoi pour correction pour la modifier. »",
+   "surfaces": "=",
+   "action": "« Revenir à la fiche »"
+  },
+  "CRITICALITY_NOT_APPROVED": {
+   "message": "« La criticité {criticite} de {actif} n'est pas approuvée. Faites-la approuver par un autre responsable. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la criticité »"
+  },
+  "ATTRIBUTE_VALUE_INVALID": {
+   "message": "« La valeur de {champ} n'est pas valable : {regle}. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "TAXONOMY_LEVEL_INVALID": {
+   "message": "« Le niveau {niveau} ne dépasse pas celui de {parent}. Choisissez un niveau plus fin. »",
+   "surfaces": "=",
+   "action": "focus sur « Niveau taxonomique »"
+  },
+  "SERVED_SPACE_OUTSIDE_SITE": {
+   "message": "« {lieu} n'est pas sur le site de {actif}. Choisissez un espace de ce site. »",
+   "surfaces": "=",
+   "action": "focus sur « Espaces desservis »"
+  },
+  "OWNER_CLIENT_MISMATCH": {
+   "message": "« Le client propriétaire est le client du site, {client}. Choisissez ce client ou la société FM. »",
+   "surfaces": "=",
+   "action": "focus sur « Propriétaire de l'actif »"
+  },
+  "VALUE_MANAGED_BY_FNA": {
+   "message": "« La valeur nette comptable vient d'Atlas FNA. Modifiez-la dans Atlas FNA. »",
+   "surfaces": "=",
+   "action": "aucune"
+  },
+  "OBJECT_SITE_MISMATCH": {
+   "message": "« {objet} n'est pas rattaché au site de {actif}. Choisissez un élément de ce site. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "BILLING_MODE_REQUIRED": {
+   "message": "« Choisissez le type de facturation : sous contrat, hors contrat ou interne. »",
+   "surfaces": "=",
+   "action": "focus sur « Type de facturation »"
+  },
+  "BILLING_MODE_LOCKED": {
+   "message": "« Le type de facturation de {reference} est figé depuis l'étape Couverture. »",
+   "surfaces": "=",
+   "action": "aucune"
+  },
+  "WO_CONTRACT_REQUIRED": {
+   "message": "« Choisissez un contrat actif qui couvre ce site et cette cible. » ; cause `inactive` : « Le contrat {reference} n'est plus actif au {date}. Choisissez-en un autre. »",
+   "surfaces": "=",
+   "action": "focus sur « Contrat »"
+  },
+  "PURCHASE_REQUEST_REQUIRED": {
+   "message": "« Rattachez une demande d'achat à cet OT hors contrat. »",
+   "surfaces": "=",
+   "action": "« Créer la demande d'achat »"
+  },
+  "PURCHASE_REQUEST_NOT_APPROVED": {
+   "message": "« La demande d'achat {reference} est au statut « {statut} ». L'OT s'engage après son approbation. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la demande d'achat »"
+  },
+  "PURCHASE_REQUEST_NOT_LINKABLE": {
+   "message": "« La demande d'achat {reference} ne se rattache pas à cet OT : {cause}. » ; causes : « autre site », « autre entité juridique », « refusée », « annulée », « liée à l'OT {reference_ot} », `billing_mode` : « OT qui n'est pas hors contrat », `already_linked` : « déjà rattachée à cet OT »",
+   "surfaces": "=",
+   "action": "« Choisir une autre demande »"
+  },
+  "INTERNAL_BENEFICIARY_REQUIRED": {
+   "message": "« Choisissez l'utilisateur interne bénéficiaire de l'OT. »",
+   "surfaces": "=",
+   "action": "focus sur « Utilisateur interne »"
+  },
+  "WO_TARGET_INCOMPLETE": {
+   "message": "« Précisez la cible de l'intervention : {manques}. »",
+   "surfaces": "T : « Cible incomplète : {manques}. »",
+   "action": "focus sur le premier champ manquant"
+  },
+  "WO_ORIGIN_SOURCE_REQUIRED": {
+   "message": "« Indiquez le {objet} à l'origine de l'OT. »",
+   "surfaces": "=",
+   "action": "focus sur « Ticket lié » ou « Inspection liée »"
+  },
+  "SUPERVISOR_REQUIRED": {
+   "message": "« Choisissez le membre de l'équipe qui supervise {prestataire} sur cet OT. »",
+   "surfaces": "=",
+   "action": "focus sur « Superviseur interne de suivi »"
+  },
+  "ASSIGNEE_REQUIRED": {
+   "message": "« Choisissez une personne ou une équipe. »",
+   "surfaces": "=",
+   "action": "focus sur « Intervenant »"
+  },
+  "ASSIGNEE_UNAVAILABLE_OR_UNQUALIFIED": {
+   "message": "« {nom} ne peut pas recevoir cet OT : {cause}. Choisissez un autre intervenant. » ; causes : « absent le {date} », « habilitation {habilitation} échue le {date} », « compétence {competence} manquante »",
+   "surfaces": "F : dispatcher, même message",
+   "action": "« Voir les intervenants disponibles »"
+  },
+  "CONTRACTOR_ACK_PENDING": {
+   "message": "« {prestataire} n'a pas encore accepté l'OT. La suite attend sa réponse. »",
+   "surfaces": "=",
+   "action": "« Relancer le prestataire »"
+  },
+  "WATCH_CONFIRMATION_REQUIRED": {
+   "message": "« {prestataire} est sous surveillance (score {score}). Confirmez l'affectation. »",
+   "surfaces": "=",
+   "action": "case « Je confirme », « Affecter »"
+  },
+  "DIAGNOSIS_INCOMPLETE": {
+   "message": "« Complétez le diagnostic : {champs manquants}. »",
+   "surfaces": "T : « Diagnostic incomplet : {champs manquants}. »",
+   "action": "« Compléter le diagnostic »"
+  },
+  "EST_MINUTES_REQUIRED": {
+   "message": "« Indiquez la durée estimée pour planifier l'OT. »",
+   "surfaces": "=",
+   "action": "focus sur « Durée estimée »"
+  },
+  "COST_LINES_REQUIRED": {
+   "message": "« Ajoutez au moins une ligne de chiffrage : main-d'œuvre, pièce ou sous-traitance. »",
+   "surfaces": "=",
+   "action": "« Ajouter une ligne »"
+  },
+  "COVERAGE_REQUIRED": {
+   "message": "« Choisissez la couverture de la dépense : commande, contrat ou ligne de budget. »",
+   "surfaces": "=",
+   "action": "« Choisir la couverture »"
+  },
+  "CLIENT_PO_REQUIRED": {
+   "message": "« Le contrat exige le bon de commande du client. Renseignez sa référence. »",
+   "surfaces": "=",
+   "action": "focus sur « Bon de commande client »"
+  },
+  "QUOTE_APPROVAL_REQUIRED": {
+   "message": "« Le client approuve le devis avant la suite : le montant dépasse le seuil du contrat ({seuil}). »",
+   "surfaces": "=",
+   "action": "« Créer le devis » ou « Voir le devis »"
+  },
+  "SUBCONTRACTING_REQUIRED": {
+   "message": "« Ce travail est confié à un prestataire qualifié. Affectez-le pour engager l'OT. »",
+   "surfaces": "=",
+   "action": "« Affecter un prestataire »"
+  },
+  "DIRECTION_APPROVAL_REQUIRED": {
+   "message": "« Ce travail demande l'accord de la direction avant engagement. »",
+   "surfaces": "=",
+   "action": "« Demander l'accord »"
+  },
+  "PERMIT_REQUIRED": {
+   "message": "« Cet OT exige un permis de travail {approuvé ou actif}. Le travail ne commence pas sans lui. »",
+   "surfaces": "T : « Permis requis. Ne commencez pas. » plus pictogramme d'interdiction",
+   "action": "« Voir le permis » ou « Demander un permis » ; T : « Appeler le responsable »"
+  },
+  "SCAN_REQUIRED": {
+   "message": "« Scannez le QR de {actif ou lieu} pour {action}. »",
+   "surfaces": "T : « Scannez l'étiquette de {actif}. »",
+   "action": "« Scanner », « Saisir le code »"
+  },
+  "SCAN_MISMATCH": {
+   "message": "« Ce QR correspond à {actif scanné}, pas à {actif attendu}. Placez-vous devant le bon équipement. »",
+   "surfaces": "T : « Mauvais équipement. Attendu : {actif attendu}, {lieu}. »",
+   "action": "« Scanner à nouveau »"
+  },
+  "INVALID_PUNCH": {
+   "message": "« Ce pointage ne suit pas l'ordre démarrer, pause, reprendre, terminer. Dernier pointage : {pointage} à {heure}. »",
+   "surfaces": "T : « Dernier pointage : {pointage} à {heure}. »",
+   "action": "« Voir mes pointages »"
+  },
+  "WORK_LINE_REQUIRED": {
+   "message": "« Décrivez au moins un travail réalisé pour envoyer le rapport. »",
+   "surfaces": "T : « Ajoutez le travail réalisé. »",
+   "action": "« Ajouter un travail »"
+  },
+  "BLOCKING_CHECKPOINT_OPEN": {
+   "message": "« Le point « {point} » est hors tolérance ({valeur}). Décidez de la suite avant d'envoyer le rapport. »",
+   "surfaces": "T : « Point hors tolérance : {point}. Décision requise. »",
+   "action": "« Décider »"
+  },
+  "QUOTE_AMOUNT_EXCEEDED": {
+   "message": "« Le montant dépasse le devis approuvé de {montant}. Faites approuver un devis complémentaire. »",
+   "surfaces": "=",
+   "action": "« Créer un devis complémentaire »"
+  },
+  "REMOTE_RECEPTION_PHOTOS_REQUIRED": {
+   "message": "« Une réception à distance exige les photos avant et après l'intervention. »",
+   "surfaces": "T : « Ajoutez les photos avant et après. »",
+   "action": "« Ajouter les photos »"
+  },
+  "SECOND_VERIFICATION_REQUIRED": {
+   "message": "« Cette réception demande un second vérificateur, différent de l'exécutant et de vous. »",
+   "surfaces": "=",
+   "action": "« Choisir le second vérificateur »"
+  },
+  "CLIENT_ACCEPTANCE_PENDING": {
+   "message": "« L'OT {reference} attend la validation du client jusqu'au {date}. Il passe en vérifié après sa validation. »",
+   "surfaces": "=",
+   "action": "« Relancer le client »"
+  },
+  "PERMIT_NOT_CLOSED": {
+   "message": "« Clôturez le permis {reference} avant de valider l'OT : le site est restitué en sécurité d'abord. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le permis »"
+  },
+  "SLA_PAUSE_NOT_ALLOWED": {
+   "message": "« Ce motif n'arrête pas le délai : seuls l'accès refusé par l'occupant, l'attente client ou une pièce validée par le client le suspendent. »",
+   "surfaces": "=",
+   "action": "« Choisir un motif »"
+  },
+  "DOWNTIME_OVERLAP": {
+   "message": "« Un arrêt de {actif} est déjà saisi du {debut} au {fin}. Modifiez-le au lieu d'en créer un autre. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'arrêt existant »"
+  },
+  "BILLING_PENDING": {
+   "message": "« L'élément facturable n'est pas encore transmis à la facturation. L'OT se clôture après. »",
+   "surfaces": "=",
+   "action": "« Transmettre à la facturation »"
+  },
+  "EXPENSE_PENDING": {
+   "message": "« La dépense de cet OT n'est pas encore approuvée ou rapprochée. »",
+   "surfaces": "=",
+   "action": "« Voir la dépense »"
+  },
+  "REGULARIZATION_PENDING": {
+   "message": "« Régularisez la couverture et le devis de cette urgence avant la clôture. »",
+   "surfaces": "=",
+   "action": "« Régulariser »"
+  },
+  "WO_VERIFIED_FINAL": {
+   "message": "« Cet OT est vérifié. Créez un OT de reprise lié pour reprendre le travail. »",
+   "surfaces": "=",
+   "action": "« Créer un OT de reprise »"
+  },
+  "PART_CONSUMPTION_TO_REVIEW": {
+   "message": "« {n, plural, one {# consommation de pièce saisie hors ligne attend} other {# consommations de pièces saisies hors ligne attendent}} une décision. Traitez-les avant la vérification. »",
+   "surfaces": "=",
+   "action": "« Voir les consommations »"
+  },
+  "REGULATORY_DUE_EXCEEDED": {
+   "message": "« Cette date dépasse l'échéance réglementaire du {date}. Choisissez une date antérieure. »",
+   "surfaces": "porteur de `crp.manage` : « Cette date dépasse l'échéance réglementaire du {date}. Choisissez une date antérieure ou accordez une dérogation motivée. »",
+   "action": "« Choisir une autre date », « Accorder une dérogation »"
+  },
+  "PLANNING_FROZEN": {
+   "message": "« Le planning du {debut} au {fin} est gelé. Seuls les correctifs P1 et P2 se modifient, avec motif. »",
+   "surfaces": "=",
+   "action": "porteur : « Modifier avec motif »"
+  },
+  "SHUTDOWN_REDUNDANCY_CONFLICT": {
+   "message": "« {actif 1} et {actif 2} se secourent et s'arrêtent tous les deux sur ce créneau. Décalez l'un des arrêts. »",
+   "surfaces": "FM Manager : « Lever avec motif »",
+   "action": "« Choisir un autre créneau »"
+  },
+  "SHUTDOWN_BLACKOUT": {
+   "message": "« {site} interdit les arrêts du {debut} au {fin} : {motif}. Choisissez un autre créneau. »",
+   "surfaces": "FM Manager : « Lever avec motif »",
+   "action": "« Choisir un autre créneau »"
+  },
+  "SHIFT_OVERLAP": {
+   "message": "« {nom} est déjà {de poste ou d'astreinte} du {debut} au {fin}. »",
+   "surfaces": "=",
+   "action": "« Voir le planning de {nom} »"
+  },
+  "TIME_OFF_OVERLAP": {
+   "message": "« Une absence existe déjà du {debut} au {fin}. »",
+   "surfaces": "T : « Absence déjà posée du {debut} au {fin}. »",
+   "action": "« Voir l'absence »"
+  },
+  "PERSON_ON_TIME_OFF": {
+   "message": "« {nom} est absent du {debut} au {fin}. Choisissez une autre personne. »",
+   "surfaces": "=",
+   "action": "focus sur « Personne »"
+  },
+  "PERSON_NOT_ACTIVE": {
+   "message": "« {nom} n'est pas active. Validez la personne d'abord. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la fiche »"
+  },
+  "SHIFT_TOO_LONG": {
+   "message": "« Ce poste dure {duree}, au delà du plafond de {plafond}. Confirmez. »",
+   "surfaces": "=",
+   "action": "« Confirmer le poste »"
+  },
+  "REST_PERIOD_INSUFFICIENT": {
+   "message": "« {nom} n'a que {duree} de repos entre deux postes. Confirmez. »",
+   "surfaces": "=",
+   "action": "« Confirmer le poste »"
+  },
+  "SHIFT_SHORT_NOTICE": {
+   "message": "« Ce poste commence dans {duree}. {nom} est prévenu. Confirmez. »",
+   "surfaces": "=",
+   "action": "« Confirmer la modification »"
+  },
+  "SHIFT_PATTERN_INVALID": {
+   "message": "« La rotation est incohérente : {motif}. »",
+   "surfaces": "=",
+   "action": "focus sur la ligne en erreur"
+  },
+  "TEAM_MEMBER_ALREADY_ACTIVE": {
+   "message": "« {nom} fait déjà partie de {equipe} sur cette période. »",
+   "surfaces": "=",
+   "action": "« Voir l'adhésion »"
+  },
+  "TEAM_VENDOR_MISMATCH": {
+   "message": "« {nom} ne relève pas du prestataire de cette équipe. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "TEAM_IN_USE": {
+   "message": "« {equipe} porte {n} postes ou astreintes à venir. Réaffectez-les d'abord. »",
+   "surfaces": "=",
+   "action": "« Voir les postes »"
+  },
+  "ON_CALL_PERSON_UNQUALIFIED": {
+   "message": "« {nom} n'a pas d'habilitation valide : {competence}. »",
+   "surfaces": "=",
+   "action": "« Voir les habilitations »"
+  },
+  "ON_CALL_PHONE_REQUIRED": {
+   "message": "« Indiquez le numéro d'astreinte de {nom}. »",
+   "surfaces": "=",
+   "action": "focus sur « Téléphone »"
+  },
+  "ON_CALL_COVERAGE_GAP": {
+   "message": "« Aucune astreinte de niveau 1 du {debut} au {fin}. »",
+   "surfaces": "C ; signal quotidien au responsable",
+   "action": "« Couvrir la période »"
+  },
+  "ON_CALL_REPLACEMENT_REQUIRED": {
+   "message": "« {nom} est d'astreinte du {debut} au {fin}. Désignez un remplaçant d'abord. »",
+   "surfaces": "=",
+   "action": "« Désigner un remplaçant »"
+  },
+  "ON_CALL_PAGE_ALREADY_HANDLED": {
+   "message": "« Déjà pris en charge par {nom} à {heure}. »",
+   "surfaces": "T : « Déjà pris par {nom} à {heure}. »",
+   "action": "« Voir l'appel »"
+  },
+  "ESCALATION_POLICY_DUPLICATE": {
+   "message": "« Une politique existe déjà pour {declencheur} sur ce périmètre. Modifiez-la. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la politique »"
+  },
+  "ESCALATION_POLICY_REQUIRED": {
+   "message": "« La politique du tenant reste active : désactivez la politique du site. »",
+   "surfaces": "=",
+   "action": "aucune"
+  },
+  "TIME_OFF_CONFLICTS": {
+   "message": "« {n} postes et {m} OT sont prévus pendant cette absence. Confirmez. »",
+   "surfaces": "=",
+   "action": "« Approuver quand même », « Voir les éléments »"
+  },
+  "TIME_OFF_SOURCE_LOCKED": {
+   "message": "« Cette absence vient d'Atlas People. Modifiez-la dans Atlas People. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "TIME_OFF_MANAGED_BY_PEOPLE": {
+   "message": "« Les absences de {nom} se demandent dans Atlas People. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "PERSON_REF_UNKNOWN": {
+   "message": "Admin : « Personne inconnue : {reference}. Associez-la dans Intégrations. »",
+   "surfaces": "C seulement",
+   "action": "« Ouvrir Intégrations »"
+  },
+  "WORK_CENTER_IN_USE": {
+   "message": "« Ce centre de travail sert à {n} actifs et {m} gammes. Désactivez-le au lieu de le supprimer. »",
+   "surfaces": "=",
+   "action": "« Désactiver »"
+  },
+  "DUPLICATE_LEVEL": {
+   "message": "« Le niveau {n} existe déjà. Modifiez-le ou choisissez un autre niveau. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le niveau {n} »"
+  },
+  "PLAN_INCLUSION_CYCLE": {
+   "message": "« Cette inclusion crée une boucle : {gamme} inclut déjà {gamme incluse}. »",
+   "surfaces": "=",
+   "action": "« Voir l'arbre des inclusions »"
+  },
+  "PLAN_INCLUSION_DEPTH": {
+   "message": "« Une gamme inclut au plus 3 niveaux de gammes. »",
+   "surfaces": "=",
+   "action": "« Voir l'arbre des inclusions »"
+  },
+  "PLAN_ALREADY_APPLIED": {
+   "message": "« La gamme {gamme} est déjà appliquée à {actif}. »",
+   "surfaces": "=",
+   "action": "« Voir l'application existante »"
+  },
+  "PLAN_NOT_ACTIVABLE": {
+   "message": "« La gamme n'est pas prête : {manques}. Complétez-la pour l'activer. »",
+   "surfaces": "=",
+   "action": "« Voir les manques »"
+  },
+  "INSUFFICIENT_STOCK": {
+   "message": "« Stock insuffisant : {disponible} {unite} de {article} au magasin {magasin}, {demande} demandés. »",
+   "surfaces": "T, à la synchronisation : « Stock insuffisant pour {article}. Consommation à revoir. »",
+   "action": "« Choisir un autre magasin », « Demander un réapprovisionnement »"
+  },
+  "RESERVATION_EXCEEDS_AVAILABLE": {
+   "message": "« {disponible} {unite} de {article} restent disponibles, {demande} demandés. »",
+   "surfaces": "=",
+   "action": "« Réserver le disponible »"
+  },
+  "STOCK_OWNER_MISMATCH": {
+   "message": "« Ces deux magasins n'appartiennent pas au même propriétaire. Le transfert de stock n'est pas permis. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre magasin »"
+  },
+  "TRANSFER_SAME_WAREHOUSE": {
+   "message": "« Le magasin de destination est le magasin d'origine. Choisissez-en un autre. »",
+   "surfaces": "=",
+   "action": "focus sur « Destination »"
+  },
+  "CYCLE_COUNT_OPEN": {
+   "message": "« {article} figure aussi dans le comptage {reference}, ouvert plus tôt. Validez ou annulez ce comptage d'abord. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le comptage {reference} »"
+  },
+  "CYCLE_COUNT_ALREADY_OPEN": {
+   "message": "« Un inventaire est déjà en cours pour {magasin}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'inventaire en cours »"
+  },
+  "PART_REQUEST_ALREADY_OPEN": {
+   "message": "« Une demande de {article} est déjà ouverte pour cet OT. »",
+   "surfaces": "T : « Demande déjà en cours pour {article}. »",
+   "action": "« Voir la demande »"
+  },
+  "STOCK_OWNER_LOCKED": {
+   "message": "« Le propriétaire du stock de {magasin} est figé depuis son premier mouvement. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "TRANSFER_NOT_DRAFT": {
+   "message": "« Le transfert {reference} est au statut « {statut} » : seul un brouillon s'annule. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le transfert »"
+  },
+  "RETURN_EXCEEDS_ISSUE": {
+   "message": "« Ce retour dépasse la sortie : {reste} {unite} de {article} restent retournables. »",
+   "surfaces": "T : « Retour trop élevé : {reste} {unite} au plus. »",
+   "action": "focus sur la quantité"
+  },
+  "METER_INDEX_DECREASING": {
+   "message": "« L'index {valeur} est inférieur au précédent ({precedent} le {date}). Est-ce une remise à zéro ou un remplacement du compteur ? »",
+   "surfaces": "T : « Index plus bas que le précédent ({precedent}). »",
+   "action": "« Remise à zéro », « Compteur remplacé », « Corriger »"
+  },
+  "METER_READING_OUTLIER": {
+   "message": "« Cette valeur sort de la plage habituelle ({min} à {max}). Prenez une photo du compteur pour confirmer. »",
+   "surfaces": "=",
+   "action": "« Photographier et confirmer », « Corriger »"
+  },
+  "METER_READING_IN_FUTURE": {
+   "message": "« La date du relevé est dans le futur. Indiquez l'heure réelle de lecture. »",
+   "surfaces": "=",
+   "action": "focus sur la date"
+  },
+  "DUPLICATE_READING": {
+   "message": "« Un relevé de ce compteur existe déjà le {date} à {heure}. »",
+   "surfaces": "=",
+   "action": "« Voir le relevé »"
+  },
+  "METER_CYCLE": {
+   "message": "« Ce rattachement crée une boucle de comptage. Choisissez un autre compteur parent. »",
+   "surfaces": "=",
+   "action": "« Changer de compteur parent »"
+  },
+  "METER_IN_USE": {
+   "message": "« {n, plural, one {# gamme déclenchée par ce compteur est active} other {# gammes déclenchées par ce compteur sont actives}}. Après sa désactivation, elles ne se déclenchent plus à l'usage. »",
+   "surfaces": "=",
+   "action": "« Désactiver quand même », « Voir les gammes »"
+  },
+  "METER_BASE_REQUIRED": {
+   "message": "« Indiquez le compteur de {actif} et sa valeur de départ. »",
+   "surfaces": "=",
+   "action": "focus sur « Valeur de départ »"
+  },
+  "METER_BASE_INVALID": {
+   "message": "« La valeur de départ {base} dépasse le dernier relevé valide ({valeur} le {date}). »",
+   "surfaces": "=",
+   "action": "focus sur « Valeur de départ »"
+  },
+  "READING_NOT_TO_REVIEW": {
+   "message": "« Ce relevé est déjà {statut}. Actualisez la file des relevés à revoir. »",
+   "surfaces": "=",
+   "action": "« Actualiser »"
+  },
+  "ROUND_ITEM_SKIP_REASON_REQUIRED": {
+   "message": "« {n, plural, one {# compteur n'est pas relevé} other {# compteurs ne sont pas relevés}}. Indiquez un motif pour chacun. »",
+   "surfaces": "T : « {n} compteurs sans relevé. Motif requis. »",
+   "action": "« Indiquer les motifs »"
+  },
+  "REPORT_REQUIRED": {
+   "message": "« Joignez le rapport de l'organisme de contrôle pour enregistrer le résultat. »",
+   "surfaces": "=",
+   "action": "« Joindre le rapport »"
+  },
+  "CRP_RECHECK_REQUIRED": {
+   "message": "« {actif} reste à l'arrêt jusqu'à une contre-visite conforme. »",
+   "surfaces": "T : « Remise en service interdite. Contre-visite attendue. »",
+   "action": "« Planifier la contre-visite »"
+  },
+  "CRP_CRITICAL_OVERDUE": {
+   "message": "« Un contrôle critique est en retard sur {site} : {controle}, échu le {date}. »",
+   "surfaces": "porteur de `crp.manage` : ajoute « Accordez une dérogation motivée pour continuer. »",
+   "action": "« Voir le contrôle »"
+  },
+  "SITE_REGULATORY_SUSPENDED": {
+   "message": "« Le registre réglementaire de {site} est suspendu depuis le {date}. Il reprend à la réouverture du site. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "HUMAN_CLOSURE_REQUIRED": {
+   "message": "« Un OT réglementaire se clôture par une personne habilitée. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "COMPENSATORY_MEASURES_REQUIRED": {
+   "message": "« Décrivez la mesure compensatoire pendant la neutralisation : ronde ou surveillance. »",
+   "surfaces": "=",
+   "action": "« Ajouter une mesure »"
+  },
+  "RESTORE_TEST_REQUIRED": {
+   "message": "« Testez la détection de {compartiment} avant de la déclarer rétablie. »",
+   "surfaces": "T : « Test de détection requis. »",
+   "action": "« Enregistrer le test »"
+  },
+  "DUPLICATE_CONTROL": {
+   "message": "« Un contrôle {regime} est déjà actif sur {actif}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le contrôle »"
+  },
+  "SSI_PERMIT_NOT_ELIGIBLE": {
+   "message": "« Choisissez un permis de travail par point chaud en brouillon ou à approuver. »",
+   "surfaces": "=",
+   "action": "« Choisir un permis »"
+  },
+  "SSI_PERMIT_NOT_APPROVED": {
+   "message": "« Le permis {reference} n'est pas approuvé. Attendez son approbation pour confirmer la neutralisation. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le permis »"
+  },
+  "SECTOR_NOT_FIRE_ZONING": {
+   "message": "« Choisissez un compartiment du zonage sécurité incendie. »",
+   "surfaces": "=",
+   "action": "« Voir sur le plan »"
+  },
+  "BODY_IN_USE": {
+   "message": "« Cet organisme est désigné sur {n} contrôles actifs. Désignez un autre organisme avant de l'archiver. »",
+   "surfaces": "=",
+   "action": "« Voir les contrôles »"
+  },
+  "REGIME_IN_USE": {
+   "message": "« Ce régime porte {n} contrôles actifs : il reste actif tant qu'ils existent. »",
+   "surfaces": "=",
+   "action": "« Voir les contrôles »"
+  },
+  "ENERGY_ALLOCATION_EXCEEDED": {
+   "message": "« Ce compteur est déjà réparti à {part} % entre les usages. Le total ne dépasse pas 100 %. »",
+   "surfaces": "=",
+   "action": "« Ajuster les parts »"
+  },
+  "ENERGY_TARIFF_OVERLAP": {
+   "message": "« Une autre version de ce tarif couvre déjà le {debut} au {fin}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la version existante »"
+  },
+  "TRANCHE_GAP": {
+   "message": "« Les tranches se suivent sans trou, de 0 à la dernière tranche, seule ouverte. »",
+   "surfaces": "=",
+   "action": "focus sur la tranche"
+  },
+  "ENERGY_DATA_INCOMPLETE": {
+   "message": "« Données insuffisantes : {n} mois mesurés sur 12, ou variable {variable} absente. »",
+   "surfaces": "=",
+   "action": "« Voir les données manquantes »"
+  },
+  "ENERGY_BASELINE_MODEL_INVALID": {
+   "message": "« Le modèle ne représente pas assez bien la consommation : R² {r2}, CV(RMSE) {cv}. »",
+   "surfaces": "=",
+   "action": "« Changer de variable »"
+  },
+  "ENERGY_BASELINE_LOCKED": {
+   "message": "« Une référence approuvée ne se modifie pas. Créez une révision motivée. »",
+   "surfaces": "=",
+   "action": "« Créer une révision »"
+  },
+  "ENERGY_REVIEW_INCOMPLETE": {
+   "message": "« Désignez les usages significatifs et qualifiez chaque opportunité avant de valider la revue. »",
+   "surfaces": "=",
+   "action": "« Voir les manques »"
+  },
+  "ENERGY_INVOICE_GAP": {
+   "message": "« La facture s'écarte de {ecart} % des relevés. Justifiez l'écart pour l'approuver. »",
+   "surfaces": "=",
+   "action": "« Justifier l'écart »"
+  },
+  "ENERGY_GAIN_MISMATCH": {
+   "message": "« Le gain saisi ({saisi}) s'écarte de plus de 1 % du gain mesuré ({mesure}). Reprenez le gain mesuré. »",
+   "surfaces": "=",
+   "action": "« Reprendre le gain mesuré »"
+  },
+  "TARIFF_IN_USE": {
+   "message": "« Ce tarif est utilisé : remplacez-le par une nouvelle version. »",
+   "surfaces": "=",
+   "action": "« Créer une version »"
+  },
+  "DEVICE_UNKNOWN": {
+   "message": "« Mesure ignorée : capteur {identifiant} inconnu. Déclarez-le pour la recevoir. »",
+   "surfaces": "C",
+   "action": "« Déclarer le capteur »"
+  },
+  "DEVICE_DISABLED": {
+   "message": "« Mesure ignorée : le capteur {capteur} est désactivé. »",
+   "surfaces": "C",
+   "action": "« Réactiver le capteur »"
+  },
+  "DEVICE_SITE_MISMATCH": {
+   "message": "« Le capteur et le compteur sont sur deux sites différents. »",
+   "surfaces": "C",
+   "action": "« Choisir un autre compteur »"
+  },
+  "POINT_ALREADY_MAPPED": {
+   "message": "« Ce capteur et cette métrique alimentent déjà le point {point}. »",
+   "surfaces": "C",
+   "action": "« Ouvrir le point »"
+  },
+  "POINT_QUARANTINED": {
+   "message": "« Point en quarantaine : corrigez sa correspondance pour reprendre les mesures. »",
+   "surfaces": "C",
+   "action": "« Corriger la correspondance »"
+  },
+  "UNIT_MISMATCH": {
+   "message": "« Unité reçue {unite recue}, attendue {unite}. Le point passe en quarantaine. »",
+   "surfaces": "C",
+   "action": "« Corriger la correspondance »"
+  },
+  "METRIC_NEVER_RECEIVED": {
+   "message": "« Aucune mesure reçue pour cette métrique. Vérifiez le capteur et la passerelle. »",
+   "surfaces": "C",
+   "action": "« Voir la passerelle »"
+  },
+  "KEY_REJECTED": {
+   "message": "« Connexion de la passerelle {passerelle} refusée : signature invalide. »",
+   "surfaces": "C, Admin",
+   "action": "« Voir le journal de la passerelle »"
+  },
+  "GATEWAY_READ_ONLY": {
+   "message": "« La GTB est en lecture seule : aucune commande n'est envoyée. »",
+   "surfaces": "C",
+   "action": "aucun"
+  },
+  "CLIENT_CONSENT_REQUIRED": {
+   "message": "« Joignez l'accord écrit du client pour raccorder sa GTB. »",
+   "surfaces": "C",
+   "action": "« Joindre l'accord »"
+  },
+  "DEVICE_HAS_OPEN_ALERTS": {
+   "message": "« Ce capteur a {n} alertes ouvertes. Résolvez-les avant son retrait. »",
+   "surfaces": "=",
+   "action": "« Voir les alertes »"
+  },
+  "TELEMETRY_RANGE_TOO_LARGE": {
+   "message": "« Réduisez la période : 5 ans au plus. »",
+   "surfaces": "=",
+   "action": "focus sur la période"
+  },
+  "FMEA_ACTION_REQUIRED": {
+   "message": "« {n} modes de défaillance prioritaires n'ont pas d'action complète : action, responsable et échéance. »",
+   "surfaces": "=",
+   "action": "« Voir les modes »"
+  },
+  "ISO14224_MODE_NOT_ALLOWED": {
+   "message": "« Ce mode de défaillance n'existe pas pour un actif de classe {classe}. Choisissez dans la liste proposée. »",
+   "surfaces": "T : « Mode non prévu pour cet équipement. »",
+   "action": "« Choisir un mode »"
+  },
+  "CAPEX_PLAN_AMOUNT_MISMATCH": {
+   "message": "« La répartition par année fait {somme}, le montant estimé est {montant}. »",
+   "surfaces": "=",
+   "action": "« Ajuster la répartition »"
+  },
+  "FMEA_SCALE_INCOMPLETE": {
+   "message": "« Les échelles sont incomplètes : chaque axe a 10 niveaux et des bornes qui se suivent. »",
+   "surfaces": "=",
+   "action": "« Voir les échelles »"
+  },
+  "FMEA_STUDY_EXISTS": {
+   "message": "« L'analyse {reference} couvre déjà ce périmètre. Créer une seconde analyse ? »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'analyse existante », « Créer quand même »"
+  },
+  "LCC_NOT_COMPUTED": {
+   "message": "« Des valeurs ont changé depuis le dernier calcul. Recalculez l'analyse avant de la valider. »",
+   "surfaces": "=",
+   "action": "« Recalculer »"
+  },
+  "HEALTH_KEY_UNAVAILABLE": {
+   "message": "« Les données de santé sont momentanément inaccessibles. Réessayez dans quelques minutes ; si le problème persiste, contactez l'administrateur. »",
+   "surfaces": "=",
+   "action": "« Réessayer »"
+  },
+  "INVALID_DATE": {
+   "message": "« La date de survenue est après la déclaration. Indiquez quand l'événement a eu lieu. »",
+   "surfaces": "T : « Date de l'événement à corriger. »",
+   "action": "focus sur la date"
+  },
+  "INVESTIGATION_REQUIRED": {
+   "message": "« Cet événement exige une investigation, par sa gravité potentielle. Lancez-la avant de définir les actions. »",
+   "surfaces": "=",
+   "action": "« Lancer l'investigation »"
+  },
+  "LESSON_CONTAINS_PERSON_NAME": {
+   "message": "« Le retour d'expérience cite une personne de l'événement. Retirez son nom avant de publier. »",
+   "surfaces": "=",
+   "action": "focus sur « Contenu »"
+  },
+  "ACTION_REQUIRED": {
+   "message": "« Créez au moins une action corrective ou un OT avant de continuer. »",
+   "surfaces": "=",
+   "action": "« Créer une action »"
+  },
+  "ROOT_CAUSE_REQUIRED": {
+   "message": "« Identifiez au moins une cause racine pour terminer l'investigation. »",
+   "surfaces": "=",
+   "action": "« Ajouter une cause »"
+  },
+  "ROOT_CAUSE_WITHOUT_CAPA": {
+   "message": "« La cause « {cause} » n'a pas d'action corrective. Chaque cause racine en porte au moins une. »",
+   "surfaces": "=",
+   "action": "« Ajouter une action »"
+  },
+  "BARRIER_WITHOUT_CAPA": {
+   "message": "« La barrière « {barriere} » a cédé sans action de renforcement. Ajoutez-en une. »",
+   "surfaces": "=",
+   "action": "« Ajouter une action »"
+  },
+  "REPORT_NOT_APPROVED": {
+   "message": "« Le rapport d'investigation attend son approbation avant la validation des actions. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le rapport »"
+  },
+  "CAPA_OPEN": {
+   "message": "« {n, plural, one {# action corrective reste ouverte} other {# actions correctives restent ouvertes}}. Clôturez-les ou annulez-les avec motif (A43). »",
+   "surfaces": "=",
+   "action": "« Voir les actions »"
+  },
+  "MUST_VERIFY_FIRST": {
+   "message": "« Vérifiez l'efficacité de l'action avant de la clôturer. »",
+   "surfaces": "=",
+   "action": "« Vérifier l'efficacité »"
+  },
+  "NOT_EFFECTIVE": {
+   "message": "« L'action est jugée non efficace et ne se clôture pas. Rouvrez-la pour la reprendre. »",
+   "surfaces": "=",
+   "action": "« Rouvrir l'action »"
+  },
+  "WORK_ORDER_REQUIRED": {
+   "message": "« Ce type de permis se rattache à un OT. Choisissez l'OT des travaux. »",
+   "surfaces": "=",
+   "action": "« Choisir un OT »"
+  },
+  "PERMIT_INCOMPLETE": {
+   "message": "« {n} champs obligatoires manquent : {champs}. »",
+   "surfaces": "T : « Permis incomplet : {n} champs. »",
+   "action": "« Aller au premier champ »"
+  },
+  "RISK_ASSESSMENT_REQUIRED": {
+   "message": "« Joignez une analyse de risque approuvée pour soumettre le permis. »",
+   "surfaces": "=",
+   "action": "« Joindre l'analyse »"
+  },
+  "PREVENTION_PLAN_REQUIRED": {
+   "message": "« {entreprise} n'a pas de plan de prévention valide pour {site}. Établissez-le avant de continuer. »",
+   "surfaces": "F : « Votre plan de prévention pour {site} manque ou est échu. Contactez {exploitant}. » ; O : « L'entreprise {entreprise} attend un plan de prévention validé par le site. »",
+   "action": "« Créer le plan de prévention »"
+  },
+  "PREVENTION_PLAN_INCOMPLETE": {
+   "message": "« Ajoutez au moins un risque d'interférence pour signer le plan de prévention. »",
+   "surfaces": "=",
+   "action": "« Ajouter un risque »"
+  },
+  "LONE_WORK_NOT_ALLOWED": {
+   "message": "« La rubrique {rubrique} interdit le travail isolé. Ajoutez un second intervenant. »",
+   "surfaces": "T : « Travail seul interdit pour {rubrique}. »",
+   "action": "« Ajouter un intervenant »"
+  },
+  "APPROVER_NOT_QUALIFIED": {
+   "message": "« Vous n'avez pas la compétence exigée pour signer le niveau {niveau}. Un signataire habilité le fait. »",
+   "surfaces": "=",
+   "action": "« Voir les signataires habilités »"
+  },
+  "PERMIT_APPROVAL_INCOMPLETE": {
+   "message": "« {n} niveaux du circuit restent à signer : {niveaux}. »",
+   "surfaces": "=",
+   "action": "« Voir le circuit »"
+  },
+  "CLIENT_VISA_REQUIRED": {
+   "message": "« Le contrat exige le visa du client sur ce permis. Il s'active après son visa. »",
+   "surfaces": "K : « Votre visa est attendu sur le permis {reference}. »",
+   "action": "« Demander le visa »"
+  },
+  "PERMIT_VALIDITY_TOO_LONG": {
+   "message": "« La validité dépasse {duree} pour la rubrique {rubrique}. Fin au plus tard le {date} à {heure}. »",
+   "surfaces": "=",
+   "action": "focus sur la fin"
+  },
+  "PERMIT_EXTENSION_LIMIT": {
+   "message": "« Ce permis est déjà prolongé. Réémettez un permis pour continuer. »",
+   "surfaces": "=",
+   "action": "« Réémettre le permis »"
+  },
+  "NOT_APPROVED": {
+   "message": "« Le permis n'est pas approuvé. Il s'active après la dernière signature. »",
+   "surfaces": "T : « Permis non approuvé. Ne commencez pas. » ; achats : « La demande {reference} n'est pas approuvée. La commande attend son approbation. »",
+   "action": "« Voir le circuit »"
+  },
+  "OUT_OF_VALIDITY": {
+   "message": "« Le permis est valable du {debut} au {fin}. Il ne s'active pas en dehors. »",
+   "surfaces": "T : « Permis hors validité. Ne commencez pas. »",
+   "action": "« Réémettre le permis »"
+  },
+  "RECEPTION_NOT_SIGNED": {
+   "message": "« La réception sur site n'est pas signée par tous : {noms}. »",
+   "surfaces": "T : « Signatures de réception manquantes : {n}. »",
+   "action": "« Faire signer »"
+  },
+  "WORKER_NOT_QUALIFIED": {
+   "message": "« {nom} n'a pas de {competence} valide. Remplacez-le ou retirez-le du permis. »",
+   "surfaces": "T : « {nom} non habilité pour {rubrique}. »",
+   "action": "« Remplacer l'intervenant »"
+  },
+  "EQUIPMENT_CHECK_EXPIRED": {
+   "message": "« La vérification de {equipement} est échue depuis le {date}. Utilisez un équipement vérifié. »",
+   "surfaces": "T : « {equipement} non vérifié. Ne l'utilisez pas. »",
+   "action": "« Choisir un autre équipement »"
+  },
+  "ENERGIZED_TWO_PERSONS": {
+   "message": "« Un travail sous tension se fait à deux personnes au moins. Ajoutez un intervenant. »",
+   "surfaces": "T : « Sous tension : deux personnes obligatoires. »",
+   "action": "« Ajouter un intervenant »"
+  },
+  "WIND_LIMIT_EXCEEDED": {
+   "message": "« Le vent relevé ({vent} km/h) dépasse la limite de {limite} km/h. Le travail en hauteur attend. »",
+   "surfaces": "T : « Vent trop fort. Ne montez pas. »",
+   "action": "« Saisir un nouveau relevé »"
+  },
+  "WATCHER_REQUIRED": {
+   "message": "« Désignez le surveillant exigé par la rubrique {rubrique}. »",
+   "surfaces": "=",
+   "action": "« Désigner le surveillant »"
+  },
+  "SSI_INHIBITION_NOT_CONFIRMED": {
+   "message": "« La neutralisation de la détection n'est pas confirmée par le responsable SSI. »",
+   "surfaces": "T : « Détection non neutralisée. Ne commencez pas. »",
+   "action": "« Demander la confirmation »"
+  },
+  "ISOLATION_NOT_VERIFIED": {
+   "message": "« {n} points de consignation ne sont pas vérifiés à zéro énergie. »",
+   "surfaces": "T : « Consignation non vérifiée : {point}. Danger. »",
+   "action": "« Vérifier les consignations »"
+  },
+  "GAS_TEST_REQUIRED": {
+   "message": "« Aucune mesure d'atmosphère valide pour {espace}. Mesurez avant d'entrer. »",
+   "surfaces": "T : « Mesure de gaz requise. N'entrez pas. »",
+   "action": "« Saisir la mesure »"
+  },
+  "LONE_WORKER_SESSION_REQUIRED": {
+   "message": "« Ouvrez la session de travailleur isolé de {nom} avant d'activer le permis. »",
+   "surfaces": "T : « Ouvrez votre session de travail isolé. »",
+   "action": "« Ouvrir la session »"
+  },
+  "PERMIT_REISSUE_REQUIRED": {
+   "message": "« Le permis {reference} n'est plus utilisable : {cause}. Réémettez-le pour reprendre. »",
+   "surfaces": "T : « Permis à réémettre. Ne reprenez pas. »",
+   "action": "« Réémettre le permis »"
+  },
+  "PERSONAL_LOCK_NOT_APPLIED": {
+   "message": "« N'entrez pas. Posez d'abord votre cadenas. »",
+   "surfaces": "T =",
+   "action": "« Poser mon cadenas »"
+  },
+  "LOTO_LOCK_OWNER": {
+   "message": "« Seul {poseur} ou un responsable habilité retire ce cadenas. »",
+   "surfaces": "T : « Cadenas de {poseur}. Ne le retirez pas. »",
+   "action": "« Appeler le responsable »"
+  },
+  "PERSONAL_LOCKS_REMAINING": {
+   "message": "« {n} cadenas personnels restent posés : {noms}. Chacun retire le sien avant la déconsignation. »",
+   "surfaces": "T : « Cadenas encore posés : {noms}. »",
+   "action": "« Voir les cadenas »"
+  },
+  "CONFINED_SPACE_OCCUPIED": {
+   "message": "« {n} personnes sont encore enregistrées dans {espace}. Enregistrez leur sortie. »",
+   "surfaces": "T : « Quelqu'un est encore dans l'espace. »",
+   "action": "« Voir les entrées »"
+  },
+  "FIRE_WATCH_PENDING": {
+   "message": "« La surveillance incendie dure jusqu'à {heure}. Le permis se clôture après. »",
+   "surfaces": "T : « Surveillance feu jusqu'à {heure}. Restez sur place. »",
+   "action": "aucun, compte à rebours en texte"
+  },
+  "SSI_INHIBITION_ACTIVE": {
+   "message": "« La détection de {compartiment} est encore neutralisée. Faites-la rétablir avant de clôturer. »",
+   "surfaces": "=",
+   "action": "« Voir la neutralisation »"
+  },
+  "WO_NOT_DONE": {
+   "message": "« L'OT {reference} n'est pas terminé. Le permis se clôture après la fin du travail. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'OT »"
+  },
+  "RESTITUTION_NOT_SIGNED": {
+   "message": "« Le receveur {nom} signe la restitution : travaux terminés, zone remise en état, personnel sorti. »",
+   "surfaces": "T : « Signez la restitution. »",
+   "action": "« Faire signer »"
+  },
+  "ISOLATIONS_NOT_REMOVED": {
+   "message": "« {n} consignations ne sont ni retirées ni transférées à un nouveau permis. »",
+   "surfaces": "=",
+   "action": "« Transférer », « Déconsigner »"
+  },
+  "TEMPLATE_NOT_PUBLISHED": {
+   "message": "« Ce modèle d'inspection n'est pas publié. Publiez-le ou choisissez-en un autre. »",
+   "surfaces": "T : « Modèle non disponible. »",
+   "action": "« Choisir un autre modèle »"
+  },
+  "TARGET_MISMATCH": {
+   "message": "« Ce QR ne correspond pas à {cible} prévue par l'inspection. »",
+   "surfaces": "T : « Mauvaise cible. Attendu : {cible}. »",
+   "action": "« Scanner à nouveau »"
+  },
+  "INSPECTION_INCOMPLETE": {
+   "message": "« {n} points sont incomplets : {liste}. »",
+   "surfaces": "T : « {n} points à compléter. »",
+   "action": "« Aller au premier point »"
+  },
+  "CAPA_REQUIRED": {
+   "message": "« Cette non-conformité attend son action corrective : créez-la ou clôturez-la d'abord. »",
+   "surfaces": "=",
+   "action": "« Créer l'action » ou « Voir l'action »"
+  },
+  "AUDITOR_NOT_INDEPENDENT": {
+   "message": "« {nom} est responsable du processus audité. Choisissez un autre auditeur. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre auditeur »"
+  },
+  "AUDITOR_NOT_QUALIFIED": {
+   "message": "« {nom} n'a pas la compétence d'auditeur principal exigée. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre auditeur »"
+  },
+  "AUDIT_REPORT_REQUIRED": {
+   "message": "« Diffusez le rapport d'audit avant de clôturer l'audit. »",
+   "surfaces": "=",
+   "action": "« Diffuser le rapport »"
+  },
+  "PROGRAM_EVALUATION_REQUIRED": {
+   "message": "« Évaluez le programme d'audit avant de le clôturer. »",
+   "surfaces": "=",
+   "action": "« Évaluer le programme »"
+  },
+  "TREATMENT_PLAN_REQUIRED": {
+   "message": "« Ce risque dépasse le seuil (score {score}, {bande}). Ajoutez un plan de traitement. »",
+   "surfaces": "=",
+   "action": "« Ajouter un plan de traitement »"
+  },
+  "HUMAN_RATING_REQUIRED": {
+   "message": "« La gravité et la probabilité sont saisies par une personne. »",
+   "surfaces": "=",
+   "action": "« Coter le risque »"
+  },
+  "AI_SCORING_FORBIDDEN": {
+   "message": "« La proposition de l'assistant est retenue sans cotation : la gravité et la probabilité sont saisies par vous. »",
+   "surfaces": "=",
+   "action": "« Coter le risque »"
+  },
+  "AI_DRAFT_NOT_APPROVED": {
+   "message": "« {n} analyses proposées par l'assistant attendent votre approbation avant la publication. »",
+   "surfaces": "=",
+   "action": "« Voir les propositions »"
+  },
+  "DUER_REVIEW_OVERDUE": {
+   "message": "« {n} risques ont dépassé leur date de revue. Revoyez-les avant de publier le DUER. »",
+   "surfaces": "=",
+   "action": "« Voir les risques à revoir »"
+  },
+  "UNIT_REVIEW_INCOMPLETE": {
+   "message": "« {n} risques de l'unité ont une revue échue. Revoyez-les d'abord. »",
+   "surfaces": "=",
+   "action": "« Voir les risques »"
+  },
+  "DUER_IMMUTABLE": {
+   "message": "« Une version publiée du DUER ne se modifie pas. Préparez une nouvelle version. »",
+   "surfaces": "=",
+   "action": "« Créer une nouvelle version »"
+  },
+  "EXPLANATION_REQUIRED": {
+   "message": "« Cette proposition n'a pas d'explication : elle n'est pas présentée. »",
+   "surfaces": "C, Admin",
+   "action": "aucun"
+  },
+  "PROPOSAL_EXPIRED": {
+   "message": "« Cette proposition a expiré. Relancez l'analyse pour une proposition à jour. »",
+   "surfaces": "=",
+   "action": "« Relancer l'analyse »"
+  },
+  "AGENT_CANNOT_EMIT": {
+   "message": "« Un agent prépare l'OT en brouillon ; une personne l'émet. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le brouillon »"
+  },
+  "AGENT_CANNOT_DECIDE": {
+   "message": "« Un agent propose ; une personne décide. Ouvrez la proposition pour la trancher. »",
+   "surfaces": "Admin : « Jeton d'agent refusé pour {fonction}. »",
+   "action": "« Ouvrir la proposition »"
+  },
+  "DUPLICATE_WATCH_ITEM": {
+   "message": "« Ce texte est déjà suivi en veille réglementaire. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le texte suivi »"
+  },
+  "AGENT_DISABLED": {
+   "message": "« L'agent {agent} est désactivé ou suspendu. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir les agents »"
+  },
+  "AGENT_BUDGET_EXCEEDED": {
+   "message": "« L'agent {agent} a atteint son budget d'actions de l'heure et est suspendu. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir l'agent »"
+  },
+  "AI_PROVIDER_FORBIDDEN": {
+   "message": "« Ces données ne sont pas traitées par ce service d'analyse. Le traitement reste local. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "OBLIGATION_GLOBAL_READONLY": {
+   "message": "« Cette ligne appartient au pack {pays} de Keystone. Dupliquez-la pour l'adapter à votre organisation. »",
+   "surfaces": "=",
+   "action": "« Dupliquer la ligne »"
+  },
+  "VALUE_OUT_OF_RANGE": {
+   "message": "« La valeur de {champ} sort des limites : {min} à {max}. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "INVALID_VALUE": {
+   "message": "« Cette valeur n'est pas reconnue pour {champ}. Choisissez dans la liste. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "EVIDENCE_REQUIRED": {
+   "message": "« Joignez la preuve de l'habilitation {habilitation} : attestation ou titre. »",
+   "surfaces": "mobilisation : « Cette tâche exige une preuve. Joignez un document ou une photo. »",
+   "action": "« Joindre la preuve »"
+  },
+  "DUPLICATE_PERIOD": {
+   "message": "« Une valeur de {indicateur} existe déjà pour {periode}. Modifiez-la au lieu d'en créer une autre. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la valeur existante »"
+  },
+  "PERIOD_LOCKED": {
+   "message": "« La période {periode} est verrouillée. Demandez une révision motivée. »",
+   "surfaces": "=",
+   "action": "« Demander une révision »"
+  },
+  "WORKED_HOURS_PERIOD_LOCKED": {
+   "message": "« Les heures de {periode} sont verrouillées : l'import d'Atlas People est refusé. »",
+   "surfaces": "C, Admin",
+   "action": "« Demander une révision »"
+  },
+  "BSD_REQUIRED": {
+   "message": "« Un déchet dangereux part avec son bordereau de suivi. Joignez-le pour valider. »",
+   "surfaces": "T : « Bordereau de suivi requis. »",
+   "action": "« Joindre le bordereau »"
+  },
+  "CONTROL_REQUIRED": {
+   "message": "« Cet aspect significatif attend une mesure de maîtrise ou une action corrective. »",
+   "surfaces": "=",
+   "action": "« Ajouter une mesure »"
+  },
+  "REPORT_IMMUTABLE": {
+   "message": "« Un bilan publié ne se modifie pas. Publiez une nouvelle version. »",
+   "surfaces": "=",
+   "action": "« Créer une nouvelle version »"
+  },
+  "REVIEW_INPUT_MISSING": {
+   "message": "« L'entrée « {entree} » de la revue est vide. Renseignez-la avant de tenir la revue. »",
+   "surfaces": "=",
+   "action": "« Compléter l'entrée »"
+  },
+  "SESSION_NOT_HELD": {
+   "message": "« La session du {date} n'a pas encore eu lieu. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "SESSION_RESULTS_MISSING": {
+   "message": "« {n, plural, one {# participant n'a pas de résultat} other {# participants n'ont pas de résultat}}. Saisissez le résultat de chaque participant. »",
+   "surfaces": "=",
+   "action": "« Saisir les résultats »"
+  },
+  "MANAGEMENT_PARTICIPANT_REQUIRED": {
+   "message": "« Ajoutez au moins un membre de la direction aux participants et désignez la présidence de la revue. »",
+   "surfaces": "=",
+   "action": "« Modifier les participants »"
+  },
+  "PERIOD_NOT_LOCKED": {
+   "message": "« Cette période n'est pas verrouillée : corrigez les heures directement. »",
+   "surfaces": "=",
+   "action": "« Corriger les heures »"
+  },
+  "QC_SAMPLING_PLAN_UNVERIFIED": {
+   "message": "« Le plan d'échantillonnage {plan} n'est pas vérifié. Faites-le valider avant d'ouvrir un lot de contrôle. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le plan »"
+  },
+  "PEST_FIELDS_REQUIRED": {
+   "message": "« Renseignez le produit, la quantité, l'unité et la cible du traitement. »",
+   "surfaces": "T : « Produit, quantité et cible obligatoires. »",
+   "action": "« Aller au premier champ »"
+  },
+  "PEST_REG_NUMBER_REQUIRED": {
+   "message": "« Indiquez le numéro d'homologation du produit {produit}. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "PEST_OPERATOR_NOT_CERTIFIED": {
+   "message": "« {nom} n'a pas d'habilitation d'applicateur valide. Un opérateur habilité réalise le traitement. »",
+   "surfaces": "T : « Habilitation d'applicateur requise. »",
+   "action": "« Choisir un opérateur »"
+  },
+  "QC_PROFILE_REQUIRED": {
+   "message": "« Aucun profil de qualité actif pour le secteur {secteur}. Activez-en un. »",
+   "surfaces": "=",
+   "action": "« Ouvrir les profils »"
+  },
+  "QC_PROFILE_FROZEN": {
+   "message": "« Ce profil est figé par un contrôle. Créez une nouvelle version. »",
+   "surfaces": "=",
+   "action": "« Créer une version »"
+  },
+  "QC_SAMPLE_ALREADY_DRAWN": {
+   "message": "« L'échantillon de ce contrôle est déjà tiré. »",
+   "surfaces": "T =",
+   "action": "« Voir l'échantillon »"
+  },
+  "QC_SAMPLE_INCOMPLETE": {
+   "message": "« {n} espaces tirés restent à contrôler. »",
+   "surfaces": "T : « {n} espaces à contrôler. »",
+   "action": "« Aller au suivant »"
+  },
+  "QC_EVIDENCE_REQUIRED": {
+   "message": "« Ajoutez une photo ou une note à la non-conformité. »",
+   "surfaces": "=",
+   "action": "« Prendre une photo »"
+  },
+  "REWORK_ALREADY_EXISTS": {
+   "message": "« Une reprise est déjà ouverte pour ce contrôle. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la reprise »"
+  },
+  "QC_LOT_ALREADY_OPEN": {
+   "message": "« Un contrôle est déjà ouvert pour ce secteur sur cette période. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le contrôle »"
+  },
+  "PLAN_NOT_SCALED": {
+   "message": "« Ce plan n'est pas calé : la surface reste vide. Calez le plan avec une cote connue. »",
+   "surfaces": "=",
+   "action": "« Caler le plan »"
+  },
+  "POLYGON_SELF_INTERSECTS": {
+   "message": "« Le contour se croise lui-même. Corrigez l'arête en rouge. »",
+   "surfaces": "=",
+   "action": "« Aller à l'arête »"
+  },
+  "POLYGON_OUT_OF_BOUNDS": {
+   "message": "« Des sommets dépassent le plan et sont ramenés au bord. Vérifiez le contour. »",
+   "surfaces": "=",
+   "action": "« Vérifier le contour »"
+  },
+  "SPACE_OVERLAP": {
+   "message": "« Cet espace chevauche {espace} sur {surface} m². Ajustez le contour. »",
+   "surfaces": "=",
+   "action": "« Voir le chevauchement »"
+  },
+  "NODE_IN_USE": {
+   "message": "« Cet élément porte encore {liste}. Déplacez-les ou clôturez-les avant l'archivage. »",
+   "surfaces": "=",
+   "action": "« Voir les éléments »"
+  },
+  "GEOREF_AREA_MISMATCH": {
+   "message": "« Surface locale et surface géographique diffèrent de {ecart} % sur {espace}. Vérifiez le calage. »",
+   "surfaces": "=",
+   "action": "« Vérifier le calage »"
+  },
+  "MEASUREMENT_INCONSISTENT": {
+   "message": "« Les surfaces de {objet} ne concordent pas : {detail}. »",
+   "surfaces": "=",
+   "action": "« Voir l'anomalie »"
+  },
+  "SEGMENT_DEPTH_EXCEEDED": {
+   "message": "« Un segment ne se découpe pas à nouveau. Découpez l'espace parent. »",
+   "surfaces": "=",
+   "action": "« Sélectionner le parent »"
+  },
+  "DRAFT_LOCKED": {
+   "message": "« {nom} édite ce niveau depuis le {date} à {heure}. Attendez sa publication ou demandez-lui de libérer le brouillon. »",
+   "surfaces": "=",
+   "action": "« Contacter {nom} »"
+  },
+  "DRAFT_STALE": {
+   "message": "« Le plan de ce niveau a été publié depuis l'ouverture du brouillon. Mettez le brouillon à jour. »",
+   "surfaces": "=",
+   "action": "« Mettre à jour depuis l'existant »"
+  },
+  "ATELIER_CHECKS_FAILED": {
+   "message": "« {n} anomalies bloquantes empêchent la soumission. Corrigez-les dans la file de contrôle. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la file de contrôle »"
+  },
+  "SPACE_OUTSIDE_FLOOR": {
+   "message": "« {espace} dépasse le contour du niveau. »",
+   "surfaces": "=",
+   "action": "« Aller à l'espace »"
+  },
+  "SEGMENT_OUTSIDE_PARENT": {
+   "message": "« Le segment {segment} sort de son espace parent {espace}. »",
+   "surfaces": "=",
+   "action": "« Aller au segment »"
+  },
+  "SEGMENT_OVERLAP": {
+   "message": "« Les segments {segment 1} et {segment 2} se recouvrent. »",
+   "surfaces": "=",
+   "action": "« Aller au recouvrement »"
+  },
+  "SEGMENT_SUM_MISMATCH": {
+   "message": "« Les segments couvrent {surface} m² de moins ou de plus que {espace}, au delà de la tolérance de {tolerance} m². »",
+   "surfaces": "=",
+   "action": "« Voir l'écart »"
+  },
+  "SPACE_NOT_CONTIGUOUS": {
+   "message": "« Ces espaces ne se touchent pas : ils ne se fusionnent pas. »",
+   "surfaces": "=",
+   "action": "« Modifier la sélection »"
+  },
+  "CROSS_FLOOR_OPERATION": {
+   "message": "« Les espaces choisis sont sur deux niveaux. L'opération porte sur un seul niveau. »",
+   "surfaces": "=",
+   "action": "« Modifier la sélection »"
+  },
+  "MERGE_OCCUPANCY_CONFLICT": {
+   "message": "« Ces espaces ont des occupants différents. Clôturez ou alignez les occupations avant la fusion. »",
+   "surfaces": "=",
+   "action": "« Voir les occupations »"
+  },
+  "MERGE_SECTOR_CONFLICT": {
+   "message": "« Ces espaces sont dans deux secteurs de {zonage}. Choisissez le secteur de l'espace fusionné. »",
+   "surfaces": "=",
+   "action": "« Choisir le secteur »"
+  },
+  "SPLIT_FUTURE_BOOKINGS": {
+   "message": "« {n} réservations futures portent sur {espace}. Migrez-les ou annulez-les avec notification. »",
+   "surfaces": "=",
+   "action": "« Traiter les réservations »"
+  },
+  "SPACE_IN_OPEN_MOVE": {
+   "message": "« {espace} fait partie du déménagement {reference} en cours. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le déménagement »"
+  },
+  "OCCUPANCY_NOT_REPORTED": {
+   "message": "« L'occupation de {organisation} sur {espace} n'est pas reportée sur un nouvel espace. »",
+   "surfaces": "=",
+   "action": "« Reporter l'occupation »"
+  },
+  "ZONING_GAP": {
+   "message": "« {espace} n'appartient à aucun secteur de {zonage}. Chaque espace en a un. »",
+   "surfaces": "=",
+   "action": "« Affecter un secteur »"
+  },
+  "ZONING_OVERLAP": {
+   "message": "« {espace} appartient à deux secteurs de {zonage}. Gardez-en un seul. »",
+   "surfaces": "=",
+   "action": "« Choisir le secteur »"
+  },
+  "SECTOR_EMPTY": {
+   "message": "« Le secteur {secteur} ne contient aucun espace. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le secteur »"
+  },
+  "SECTOR_OWNER_REQUIRED": {
+   "message": "« Le secteur {secteur} n'a pas de responsable. »",
+   "surfaces": "=",
+   "action": "« Désigner un responsable »"
+  },
+  "SECTOR_WITHOUT_SERVICE": {
+   "message": "« Le secteur {secteur} n'est couvert par aucun plan de prestation de propreté. »",
+   "surfaces": "=",
+   "action": "« Ouvrir les plans de prestation »"
+  },
+  "ASSET_OUTSIDE_SPACE": {
+   "message": "« {actif} est placé hors de tout espace validé. »",
+   "surfaces": "=",
+   "action": "« Repositionner l'actif »"
+  },
+  "ASSET_SPACE_REMOVED": {
+   "message": "« {actif} perd son espace {espace}. Repositionnez-le avant la publication. »",
+   "surfaces": "=",
+   "action": "« Repositionner l'actif »"
+  },
+  "LEASE_MISMATCH": {
+   "message": "« {espace} diffère du lot {lot} d'Atlas Patrimoine : {ecart}. Aucune correction automatique n'est faite. »",
+   "surfaces": "=",
+   "action": "« Voir l'écart »"
+  },
+  "SPACE_CODE_MISSING": {
+   "message": "« {n} espaces n'ont pas de code. »",
+   "surfaces": "=",
+   "action": "« Numéroter »"
+  },
+  "DUPLICATE_SPACE_CODE": {
+   "message": "« Le code {code} est déjà utilisé par {espace}. »",
+   "surfaces": "=",
+   "action": "« Aller au doublon »"
+  },
+  "CODE_RETIRED": {
+   "message": "« Le code {code} est retiré le {date} et ne se réutilise pas avant le {date de fin}. »",
+   "surfaces": "=",
+   "action": "« Proposer un code »"
+  },
+  "ASSEMBLY_POINT_REQUIRED": {
+   "message": "« Le secteur {secteur} n'a aucun point de rassemblement. Ajoutez-en un avant la publication. »",
+   "surfaces": "=",
+   "action": "« Ajouter un point »"
+  },
+  "ASSEMBLY_POINT_DUPLICATE": {
+   "message": "« Le code {code} est déjà pris par un autre point de rassemblement du zonage. »",
+   "surfaces": "=",
+   "action": "focus sur « Code »"
+  },
+  "SPACE_IN_WORKS": {
+   "message": "« {espace} est en travaux jusqu'au {date}. L'affectation attend la fin des travaux. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre espace »"
+  },
+  "HEADCOUNT_OVER_CAPACITY": {
+   "message": "« L'effectif de {espace} ({n}) dépasse sa capacité ({capacite}). Confirmez ou corrigez. »",
+   "surfaces": "=",
+   "action": "« Confirmer », « Corriger »"
+  },
+  "COST_PERIOD_CLOSED": {
+   "message": "« La période {periode} est close. Demandez une révision motivée. »",
+   "surfaces": "=",
+   "action": "« Demander une révision »"
+  },
+  "IN_HOUSE_ONLY": {
+   "message": "« L'imputation interne n'existe que pour une exploitation en propre. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "CHARGEBACK_MIXED_DISABLED": {
+   "message": "« La formule mixte n'est pas activée : seule la part surface s'applique. »",
+   "surfaces": "Admin : « Activez la formule mixte dans les paramètres d'imputation. »",
+   "action": "« Ouvrir les paramètres »"
+  },
+  "PRESENCE_DISABLED": {
+   "message": "« Le suivi de présence n'est pas activé sur ce compte. Aucune position n'est envoyée. »",
+   "surfaces": "T",
+   "action": "aucun"
+  },
+  "PRESENCE_DPIA_REQUIRED": {
+   "message": "« Validez l'analyse d'impact sur la protection des données avant d'activer le suivi de présence. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir l'analyse d'impact »"
+  },
+  "PRESENCE_OUT_OF_SERVICE": {
+   "message": "aucun message à l'utilisateur ; la position n'est pas enregistrée",
+   "surfaces": "T : indicateur « Présence en pause »",
+   "action": "aucun"
+  },
+  "DOCK_IN_USE": {
+   "message": "« Le quai {code} porte {n} créneaux à venir. Déplacez-les ou annulez-les avant de le désactiver. »",
+   "surfaces": "=",
+   "action": "« Voir les créneaux »"
+  },
+  "BOOKING_CONFLICT": {
+   "message": "« Ce créneau est déjà réservé. Créneaux libres proches : {creneaux}. »",
+   "surfaces": "=",
+   "action": "« Choisir un créneau libre »"
+  },
+  "CAPACITY_EXCEEDED": {
+   "message": "« {n} participants pour une capacité de {capacite}. »",
+   "surfaces": "=",
+   "action": "« Choisir une salle plus grande »"
+  },
+  "OUTSIDE_OPEN_HOURS": {
+   "message": "« {ressource} se réserve de {debut} à {fin}. »",
+   "surfaces": "=",
+   "action": "focus sur l'heure"
+  },
+  "DURATION_OUT_OF_RANGE": {
+   "message": "« Durée permise : {min} à {max}. »",
+   "surfaces": "=",
+   "action": "focus sur la durée"
+  },
+  "LEAD_TIME_NOT_MET": {
+   "message": "« {ressource} se réserve au moins {delai} à l'avance. »",
+   "surfaces": "=",
+   "action": "« Choisir une autre date »"
+  },
+  "HORIZON_EXCEEDED": {
+   "message": "« Réservation possible jusqu'à {jours} jours à l'avance. »",
+   "surfaces": "=",
+   "action": "« Choisir une autre date »"
+  },
+  "BOOKING_QUOTA_EXCEEDED": {
+   "message": "« Vous avez déjà {n} réservations actives, le maximum. Annulez-en une pour réserver. »",
+   "surfaces": "=",
+   "action": "« Voir mes réservations »"
+  },
+  "RESOURCE_UNAVAILABLE": {
+   "message": "« {ressource} est indisponible du {debut} au {fin}. »",
+   "surfaces": "=",
+   "action": "« Choisir une autre ressource »"
+  },
+  "SPACE_NOT_VERIFIED": {
+   "message": "« Cet espace n'est pas encore validé : il ne se réserve pas. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre espace »"
+  },
+  "AUDIENCE_NOT_ALLOWED": {
+   "message": "« Cette ressource n'est pas proposée à votre organisation. »",
+   "surfaces": "O",
+   "action": "« Voir les ressources disponibles »"
+  },
+  "CHECKIN_WINDOW_CLOSED": {
+   "message": "« Check-in possible de {debut} à {fin}. »",
+   "surfaces": "T, O : idem",
+   "action": "aucun"
+  },
+  "CHECKIN_WRONG_RESOURCE": {
+   "message": "« Ce QR est celui de {ressource scannee}. Votre réservation porte sur {ressource}. »",
+   "surfaces": "=",
+   "action": "« Scanner à nouveau »"
+  },
+  "CANCEL_WINDOW_CLOSED": {
+   "message": "« Ce créneau s'annule au plus tard 2 heures avant. Contactez l'accueil du site. »",
+   "surfaces": "O",
+   "action": "« Contacter l'accueil »"
+  },
+  "DOCK_GAUGE_EXCEEDED": {
+   "message": "« Ce véhicule dépasse le gabarit du quai {quai} : {limite}. Choisissez un autre quai. »",
+   "surfaces": "O",
+   "action": "« Choisir un autre quai »"
+  },
+  "SLOT_FORBIDDEN": {
+   "message": "« Les livraisons sont interdites de {debut} à {fin} sur ce site. »",
+   "surfaces": "O",
+   "action": "« Choisir un autre créneau »"
+  },
+  "MOVE_PLAN_INCOMPLETE": {
+   "message": "« {n} lignes du plan n'ont pas de destination ou de créneau. »",
+   "surfaces": "=",
+   "action": "« Compléter le plan »"
+  },
+  "MOVE_DESTINATION_OCCUPIED": {
+   "message": "« {espace} reste occupé par {organisation} au créneau prévu. »",
+   "surfaces": "=",
+   "action": "« Choisir une autre destination »"
+  },
+  "MOVE_ITEMS_PENDING": {
+   "message": "« {n} biens n'ont pas de scan d'arrivée. »",
+   "surfaces": "T : « {n} biens à scanner à l'arrivée. »",
+   "action": "« Voir les biens »"
+  },
+  "MOVE_TASKS_PENDING": {
+   "message": "« {n} OT bloquants du déménagement ne sont pas vérifiés. »",
+   "surfaces": "=",
+   "action": "« Voir les OT »"
+  },
+  "SCENARIO_STALE": {
+   "message": "« L'existant a changé depuis la création du scénario. Mettez-le à jour avant de publier. »",
+   "surfaces": "=",
+   "action": "« Mettre à jour depuis l'existant »"
+  },
+  "SCENARIO_INVALID_GEOMETRY": {
+   "message": "« Le scénario contient {n} géométries invalides. »",
+   "surfaces": "=",
+   "action": "« Voir les anomalies »"
+  },
+  "PARKING_DISABLED": {
+   "message": "« Le stationnement n'est pas activé sur ce site. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "PARKING_CAPACITY_EXCEEDED": {
+   "message": "« La zone {zone} compte {capacite} places au plus. »",
+   "surfaces": "=",
+   "action": "focus sur la capacité"
+  },
+  "ZONE_FULL": {
+   "message": "« La zone {zone} est complète. »",
+   "surfaces": "T, borne : « Complet. »",
+   "action": "« Voir les autres zones »"
+  },
+  "NO_PARKING_RIGHT": {
+   "message": "« Aucun droit de stationnement dans la zone {zone} pour ce véhicule. »",
+   "surfaces": "T : « Pas de droit pour cette zone. »",
+   "action": "« Voir les droits »"
+  },
+  "PLATE_INVALID": {
+   "message": "« Cette plaque n'a pas un format reconnu. Vérifiez la saisie. »",
+   "surfaces": "=",
+   "action": "focus sur la plaque"
+  },
+  "SESSION_ALREADY_OPEN": {
+   "message": "« Un stationnement est déjà en cours pour {plaque} depuis {heure}. »",
+   "surfaces": "T =",
+   "action": "« Ouvrir le stationnement »"
+  },
+  "SESSION_NOT_OPEN": {
+   "message": "« Aucun stationnement en cours pour {plaque}. Saisissez l'heure d'entrée avec motif. »",
+   "surfaces": "T =",
+   "action": "« Saisir l'entrée »"
+  },
+  "PARKING_RESERVATION_CONFLICT": {
+   "message": "« Cette place est déjà réservée sur ce créneau. »",
+   "surfaces": "O =",
+   "action": "« Choisir une autre place »"
+  },
+  "PAYMENT_REQUIRED": {
+   "message": "« Le stationnement de {plaque} n'est pas payé : {montant}. »",
+   "surfaces": "T : « Paiement requis : {montant}. »",
+   "action": "« Payer »"
+  },
+  "PAYMENT_PENDING": {
+   "message": "« Paiement en cours de confirmation. Gardez cette page ouverte. »",
+   "surfaces": "=",
+   "action": "aucun, actualisation automatique"
+  },
+  "PAYMENT_REFUSED": {
+   "message": "« Le paiement est refusé. Réessayez ou choisissez un autre moyen. »",
+   "surfaces": "=",
+   "action": "« Réessayer », « Changer de moyen »"
+  },
+  "PAYMENT_OBJECT_NOT_SUPPORTED": {
+   "message": "« Ce paiement n'est pas proposé en ligne. Contactez l'accueil du site. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "PAYMENT_OBJECT_NOT_PAYABLE": {
+   "message": "« {objet} n'attend plus de paiement. »",
+   "surfaces": "=",
+   "action": "« Voir {objet} »"
+  },
+  "PAYMENT_ALREADY_PENDING": {
+   "message": "« Un paiement est déjà en cours pour {objet}. Attendez sa confirmation. »",
+   "surfaces": "=",
+   "action": "« Voir le paiement en cours »"
+  },
+  "AMOUNT_NOT_MULTIPLE_OF_5": {
+   "message": "« Le montant est un multiple de 5 FCFA. Ajustez le tarif {tarif}. »",
+   "surfaces": "Admin",
+   "action": "« Ajuster le tarif »"
+  },
+  "PAYMENT_SIGNATURE_INVALID": {
+   "message": "aucun message à l'utilisateur ; aucun effet métier",
+   "surfaces": "C : alerte technique",
+   "action": "aucun"
+  },
+  "PAYMENT_AMOUNT_MISMATCH": {
+   "message": "aucun message au payeur ; responsable : « Paiement {reference} : montant reçu {recu}, attendu {montant}. Aucun effet appliqué. »",
+   "surfaces": "C",
+   "action": "« Ouvrir le paiement »"
+  },
+  "PAYMENT_PROVIDER_REJECTED": {
+   "message": "« Le paiement n'a pas pu démarrer. Réessayez ; si l'erreur revient, contactez {marque}. »",
+   "surfaces": "=",
+   "action": "« Réessayer »"
+  },
+  "PAYMENT_PROVIDER_AUTH": {
+   "message": "payeur : « Le paiement en ligne est momentanément indisponible. » ; Admin : « Les identifiants CinetPay sont refusés. Vérifiez la clé et l'identifiant du site. »",
+   "surfaces": "=",
+   "action": "Admin : « Ouvrir l'intégration »"
+  },
+  "PAYMENT_PROVIDER_THROTTLED": {
+   "message": "« Le paiement en ligne est momentanément ralenti. Réessayez dans quelques minutes. »",
+   "surfaces": "=",
+   "action": "« Réessayer »"
+  },
+  "PAYMENT_PROVIDER_ERROR": {
+   "message": "« Le paiement en ligne ne répond pas. Réessayez dans un instant. »",
+   "surfaces": "=",
+   "action": "« Réessayer »"
+  },
+  "TARIFF_BANDS_GAP": {
+   "message": "« Les tranches se suivent sans trou ni chevauchement à partir de 0 minute. Corrigez la tranche {n}. »",
+   "surfaces": "=",
+   "action": "focus sur la tranche"
+  },
+  "LOST_TICKET_FEE_UNDEFINED": {
+   "message": "« Ce tarif ne prévoit pas de forfait pour ticket perdu. Renseignez-le dans le tarif avant d'encaisser. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le tarif »"
+  },
+  "ZONE_HAS_OPEN_SESSIONS": {
+   "message": "« {n, plural, one {# stationnement est en cours} other {# stationnements sont en cours}} dans cette zone. Attendez leur sortie pour la désactiver. »",
+   "surfaces": "=",
+   "action": "« Voir les stationnements »"
+  },
+  "LOCATION_REQUIRED": {
+   "message": "« Indiquez le lieu concerné. »",
+   "surfaces": "Q : lieu prérempli par le QR",
+   "action": "« Choisir le lieu »"
+  },
+  "LOCATION_NOT_ALLOWED": {
+   "message": "« Ce lieu n'est pas accessible depuis votre compte. Choisissez un espace de votre organisation ou un espace commun. »",
+   "surfaces": "O",
+   "action": "« Choisir le lieu »"
+  },
+  "PUBLIC_REPORT_DISABLED": {
+   "message": "« Ce lieu n'accepte pas de signalement en ligne. Adressez-vous à l'accueil. »",
+   "surfaces": "Q",
+   "action": "aucun"
+  },
+  "CAPTCHA_FAILED": {
+   "message": "« La vérification n'a pas abouti. Réessayez, ou recevez un lien de confirmation par e-mail ou SMS. »",
+   "surfaces": "Q, O",
+   "action": "« Réessayer », « Recevoir un lien »"
+  },
+  "SITE_CODE_INVALID": {
+   "message": "« Ce code de site n'est pas valable. Vérifiez-le auprès de votre administrateur ou de l'accueil. »",
+   "surfaces": "O",
+   "action": "« Saisir un autre code »"
+  },
+  "PRIVACY_CONSENT_REQUIRED": {
+   "message": "sous la case : « Cochez la case pour continuer. »",
+   "surfaces": "O",
+   "action": "focus sur la case de consentement"
+  },
+  "ORG_ARCHIVED": {
+   "message": "« Cette organisation est archivée. »",
+   "surfaces": "O : « Votre organisation n'est plus active sur ce site. Contactez l'accueil. »",
+   "action": "aucun"
+  },
+  "DECISION_REQUIRED": {
+   "message": "« Choisissez le traitement : résoudre directement, convertir en OT ou rejeter. »",
+   "surfaces": "=",
+   "action": "focus sur « Traitement »"
+  },
+  "PRIORITY_REASON_REQUIRED": {
+   "message": "« La priorité retenue diffère de l'urgence déclarée. Indiquez le motif, visible du déclarant. »",
+   "surfaces": "=",
+   "action": "focus sur « Motif »"
+  },
+  "RESOLUTION_REQUIRED": {
+   "message": "« Indiquez la solution apportée et le code de résolution. »",
+   "surfaces": "=",
+   "action": "focus sur « Solution »"
+  },
+  "WO_ALREADY_LINKED": {
+   "message": "« L'OT {reference} est déjà en cours pour cette demande. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'OT »"
+  },
+  "REOPEN_WINDOW_EXPIRED": {
+   "message": "« Cette demande ne se rouvre plus : le délai de 7 jours est dépassé. Déclarez une nouvelle demande. »",
+   "surfaces": "=",
+   "action": "« Déclarer une demande »"
+  },
+  "REMINDER_NOT_DUE": {
+   "message": "« Vous pourrez relancer à partir du {date} à {heure}, à l'échéance de prise en charge. »",
+   "surfaces": "O : « Relance possible à partir du {date} à {heure}. »",
+   "action": "aucune"
+  },
+  "REPORT_INCOMPLETE": {
+   "message": "« Le rapport est incomplet : {manques}. »",
+   "surfaces": "T : « Rapport incomplet : {n} éléments. »",
+   "action": "« Aller au premier manque »"
+  },
+  "ANNOUNCEMENT_TARGET_REQUIRED": {
+   "message": "« Choisissez au moins un public pour l'annonce : site, bâtiment ou organisation. »",
+   "surfaces": "=",
+   "action": "« Choisir le public »"
+  },
+  "SURVEY_INVALID": {
+   "message": "« Une enquête porte une question principale et une échelle de 1 à 5 (satisfaction) ou de 0 à 10 (recommandation). »",
+   "surfaces": "=",
+   "action": "« Corriger l'enquête »"
+  },
+  "SURVEY_NOT_ACTIVE": {
+   "message": "« Cette enquête n'est pas ouverte. »",
+   "surfaces": "O, Q =",
+   "action": "aucun"
+  },
+  "SURVEY_INVITATION_EXPIRED": {
+   "message": "« Ce lien d'enquête a expiré. Merci de votre intérêt. »",
+   "surfaces": "O, Q",
+   "action": "aucun"
+  },
+  "SURVEY_ALREADY_ANSWERED": {
+   "message": "« Vous avez déjà répondu pour cette demande. Merci. »",
+   "surfaces": "O, Q",
+   "action": "aucun"
+  },
+  "SCORE_OUT_OF_SCALE": {
+   "message": "« Choisissez une note de {min} à {max}. »",
+   "surfaces": "=",
+   "action": "focus sur la note"
+  },
+  "SURVEY_CSAT_ACTIVE_EXISTS": {
+   "message": "« Une enquête CSAT générale est déjà active : clôturez-la d'abord. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'enquête active »"
+  },
+  "SURVEY_NOT_DRAFT": {
+   "message": "« Une enquête active ne se modifie plus : créez-en une nouvelle. »",
+   "surfaces": "=",
+   "action": "« Dupliquer l'enquête »"
+  },
+  "FITOUT_SPACE_NOT_OCCUPIED": {
+   "message": "« {espace} n'est pas occupé par votre organisation au {date}. »",
+   "surfaces": "O",
+   "action": "« Choisir un espace »"
+  },
+  "FITOUT_INCOMPLETE": {
+   "message": "« Le dossier est incomplet : {sections}. »",
+   "surfaces": "O =",
+   "action": "« Aller à la première section »"
+  },
+  "FITOUT_LEAD_TIME": {
+   "message": "« Les travaux commencent au plus tôt {n} jours ouvrés après le dépôt, soit le {date}. »",
+   "surfaces": "O =",
+   "action": "focus sur la date"
+  },
+  "FITOUT_INSURANCE_EXPIRED": {
+   "message": "« L'attestation d'assurance de {entreprise} n'est pas valable jusqu'au {fin}. Déposez une attestation à jour. »",
+   "surfaces": "O, F =",
+   "action": "« Déposer l'attestation »"
+  },
+  "FITOUT_STRUCTURAL_OPINION_REQUIRED": {
+   "message": "« Une intervention sur dalle ou mur porteur exige l'avis d'un bureau de contrôle ou une note de calcul. »",
+   "surfaces": "O =",
+   "action": "« Joindre l'avis »"
+  },
+  "FITOUT_NUISANCE_HOURS": {
+   "message": "« Les travaux bruyants se font hors des heures d'ouverture : {heures}. »",
+   "surfaces": "O =",
+   "action": "« Modifier les créneaux »"
+  },
+  "FITOUT_VISA_PENDING": {
+   "message": "« {n} visas sont en attente ou défavorables : {visas}. »",
+   "surfaces": "O : « Votre dossier attend {n} avis techniques. »",
+   "action": "« Voir les visas »"
+  },
+  "FITOUT_DEPOSIT_REQUIRED": {
+   "message": "« Le dépôt de garantie de {montant} n'est pas encore reçu. Les travaux commencent après sa réception. »",
+   "surfaces": "O : bouton « Payer le dépôt »",
+   "action": "« Payer le dépôt »"
+  },
+  "FITOUT_PERMITS_MISSING": {
+   "message": "« Aucun permis actif aujourd'hui pour ces travaux : l'accès des entreprises est refusé. »",
+   "surfaces": "T, contrôle d'accès : « Accès refusé : aucun permis actif. »",
+   "action": "« Voir les permis »"
+  },
+  "FITOUT_AS_BUILT_REQUIRED": {
+   "message": "« Déposez le dossier des ouvrages exécutés avant la clôture. »",
+   "surfaces": "O =",
+   "action": "« Déposer le dossier »"
+  },
+  "FITOUT_CONDITIONS_REQUIRED": {
+   "message": "« Ajoutez au moins une condition avant d'autoriser. »",
+   "surfaces": "=",
+   "action": "« Ajouter une condition »"
+  },
+  "PAYMENT_IN_PROGRESS": {
+   "message": "« Un paiement en ligne de ce dépôt est en cours de confirmation. Attendez son résultat. »",
+   "surfaces": "O : « Votre paiement est en cours de confirmation. »",
+   "action": "« Actualiser »"
+  },
+  "RETENTION_EXCEEDS_DEPOSIT": {
+   "message": "« Les retenues ({total}) dépassent le montant du dépôt ({montant}). »",
+   "surfaces": "=",
+   "action": "focus sur les retenues"
+  },
+  "ACCESS_END_DATE_REQUIRED": {
+   "message": "« Indiquez la date de fin du droit d'accès. »",
+   "surfaces": "=",
+   "action": "focus sur « Fin »"
+  },
+  "ACCESS_ZONE_IN_USE": {
+   "message": "« Zone utilisée : {n} droits actifs, {m} visites prévues. »",
+   "surfaces": "=",
+   "action": "« Voir les droits »"
+  },
+  "RESTRICTED_ZONE_NOMINATIVE_ONLY": {
+   "message": "« Une zone restreinte n'accepte qu'un droit nominatif : personne ou visite. »",
+   "surfaces": "=",
+   "action": "« Choisir une personne »"
+  },
+  "NO_ACCESS_RIGHT": {
+   "message": "« Accès refusé : aucun droit valide pour {zone}. »",
+   "surfaces": "T, borne : « Accès refusé. »",
+   "action": "« Appeler la sûreté »"
+  },
+  "VISIT_NOT_VALID": {
+   "message": "« Visite non valable pour {zone} à cette heure. »",
+   "surfaces": "T : « Visite non valable ici. »",
+   "action": "« Appeler l'hôte »"
+  },
+  "VISITOR_DENIED": {
+   "message": "« Accès refusé. Contactez le responsable sûreté. »",
+   "surfaces": "T = ; aucun motif affiché",
+   "action": "« Appeler la sûreté »"
+  },
+  "DENYLIST_DISABLED": {
+   "message": "« La liste d'interdiction n'est pas activée sur ce compte. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "DENYLIST_DURATION_EXCEEDED": {
+   "message": "« Une interdiction dure 365 jours au plus après la décision. »",
+   "surfaces": "=",
+   "action": "focus sur « Valable jusqu'au »"
+  },
+  "VISITOR_CONTACT_REQUIRED": {
+   "message": "« Indiquez un e-mail ou un numéro de téléphone : il sert à envoyer le code de visite. »",
+   "surfaces": "O =",
+   "action": "focus sur « Contact »"
+  },
+  "VISIT_CODE_INVALID": {
+   "message": "« Ce code de visite n'est pas valable aujourd'hui sur ce site. »",
+   "surfaces": "T : « Code de visite non valable. »",
+   "action": "« Rechercher la visite »"
+  },
+  "CRISIS_DRILL_RESULTS_MISSING": {
+   "message": "« Renseignez le résultat de chaque objectif de l'exercice : {n} sans résultat. »",
+   "surfaces": "=",
+   "action": "focus sur le premier objectif sans résultat"
+  },
+  "OFFLINE_SCAN_TOO_OLD": {
+   "message": "« Ce scan date de plus de 12 heures et ne peut plus être pris en compte. Saisissez une entrée de main courante. »",
+   "surfaces": "T : « Scan trop ancien, non retenu. »",
+   "action": "« Créer une entrée de main courante »"
+  },
+  "ESCORT_REQUIRED": {
+   "message": "« Un visiteur entre en zone restreinte seulement accompagné. Désignez l'accompagnant. »",
+   "surfaces": "O, T =",
+   "action": "« Désigner l'accompagnant »"
+  },
+  "HOST_CONFIRMATION_REQUIRED": {
+   "message": "« {hote} confirme la visite avant l'entrée du visiteur. »",
+   "surfaces": "T, O : hôte notifié",
+   "action": "« Relancer l'hôte »"
+  },
+  "CHECKPOINT_NOT_IN_ROUTE": {
+   "message": "« Ce point ne fait pas partie de la ronde {ronde}. »",
+   "surfaces": "T : « Point hors circuit. »",
+   "action": "« Voir le circuit »"
+  },
+  "LOG_IMMUTABLE": {
+   "message": "« Une entrée de main courante ne se modifie pas. Saisissez un rectificatif. »",
+   "surfaces": "=",
+   "action": "« Saisir un rectificatif »"
+  },
+  "CORRECTION_TARGET_REQUIRED": {
+   "message": "« Choisissez l'entrée à rectifier. »",
+   "surfaces": "=",
+   "action": "« Choisir l'entrée »"
+  },
+  "BACKDATE_TOO_OLD": {
+   "message": "« Une entrée s'antidate de 12 heures au plus. »",
+   "surfaces": "=",
+   "action": "focus sur l'heure"
+  },
+  "BACKDATE_REASON_REQUIRED": {
+   "message": "« Indiquez pourquoi cette entrée est antidatée. »",
+   "surfaces": "=",
+   "action": "focus sur « Motif »"
+  },
+  "SIGNATURE_REQUIRED": {
+   "message": "« La remise du colis se fait contre signature. »",
+   "surfaces": "T : « Signature du destinataire. »",
+   "action": "« Signer »"
+  },
+  "HANDOVER_ALREADY_OPEN": {
+   "message": "« Un poste est déjà ouvert sur le code {code}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le poste »"
+  },
+  "HANDOVER_SAME_AGENT": {
+   "message": "« Désignez un autre agent pour prendre le poste. »",
+   "surfaces": "=",
+   "action": "focus sur « Agent entrant »"
+  },
+  "RECEPTION_DISABLED": {
+   "message": "« L'accueil des visiteurs n'est pas géré sur ce site. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "REVIEW_ALREADY_OPEN": {
+   "message": "« Une revue des droits est déjà ouverte sur ce site. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la revue »"
+  },
+  "VIDEO_PERIOD_TOO_LONG": {
+   "message": "« Une réquisition couvre au plus {heures} heures. Réduisez la période. »",
+   "surfaces": "=",
+   "action": "focus sur la période"
+  },
+  "VIDEO_RETENTION_EXCEEDED": {
+   "message": "« Les images de cette période ne sont plus conservées par le système vidéo. »",
+   "surfaces": "=",
+   "action": "focus sur la période"
+  },
+  "DUPLICATE_VENDOR": {
+   "message": "« Ce tiers est déjà référencé sous {reference} ({nom}). »",
+   "surfaces": "=",
+   "action": "« Ouvrir la fiche existante »"
+  },
+  "VENDOR_ROLE_MISMATCH": {
+   "message": "« {tiers} n'est pas référencé comme {rôle attendu}. Ajoutez ce rôle à sa fiche. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la fiche »"
+  },
+  "PREQUALIFICATION_INCOMPLETE": {
+   "message": "« La préqualification est incomplète : {pieces}. »",
+   "surfaces": "F : « Votre dossier est incomplet : {pieces}. »",
+   "action": "« Compléter le dossier »"
+  },
+  "CONTRACTOR_NOT_ASSIGNABLE": {
+   "message": "« {prestataire} est {statut} : affectation impossible. »",
+   "surfaces": "T, accès : « Accès refusé : habilitation ou préqualification non valide. »",
+   "action": "« Ouvrir la fiche »"
+  },
+  "CONTRACTOR_SITE_RESTRICTED": {
+   "message": "« {prestataire} est écarté de {site} jusqu'au {date}. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre prestataire »"
+  },
+  "CONTRACTOR_DOC_EXPIRED": {
+   "message": "« {piece} de {prestataire} est échue depuis le {date}. Une mise à jour est requise. »",
+   "surfaces": "F : « Votre {piece} est échue depuis le {date}. Déposez la nouvelle version. »",
+   "action": "« Demander la mise à jour » ; F : « Déposer la pièce »"
+  },
+  "ACK_WINDOW_CLOSED": {
+   "message": "F : « Cet OT a été réaffecté après le délai de réponse. »",
+   "surfaces": "F",
+   "action": "aucun"
+  },
+  "VENDOR_ACCESS_RESTRICTED": {
+   "message": "F : « Votre compte est en lecture seule : vous déposez les factures des travaux réalisés, sans nouvelle acceptation. Contactez {exploitant}. »",
+   "surfaces": "F",
+   "action": "« Contacter {exploitant} »"
+  },
+  "CHANGE_REQUEST_PENDING": {
+   "message": "« Une demande de modification de {champ} est déjà en cours d'examen. »",
+   "surfaces": "F",
+   "action": "« Voir la demande »"
+  },
+  "OPEN_PURCHASE_ORDERS": {
+   "message": "« {tiers} a {n} commandes ouvertes. Clôturez-les avant l'archivage. »",
+   "surfaces": "=",
+   "action": "« Voir les commandes »"
+  },
+  "CALLBACK_REQUIRED": {
+   "message": "« Tracez le contre-appel au numéro connu du tiers avant de valider ce changement de coordonnées. »",
+   "surfaces": "=",
+   "action": "« Tracer le contre-appel »"
+  },
+  "REPLY_ALREADY_EXISTS": {
+   "message": "F : « Vous avez déjà répondu à cette évaluation. »",
+   "surfaces": "F",
+   "action": "aucun"
+  },
+  "EVALUATION_ALREADY_EXISTS": {
+   "message": "« Cet OT est déjà évalué le {date} par {nom}. »",
+   "surfaces": "T =",
+   "action": "« Voir l'évaluation »"
+  },
+  "REVIEW_INCOMPLETE": {
+   "message": "« La revue est incomplète : {manques}. »",
+   "surfaces": "=",
+   "action": "« Compléter la revue »"
+  },
+  "RENEWAL_BLOCKED": {
+   "message": "« Ce contrat est marqué non renouvelable depuis le {date}. Lancez une consultation. »",
+   "surfaces": "=",
+   "action": "« Lancer une consultation »"
+  },
+  "WEIGHTS_SUM_INVALID": {
+   "message": "« La somme des poids fait {somme} %. Elle doit faire 100 %. »",
+   "surfaces": "=",
+   "action": "focus sur les poids"
+  },
+  "LONE_WORKER_SESSION_ALREADY_OPEN": {
+   "message": "« Une session de travail isolé est déjà ouverte. Terminez-la avant d'en ouvrir une autre. »",
+   "surfaces": "T : « Session déjà ouverte. Terminez-la d'abord. »",
+   "action": "« Ouvrir la session »"
+  },
+  "BUDGET_EXCEEDED": {
+   "message": "« Le disponible de {ligne} est {disponible}, l'engagement demande {montant}. Une approbation de niveau supérieur est nécessaire. »",
+   "surfaces": "=",
+   "action": "« Demander l'escalade »"
+  },
+  "BUDGET_NOT_APPROVED": {
+   "message": "« Le budget {ligne} n'est pas approuvé : aucun engagement n'y est imputé. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le budget »"
+  },
+  "BUDGET_BELOW_CONSUMED": {
+   "message": "« Ce budget est déjà consommé à {consomme}. Il ne descend pas sous ce montant. »",
+   "surfaces": "=",
+   "action": "focus sur le montant"
+  },
+  "BUDGET_CLOSED": {
+   "message": "« Le budget {budget} est clos. Imputez un budget ouvert. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre budget »"
+  },
+  "APPROVAL_LEVEL_REQUIRED": {
+   "message": "« Ce montant ({montant}) dépasse votre niveau d'approbation. Le niveau {n}, {role}, décide. »",
+   "surfaces": "transfert : « Un transfert entre fonctionnement et investissement est approuvé par le dernier niveau du circuit. »",
+   "action": "« Voir le circuit »"
+  },
+  "DELEGATION_CHAIN_FORBIDDEN": {
+   "message": "« Une délégation reçue ne se délègue pas à nouveau. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "SITE_REQUIRED": {
+   "message": "« Choisissez le site de la dépense. »",
+   "surfaces": "=",
+   "action": "focus sur « Site »"
+  },
+  "EXPENSES_WITHOUT_SITE": {
+   "message": "« {n} dépenses de {periode} n'ont pas de site. Rattachez-les avant la clôture. »",
+   "surfaces": "=",
+   "action": "« Voir les dépenses »"
+  },
+  "OPEN_EXPENSES": {
+   "message": "« {n} dépenses de {periode} attendent une décision. »",
+   "surfaces": "=",
+   "action": "« Voir les dépenses »"
+  },
+  "NO_PO_CAP_EXCEEDED": {
+   "message": "« Au delà de {plafond} TTC, un achat passe par une demande d'achat et une commande. »",
+   "surfaces": "=",
+   "action": "« Créer une demande d'achat »"
+  },
+  "POSSIBLE_SPLIT": {
+   "message": "approbateur : « {n} achats sans commande chez {tiers} totalisent {montant} en {jours} jours. Vérifiez un fractionnement. »",
+   "surfaces": "C",
+   "action": "« Voir les achats »"
+  },
+  "BUDGET_KIND_MISMATCH": {
+   "message": "« Ce budget est de nature {nature}, sa catégorie de nature {nature categorie}. Choisissez une catégorie de même nature. »",
+   "surfaces": "=",
+   "action": "focus sur « Catégorie »"
+  },
+  "APPROVAL_LEVELS_NOT_INCREASING": {
+   "message": "« Le seuil du niveau {n} est inférieur ou égal à celui du niveau précédent. Chaque niveau porte un seuil plus élevé. »",
+   "surfaces": "=",
+   "action": "focus sur le seuil"
+  },
+  "QUOTES_REQUIRED": {
+   "message": "« Au delà de {seuil}, {n} offres sont requises, {m} reçues. Ajoutez des offres ou motivez une dérogation. »",
+   "surfaces": "=",
+   "action": "« Ajouter un devis », « Motiver une dérogation »"
+  },
+  "PO_REQUIRED": {
+   "message": "« Au delà de {plafond}, cet achat exige une commande. Rattachez une commande ou créez-en une. »",
+   "surfaces": "F : « Indiquez la commande qui couvre cette facture. »",
+   "action": "« Rattacher une commande »"
+  },
+  "SUPPLIER_NOT_QUALIFIED": {
+   "message": "« {fournisseur} ne peut pas recevoir de commande : {cause}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la fiche »"
+  },
+  "SDS_REQUIRED": {
+   "message": "« Joignez la fiche de données de sécurité de {produit} avant l'attribution. »",
+   "surfaces": "F : « Déposez la fiche de données de sécurité de {produit}. »",
+   "action": "« Joindre la fiche »"
+  },
+  "RFQ_CLOSED": {
+   "message": "F : « La consultation est close depuis le {date} à {heure}. »",
+   "surfaces": "F ; C : « La date limite de {reference} est passée depuis le {date}. »",
+   "action": "aucun"
+  },
+  "PO_NOT_SENT": {
+   "message": "F : « Cette commande n'est pas active : aucun accusé possible. »",
+   "surfaces": "F ; C : « La commande {reference} n'est pas émise. »",
+   "action": "aucun"
+  },
+  "PO_ALREADY_ACKNOWLEDGED": {
+   "message": "F : « Vous avez déjà accusé réception de cette commande le {date}. »",
+   "surfaces": "F ; C : « La commande {reference} a déjà été accusée le {date}. »",
+   "action": "« Voir la commande »"
+  },
+  "SHIPMENT_QTY_EXCEEDS_ORDER": {
+   "message": "« {article} : {expedie} expédiés au total pour {commande} commandés. »",
+   "surfaces": "F =",
+   "action": "focus sur la quantité"
+  },
+  "CATALOG_ITEM_REQUIRED": {
+   "message": "« La ligne {n} n'a pas d'article de catalogue approuvé et valide. Choisissez un article du catalogue. »",
+   "surfaces": "=",
+   "action": "focus sur la ligne"
+  },
+  "RFQ_WINDOW_TOO_SHORT": {
+   "message": "« La date limite laisse moins de {duree} aux fournisseurs. Reportez-la au {date} au plus tôt. »",
+   "surfaces": "=",
+   "action": "focus sur « Date limite »"
+  },
+  "WAREHOUSE_OWNER_MISMATCH": {
+   "message": "« Le magasin {magasin} appartient à un autre propriétaire que les budgets de cette commande. Choisissez un magasin de {client}. »",
+   "surfaces": "=",
+   "action": "focus sur « Magasin »"
+  },
+  "VENDOR_RESPONSE_REQUIRED": {
+   "message": "« La réponse de {fournisseur} à cette réserve manque. Elle précède la décision. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la réception »"
+  },
+  "SPLIT_CHECK_REQUIRED": {
+   "message": "« Un fractionnement possible est signalé. Cochez « Fractionnement contrôlé » après vérification pour approuver. »",
+   "surfaces": "=",
+   "action": "focus sur la case"
+  },
+  "INVOICE_DUPLICATE": {
+   "message": "« La facture {numero} de {fournisseur} est déjà déposée le {date} ({reference}). »",
+   "surfaces": "F =",
+   "action": "« Ouvrir la facture existante »"
+  },
+  "INVOICE_WITHOUT_REFERENCE": {
+   "message": "« Rattachez la facture à un OT, une commande ou un contrat. »",
+   "surfaces": "F =",
+   "action": "« Choisir le rattachement »"
+  },
+  "PAYMENT_EXCEEDS_NET": {
+   "message": "Admin et trésorerie : « Le paiement {ref} fait passer le cumul de {reference} au delà du net à payer ({montant}). Vérifiez dans Atlas FNA. »",
+   "surfaces": "C seulement",
+   "action": "« Ouvrir la file d'intégration »"
+  },
+  "INVOICE_MISMATCH": {
+   "message": "« La facture s'écarte de la commande et de la réception : {ecart}. Elle attend une justification, un avoir ou une facture corrigée. »",
+   "surfaces": "F : « Votre facture présente un écart : {ecart}. Justifiez-le ou déposez un avoir. »",
+   "action": "« Voir l'écart »"
+  },
+  "CREDIT_NOTE_EXCEEDS_INVOICE": {
+   "message": "« L'avoir ({montant}) dépasse le solde de la facture {numero} ({solde}). »",
+   "surfaces": "F =",
+   "action": "focus sur le montant"
+  },
+  "DISPUTE_WINDOW_CLOSED": {
+   "message": "F : « Le délai de contestation est dépassé depuis le {date}. »",
+   "surfaces": "F",
+   "action": "« Contacter {exploitant} »"
+  },
+  "MATCH_IN_PROGRESS": {
+   "message": "« Le rapprochement de cette facture est en cours. Son résultat arrive dans la minute. »",
+   "surfaces": "=",
+   "action": "« Actualiser »"
+  },
+  "APPROVAL_LIMIT_EXCEEDED": {
+   "message": "K : « Ce devis ({montant}) dépasse votre limite d'approbation ({limite}). Un second approbateur le valide. »",
+   "surfaces": "K ; C : « Le montant dépasse la limite de {nom} ({limite}). Un second approbateur du client est sollicité. »",
+   "action": "« Demander un second approbateur »"
+  },
+  "QUOTE_EXPIRED": {
+   "message": "K : « Ce devis a expiré le {date}. Demandez une nouvelle version. »",
+   "surfaces": "K ; C : « Le devis {reference} a expiré le {date}. Créez une version révisée. »",
+   "action": "« Demander une révision »"
+  },
+  "QUOTE_SUPERSEDED": {
+   "message": "K : « Une nouvelle version de ce devis existe. Décidez sur la version {version}. »",
+   "surfaces": "K ; C : « Une version plus récente du devis {reference} existe. Ouvrez la version {version}. »",
+   "action": "« Ouvrir la version actuelle »"
+  },
+  "CLIENT_DECISION_REQUIRED": {
+   "message": "« La validation appartient au client. Elle se fait depuis son portail. »",
+   "surfaces": "C",
+   "action": "« Relancer le client »"
+  },
+  "MOBILIZATION_INCOMPLETE": {
+   "message": "« {n} tâches bloquantes de la mobilisation restent ouvertes. Faites-les ou marquez-les sans objet. »",
+   "surfaces": "=",
+   "action": "« Voir les tâches »"
+  },
+  "RESERVES_BLOCKING_OPEN": {
+   "message": "« {n} réserves bloquantes restent à lever et à accepter avant l'ouverture : {references}. »",
+   "surfaces": "=",
+   "action": "« Voir les réserves »"
+  },
+  "SITE_CLIENT_REQUIRED": {
+   "message": "« Chaque site est rattaché à un client avant le changement de déclinaison : {sites}. »",
+   "surfaces": "Admin",
+   "action": "« Rattacher les sites »"
+  },
+  "SITE_ALREADY_ATTACHED": {
+   "message": "« {site} est déjà rattaché à {client}. Détachez-le d'abord. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le client »"
+  },
+  "SITE_IN_ACTIVE_CONTRACT": {
+   "message": "« {site} est couvert par le contrat actif {contrat}. Retirez-le du périmètre par avenant. »",
+   "surfaces": "=",
+   "action": "« Créer un avenant »"
+  },
+  "SLA_TERMS_REQUIRED": {
+   "message": "« Le contrat {reference} n'a pas de SLA. Renseignez les délais P1 à P4 avant son activation. »",
+   "surfaces": "=",
+   "action": "« Saisir les SLA »"
+  },
+  "INVALID_TERMS": {
+   "message": "« Les conditions du contrat sont incomplètes ou mal formées : {detail}. »",
+   "surfaces": "=",
+   "action": "« Corriger les conditions »"
+  },
+  "PERIOD_ALREADY_PUSHED": {
+   "message": "« La période {periode} est déjà transmise à la facturation. L'avenant prend effet le {date}. »",
+   "surfaces": "=",
+   "action": "« Appliquer au {date} »"
+  },
+  "WO_NOT_VERIFIED": {
+   "message": "« L'OT {reference} n'est pas encore vérifié. Terminez sa réception avant de continuer. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'OT »"
+  },
+  "WO_NOT_BILLABLE": {
+   "message": "« L'OT {reference} est couvert par le contrat : il n'est pas facturé en plus. Changez son mode de facturation pour créer un devis. »",
+   "surfaces": "=",
+   "action": "« Ouvrir l'OT »"
+  },
+  "EXPENSES_NOT_MATCHED": {
+   "message": "« Les dépenses de l'OT {reference} ne sont pas toutes approuvées. L'élément facturable se crée après leur approbation. »",
+   "surfaces": "=",
+   "action": "« Voir les dépenses »"
+  },
+  "OPEN_BILLABLES": {
+   "message": "« {n} éléments facturables de {objet} restent en brouillon ou validés. Remettez-les ou annulez-les. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la facturation »"
+  },
+  "SITE_NOT_IN_CLIENT": {
+   "message": "« {sites} n'appartiennent pas à {client}. »",
+   "surfaces": "périmètre : « Le site {site} n'appartient pas à {client}. Choisissez un site rattaché. »",
+   "action": "« Modifier les sites »"
+  },
+  "REPORT_PUBLICATION_DISABLED": {
+   "message": "« Le contrat de {client} ne prévoit pas la publication de rapports au portail client. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le contrat »"
+  },
+  "REPORT_NOT_CLIENT_COMPATIBLE": {
+   "message": "« Ce modèle de rapport n'est pas prévu pour le portail client. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre modèle »"
+  },
+  "TEMPLATE_NOT_CLIENT_SAFE": {
+   "message": "« Ce modèle contient des données internes et ne se publie pas au client. »",
+   "surfaces": "=",
+   "action": "« Retirer les données internes »"
+  },
+  "TEMPLATE_CLIENT_MISMATCH": {
+   "message": "« Ce modèle est réservé à un autre client. »",
+   "surfaces": "=",
+   "action": "« Choisir un autre modèle »"
+  },
+  "AMENDMENT_REQUIRED": {
+   "message": "« Ce contrat est actif : ses conditions changent par avenant. »",
+   "surfaces": "=",
+   "action": "« Créer un avenant »"
+  },
+  "CLIENT_SUSPENDED": {
+   "message": "« Le client {client} est suspendu : son portail est en lecture seule. »",
+   "surfaces": "K : « Votre espace est en consultation seule. Contactez {marque}. »",
+   "action": "C : « Ouvrir le client »"
+  },
+  "NO_ACTIVE_SERVICE_CONTRACT": {
+   "message": "« Aucun contrat de service actif ne couvre {site}. »",
+   "surfaces": "=",
+   "action": "« Ouvrir les contrats »"
+  },
+  "QUOTE_ALREADY_EXISTS": {
+   "message": "« L'OT {reference} a déjà le devis {devis}. Créez une version révisée. »",
+   "surfaces": "=",
+   "action": "« Ouvrir le devis »"
+  },
+  "REMINDER_TOO_SOON": {
+   "message": "« Une relance est déjà partie aujourd'hui. Relancez au prochain jour ouvré. »",
+   "surfaces": "vérification de paiement : « Une vérification vient d'être faite. Réessayez dans une minute. » ; relance de demande, O : « Vous avez déjà relancé cette demande. Nouvelle relance possible à {heure}. »",
+   "action": "compte à rebours en texte"
+  },
+  "EMAIL_ALREADY_EXISTS": {
+   "message": "« Un compte existe déjà avec {email}. Ajoutez-lui un profil au lieu d'en créer un. »",
+   "surfaces": "=",
+   "action": "« Ajouter un profil »"
+  },
+  "INVITATION_EXPIRED": {
+   "message": "« Ce lien d'invitation a expiré. Demandez un nouvel envoi à votre administrateur. »",
+   "surfaces": "=",
+   "action": "« Demander un nouvel envoi »"
+  },
+  "LINK_EXPIRED": {
+   "message": "« Ce lien a expiré. Connectez-vous pour continuer. »",
+   "surfaces": "=",
+   "action": "« Se connecter »"
+  },
+  "ROLE_SURFACE_MISMATCH": {
+   "message": "« Ce rôle n'existe pas pour un profil {type de profil}. »",
+   "surfaces": "=",
+   "action": "« Choisir un rôle »"
+  },
+  "INVALID_SCOPE": {
+   "message": "« Ce périmètre contient des sites hors du compte ou du profil. »",
+   "surfaces": "=",
+   "action": "« Corriger le périmètre »"
+  },
+  "SITE_OUT_OF_SCOPE": {
+   "message": "« {site} n'est pas dans votre périmètre. »",
+   "surfaces": "=",
+   "action": "« Changer de site »"
+  },
+  "PROFILE_NOT_OWNED": {
+   "message": "« Ce profil n'est pas le vôtre. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "SURFACE_DISABLED": {
+   "message": "« Cet espace n'est pas activé pour votre organisation. »",
+   "surfaces": "F, O, K =",
+   "action": "aucun"
+  },
+  "SURFACE_REQUIRED": {
+   "message": "« La console et l'application terrain restent actives. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "ACCESS_REVIEW_OPEN": {
+   "message": "« Une revue des comptes est déjà ouverte depuis le {date}. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir la revue »"
+  },
+  "BUYER_ADMIN_SUCCESSOR_REQUIRED": {
+   "message": "« Désignez le successeur de l'acheteur administrateur avant de retirer {nom}. »",
+   "surfaces": "Admin",
+   "action": "« Désigner un successeur »"
+  },
+  "TRANSFER_ALREADY_OPEN": {
+   "message": "« Un transfert est déjà en cours vers {nom}. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir le transfert »"
+  },
+  "ROLE_IN_USE": {
+   "message": "« Retirez ce rôle à ses {n} membres avant de le supprimer. »",
+   "surfaces": "Admin",
+   "action": "« Voir les membres »"
+  },
+  "INVALID_TIMEZONE": {
+   "message": "« Ce fuseau horaire n'est pas reconnu. Choisissez dans la liste. »",
+   "surfaces": "=",
+   "action": "focus sur « Fuseau »"
+  },
+  "PREFERENCE_KEY_UNKNOWN": {
+   "message": "« Cette préférence n'existe pas. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "PREFERENCE_VALUE_INVALID": {
+   "message": "« Cette valeur n'est pas permise pour {preference}. »",
+   "surfaces": "=",
+   "action": "focus sur le champ"
+  },
+  "SETTING_UNKNOWN": {
+   "message": "« Ce paramètre n'existe pas. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "SETTING_OUT_OF_RANGE": {
+   "message": "« Valeur hors plage : entre {min} et {max}. »",
+   "surfaces": "Admin",
+   "action": "focus sur la valeur"
+  },
+  "SETTING_INCONSISTENT": {
+   "message": "« Cette valeur est incohérente avec {parametre} : {detail}. »",
+   "surfaces": "Admin",
+   "action": "« Voir le paramètre lié »"
+  },
+  "MODULE_NOT_SUBSCRIBED": {
+   "message": "« Ce module n'est pas souscrit. »",
+   "surfaces": "Admin",
+   "action": "« Contacter l'éditeur »"
+  },
+  "MODULE_HAS_OPEN_OBLIGATIONS": {
+   "message": "« Ce module porte {n} obligations en cours : {liste}. Un second administrateur confirme la désactivation. »",
+   "surfaces": "Admin",
+   "action": "« Demander la confirmation »"
+  },
+  "ONBOARDING_STEP_INCOMPLETE": {
+   "message": "« Cette étape est incomplète : {detail}. »",
+   "surfaces": "Admin",
+   "action": "« Compléter l'étape »"
+  },
+  "MODE_CHANGE_BLOCKED": {
+   "message": "« Le changement de déclinaison est bloqué : {motifs}. »",
+   "surfaces": "éditeur, Admin",
+   "action": "« Voir les motifs »"
+  },
+  "ROLLBACK_PERIOD_EXPIRED": {
+   "message": "« Le délai de retour de 30 jours est dépassé depuis le {date}. »",
+   "surfaces": "éditeur, Admin",
+   "action": "aucun"
+  },
+  "DOMAIN_ALREADY_USED": {
+   "message": "« Le domaine {domaine} est déjà utilisé. »",
+   "surfaces": "Admin",
+   "action": "« Choisir un autre domaine »"
+  },
+  "DOMAIN_NOT_VERIFIED": {
+   "message": "« Le domaine n'est pas vérifié : ajoutez l'enregistrement DNS indiqué, la vérification se relance automatiquement. »",
+   "surfaces": "Admin",
+   "action": "« Copier l'enregistrement »"
+  },
+  "BRANDING_CONTRAST_INSUFFICIENT": {
+   "message": "« Le contraste du bouton est de {ratio}:1, il faut au moins 4,5:1. Une couleur plus foncée est proposée. »",
+   "surfaces": "Admin",
+   "action": "« Appliquer la couleur proposée »"
+  },
+  "BRAND_CONTRAST_UNREACHABLE": {
+   "message": "« Cette couleur ne donne pas un contraste suffisant. Choisissez une couleur plus foncée ou plus saturée ; la marque Keystone reste appliquée. »",
+   "surfaces": "Admin",
+   "action": "« Choisir une autre couleur »"
+  },
+  "INTEGRATION_PROVIDER_UNKNOWN": {
+   "message": "« Ce service d'agenda n'est pas pris en charge. Choisissez Microsoft 365, Google Workspace ou un flux iCal. »",
+   "surfaces": "=",
+   "action": "« Choisir un service »"
+  },
+  "EVENT_KEY_UNKNOWN": {
+   "message": "aucun message à l'utilisateur ; Admin : « Événement de notification inconnu : {cle}. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "CATEGORY_NOT_DISABLEABLE": {
+   "message": "« Cette catégorie de notification est obligatoire et reste active. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "RESEND_FORBIDDEN": {
+   "message": "« Ce message de sécurité ne se renvoie pas. Relancez l'action d'origine. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "TEMPLATE_UNKNOWN_VARIABLE": {
+   "message": "« Le modèle contient une variable inconnue : {variable}. »",
+   "surfaces": "Admin",
+   "action": "« Aller à la variable »"
+  },
+  "TEMPLATE_CHECK_FAILED": {
+   "message": "« Publication refusée : {controles}. »",
+   "surfaces": "Admin",
+   "action": "« Voir les contrôles »"
+  },
+  "TEMPLATE_LOCKED": {
+   "message": "« Cette version est publiée. Créez une nouvelle version. »",
+   "surfaces": "Admin",
+   "action": "« Créer une version »"
+  },
+  "CONSENT_REFERENCE_REQUIRED": {
+   "message": "« Indiquez la référence de l'accord écrit du destinataire. »",
+   "surfaces": "=",
+   "action": "focus sur « Référence de l'accord »"
+  },
+  "DOCUMENT_NOT_FOUND": {
+   "message": "« Ce document est introuvable ou vous n'y avez pas accès. »",
+   "surfaces": "=",
+   "action": "« Retour à la liste »"
+  },
+  "CONFIDENTIALITY_TOO_LOW": {
+   "message": "« La confidentialité de ce document ne descend pas sous celle de la série {serie}. »",
+   "surfaces": "=",
+   "action": "focus sur « Confidentialité »"
+  },
+  "SHARE_NOT_ALLOWED": {
+   "message": "« Ce document ne se partage pas vers {surface}. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "DOCUMENT_DISPOSED": {
+   "message": "« Ce document est détruit le {date} : seule sa notice reste consultable. »",
+   "surfaces": "=",
+   "action": "« Voir la notice »"
+  },
+  "RETENTION_HOLD": {
+   "message": "« Ce document est gelé ({motif}) : il ne se détruit pas. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "RETENTION_NOT_REACHED": {
+   "message": "« La durée de conservation court jusqu'au {date}. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "RETENTION_RULE_UNCONFIRMED": {
+   "message": "« La règle de conservation {regle} attend sa validation avec sa base légale. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la règle »"
+  },
+  "LEGAL_BASIS_REQUIRED": {
+   "message": "« Indiquez le texte et l'article qui fondent cette durée de conservation. »",
+   "surfaces": "=",
+   "action": "focus sur « Base légale »"
+  },
+  "IMPORT_BATCH_IN_USE": {
+   "message": "« Des éléments de ce lot ont servi depuis l'import : il ne s'annule plus. »",
+   "surfaces": "=",
+   "action": "« Voir les éléments utilisés »"
+  },
+  "AUDIT_CHAIN_BROKEN": {
+   "message": "Admin et HSSE Manager : « Intégrité du journal d'audit rompue à la séquence {seq}. Un incident de sécurité est ouvert. »",
+   "surfaces": "C, Admin",
+   "action": "« Ouvrir l'incident »"
+  },
+  "SYNC_CONFLICT": {
+   "message": "« Votre saisie hors ligne sur {objet} entre en conflit avec une autre modification. Un responsable arbitre. »",
+   "surfaces": "T : élément « À revoir », motif « En arbitrage »",
+   "action": "« Voir l'élément »"
+  },
+  "OFFLINE_QUOTA_EXCEEDED": {
+   "message": "« Le volume hors ligne du site atteint {limite}. Retirez un document avant d'en ajouter. »",
+   "surfaces": "=",
+   "action": "« Voir les documents hors ligne »"
+  },
+  "IDENTITY_NOT_VERIFIED": {
+   "message": "« Votre identité n'est pas encore vérifiée. Suivez le lien reçu pour la confirmer. »",
+   "surfaces": "=",
+   "action": "« Renvoyer le lien »"
+  },
+  "ERASURE_PARTIALLY_BLOCKED": {
+   "message": "« Vos données sont effacées, sauf {n} éléments que la loi impose de conserver jusqu'au {date}. »",
+   "surfaces": "=",
+   "action": "« Voir le détail »"
+  },
+  "REQUEST_EXTENSION_NOT_ALLOWED": {
+   "message": "« Cette demande se prolonge une fois, de deux mois au plus, avant son échéance. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "PRIVACY_FORMALITY_MISSING": {
+   "message": "« La formalité de protection des données de {pays} n'est pas renseignée pour {site}. Le référent la lève avec motif. »",
+   "surfaces": "Admin",
+   "action": "« Renseigner la formalité »"
+  },
+  "SIGNATURE_INVALID": {
+   "message": "« Message de {systeme} refusé : signature invalide. »",
+   "surfaces": "Admin",
+   "action": "« Voir le journal »"
+  },
+  "SIGNATURE_EXPIRED": {
+   "message": "« Message de {systeme} refusé : horodatage trop ancien. »",
+   "surfaces": "Admin",
+   "action": "« Voir le journal »"
+  },
+  "SCHEMA_INVALID": {
+   "message": "« Message de {systeme} refusé : format non conforme ({champ}). »",
+   "surfaces": "Admin",
+   "action": "« Voir le message »"
+  },
+  "STALE_VERSION": {
+   "message": "aucun message à l'utilisateur",
+   "surfaces": "Admin : journal seulement",
+   "action": "aucun"
+  },
+  "ENDPOINT_PAUSED": {
+   "message": "« Les échanges avec {systeme} sont en pause depuis le {date}. Les messages attendent la reprise. »",
+   "surfaces": "Admin",
+   "action": "« Reprendre les échanges »"
+  },
+  "FNA_MAPPING_MISSING": {
+   "message": "« La nature {nature} n'a pas de compte dans Atlas FNA. L'écriture attend sa correspondance. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir les correspondances »"
+  },
+  "FNA_PERIOD_CLOSED": {
+   "message": "« La période {periode} est close dans Atlas FNA. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "FNA_VALIDATION_FAILED": {
+   "message": "« Atlas FNA refuse l'écriture {reference} : {motif}. »",
+   "surfaces": "Admin",
+   "action": "« Voir l'écriture »"
+  },
+  "FNA_DUPLICATE": {
+   "message": "« Atlas FNA a déjà reçu l'écriture {reference}. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "FNA_LEGAL_ENTITY_UNKNOWN": {
+   "message": "« L'entité {entite} n'existe pas dans Atlas FNA. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir les entités »"
+  },
+  "TRADE_CUSTOMER_UNKNOWN": {
+   "message": "« Le client {client} n'existe pas dans Atlas Trade. Rattachez-le dans Atlas Trade puis remettez la période. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir la fiche client »"
+  },
+  "TRADE_CONTRACT_UNKNOWN": {
+   "message": "« Le contrat {contrat} n'existe pas dans Atlas Trade. Rattachez-le dans Atlas Trade puis remettez la période. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir le contrat »"
+  },
+  "TRADE_PERIOD_LOCKED": {
+   "message": "« La période {periode} est verrouillée dans Atlas Trade. Remettez la ligne sur la période suivante. »",
+   "surfaces": "Admin",
+   "action": "« Saisir un ajustement »"
+  },
+  "TRADE_TOTAL_MISMATCH": {
+   "message": "« Le total du lot ne correspond pas à la somme de ses lignes. »",
+   "surfaces": "Admin",
+   "action": "« Voir le lot »"
+  },
+  "TRADE_VALIDATION_FAILED": {
+   "message": "« Atlas Trade refuse la ligne {reference} : {motif}. »",
+   "surfaces": "Admin",
+   "action": "« Voir la ligne »"
+  },
+  "TRADE_ITEM_ALREADY_INVOICED": {
+   "message": "« L'élément {reference} est déjà facturé dans Atlas Trade. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "LOT_SPACE_UNMATCHED": {
+   "message": "« Le lot {lot} d'Atlas Patrimoine n'a pas d'espace correspondant. »",
+   "surfaces": "C : responsable espaces",
+   "action": "« Associer un espace »"
+  },
+  "OCCUPANT_UNKNOWN": {
+   "message": "« L'occupant {occupant} transmis par Atlas Patrimoine est inconnu. »",
+   "surfaces": "Admin",
+   "action": "« Créer l'organisation »"
+  },
+  "PERSON_SITE_UNKNOWN": {
+   "message": "« La personne ou le site transmis par Atlas People est inconnu : {detail}. »",
+   "surfaces": "Admin",
+   "action": "« Voir le message »"
+  },
+  "ACCESS_ZONE_UNKNOWN": {
+   "message": "« La zone {zone} transmise par Atlas Trace est inconnue. »",
+   "surfaces": "Admin",
+   "action": "« Ouvrir les zones d'accès »"
+  },
+  "SUBJECT_UNKNOWN": {
+   "message": "« La personne transmise par Atlas Trace est inconnue. »",
+   "surfaces": "Admin",
+   "action": "« Voir le message »"
+  },
+  "CLIMATE_ISSUE_MISSING": {
+   "message": "« Aucun enjeu lié au changement climatique n'est enregistré. Indiquez s'il est pertinent pour l'organisme. »",
+   "surfaces": "=",
+   "action": "« Ajouter un enjeu », « Continuer »"
+  },
+  "KPI_RANGE_TOO_LARGE": {
+   "message": "« Réduisez la plage : 60 périodes au plus. »",
+   "surfaces": "=",
+   "action": "« Modifier la période »"
+  },
+  "KPI_PERIOD_FROZEN": {
+   "message": "« La période {periode} est close. Demandez une révision motivée. »",
+   "surfaces": "=",
+   "action": "« Demander une révision »"
+  },
+  "THRESHOLD_ORDER_INVALID": {
+   "message": "« Les seuils ne suivent pas le sens de l'indicateur : {sens}. »",
+   "surfaces": "=",
+   "action": "focus sur les seuils"
+  },
+  "DASHBOARD_LAYOUT_INVALID": {
+   "message": "« La disposition ne respecte pas la grille : tailles fixes et placement sans trou. »",
+   "surfaces": "=",
+   "action": "« Réorganiser automatiquement »"
+  },
+  "REVIEW_INPUTS_INCOMPLETE": {
+   "message": "« {n} entrées de la revue ne sont pas préparées : {entrees}. »",
+   "surfaces": "=",
+   "action": "« Préparer les entrées »"
+  },
+  "REVIEW_OUTPUTS_INCOMPLETE": {
+   "message": "« La revue attend ses décisions : améliorations, changements du système de management, ressources. »",
+   "surfaces": "=",
+   "action": "« Saisir les décisions »"
+  },
+  "COMMENTARY_REQUIRED": {
+   "message": "« Rédigez le commentaire de chaque section obligatoire. »",
+   "surfaces": "=",
+   "action": "focus sur la première section vide"
+  },
+  "DASHBOARD_IS_DEFAULT": {
+   "message": "« Le tableau de bord par défaut ne se supprime pas. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "REVIEW_CHAIR_REQUIRED": {
+   "message": "« Seul le président de séance approuve le compte rendu. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "TEMPLATE_IN_USE": {
+   "message": "« Ce modèle est utilisé par une planification active. Suspendez-la avant d'archiver le modèle. »",
+   "surfaces": "=",
+   "action": "« Voir les planifications »"
+  },
+  "REPORT_RUN_NOT_VALIDATED": {
+   "message": "« Ce rapport attend sa validation avant son envoi. »",
+   "surfaces": "K =",
+   "action": "« Ouvrir le rapport »"
+  },
+  "HEALTH_MODULE_NOT_ACTIVATED": {
+   "message": "« La santé au travail n'est pas activée : le traitement doit être inscrit au registre et l'analyse d'impact santé approuvée. »",
+   "surfaces": "=",
+   "action": "« Protection des données », avec `privacy.manage` seulement"
+  },
+  "HEALTH_RECORD_CORRECTED": {
+   "message": "« Cette saisie est déjà corrigée. Actualisez le dossier pour voir la version en vigueur. »",
+   "surfaces": "=",
+   "action": "« Actualiser »"
+  },
+  "HEALTH_EXPORT_EXPIRED": {
+   "message": "« Le lien a expiré. Relancez l'export. »",
+   "surfaces": "=",
+   "action": "« Relancer l'export »"
+  },
+  "VIEW_LIMIT_REACHED": {
+   "message": "« Cet écran compte déjà {n} vues. Supprimez une vue avant d'en enregistrer une autre. »",
+   "surfaces": "=",
+   "action": "« Gérer les vues »"
+  },
+  "MENTION_LIMIT_EXCEEDED": {
+   "message": "« 20 mentions au plus par commentaire. »",
+   "surfaces": "=",
+   "action": "focus sur le commentaire"
+  },
+  "MENTION_NO_ACCESS": {
+   "message": "« {n} personnes mentionnées n'ont pas accès à {objet} : elles ne sont pas notifiées. »",
+   "surfaces": "=",
+   "action": "« Publier sans les notifier » ; renoncement « Revenir »"
+  },
+  "COMMENT_EDIT_WINDOW_EXPIRED": {
+   "message": "« Ce commentaire ne se modifie plus après 15 minutes. Ajoutez un nouveau commentaire. »",
+   "surfaces": "=",
+   "action": "« Répondre »"
+  },
+  "UNDO_EXPIRED": {
+   "message": "« Le délai pour défaire cette action est dépassé. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "UNDO_NOT_ALLOWED": {
+   "message": "« Cette action ne se défait plus : {objet} a changé d'étape depuis. »",
+   "surfaces": "=",
+   "action": "« Ouvrir {objet} »"
+  },
+  "UNDO_CONFLICT": {
+   "message": "« {objet} a été modifié depuis par {nom}. Rien n'est défait. » ; opération en masse : « {n} lignes modifiées depuis restent inchangées. »",
+   "surfaces": "=",
+   "action": "« Voir le détail »"
+  },
+  "UNDO_ALREADY_DONE": {
+   "message": "« Cette action est déjà défaite. »",
+   "surfaces": "=",
+   "action": "aucun"
+  },
+  "SSO_REQUIRED": {
+   "message": "« Votre organisation utilise sa propre connexion. Continuez avec {fournisseur}. »",
+   "surfaces": "C",
+   "action": "« Continuer avec {fournisseur} »"
+  },
+  "SSO_NO_ROLE_MAPPED": {
+   "message": "« Votre compte est reconnu, mais aucun rôle ne vous est attribué dans Keystone. Contactez votre administrateur. »",
+   "surfaces": "C",
+   "action": "aucun"
+  },
+  "SSO_ACCOUNT_NOT_PROVISIONED": {
+   "message": "« Votre compte n'est pas encore créé dans Keystone. Contactez votre administrateur. »",
+   "surfaces": "C",
+   "action": "aucun"
+  },
+  "SSO_DOMAIN_NOT_VERIFIED": {
+   "message": "« Vérifiez au moins un domaine avant d'activer la connexion d'entreprise. »",
+   "surfaces": "Admin",
+   "action": "« Vérifier le domaine »"
+  },
+  "SSO_DOMAIN_ALREADY_USED": {
+   "message": "« Le domaine {domaine} est déjà déclaré. Contactez le support si votre organisation en est propriétaire. »",
+   "surfaces": "Admin",
+   "action": "« Contacter le support »"
+  },
+  "SSO_CONNECTION_TEST_FAILED": {
+   "message": "« Le test de connexion a échoué : {cause}. »",
+   "surfaces": "Admin",
+   "action": "« Relancer le test »"
+  },
+  "SSO_BREAK_GLASS_REQUIRED": {
+   "message": "« Gardez au moins un compte administrateur de secours hors du domaine imposé, avec double authentification. »",
+   "surfaces": "Admin",
+   "action": "« Choisir le compte de secours »"
+  },
+  "SSO_CERTIFICATE_EXPIRING": {
+   "message": "« Le certificat de {fournisseur} expire le {date}. Mettez à jour les métadonnées. »",
+   "surfaces": "Admin",
+   "action": "« Mettre à jour le certificat »"
+  },
+  "SCIM_TOKEN_INVALID": {
+   "message": "aucun message à l'utilisateur ; réponse SCIM `detail` : « Jeton SCIM invalide. »",
+   "surfaces": "API",
+   "action": "aucun"
+  },
+  "SCIM_TOKEN_LIMIT_REACHED": {
+   "message": "« 5 jetons SCIM actifs au plus. Révoquez un jeton avant d'en créer un autre. »",
+   "surfaces": "Admin",
+   "action": "« Voir les jetons »"
+  },
+  "SCIM_USER_CONFLICT": {
+   "message": "réponse SCIM `scimType = uniqueness` ; Admin : « {email} existe déjà avec un autre identifiant du fournisseur. »",
+   "surfaces": "API, Admin",
+   "action": "« Ouvrir le compte »"
+  },
+  "USAGE_EVENT_UNKNOWN": {
+   "message": "aucun message à l'utilisateur",
+   "surfaces": "aucune",
+   "action": "aucun"
+  },
+  "API_TOKEN_INVALID": {
+   "message": "« Jeton d'API invalide ou expiré. »",
+   "surfaces": "API",
+   "action": "aucun"
+  },
+  "API_IP_NOT_ALLOWED": {
+   "message": "« Adresse {ip} non autorisée pour ce jeton. »",
+   "surfaces": "API",
+   "action": "aucun"
+  },
+  "API_SCOPE_MISSING": {
+   "message": "« Portée {scope} requise. »",
+   "surfaces": "API",
+   "action": "aucun"
+  },
+  "API_SCOPE_UNKNOWN": {
+   "message": "« Portée inconnue : {scope}. »",
+   "surfaces": "Admin, API",
+   "action": "focus sur « Portées »"
+  },
+  "API_TOKEN_LIMIT_REACHED": {
+   "message": "« 25 jetons actifs au plus. Révoquez un jeton avant d'en créer un autre. »",
+   "surfaces": "Admin",
+   "action": "« Voir les jetons »"
+  },
+  "API_IDEMPOTENCY_CONFLICT": {
+   "message": "« Clé d'idempotence déjà utilisée pour une autre requête. »",
+   "surfaces": "API",
+   "action": "aucun"
+  },
+  "API_VERSION_RETIRED": {
+   "message": "« La version {version} de l'API est retirée depuis le {date}. »",
+   "surfaces": "API",
+   "action": "lien vers le journal des modifications"
+  },
+  "HEALTH_SCOPE_FORBIDDEN": {
+   "message": "« Un compte de service ne reçoit aucun accès aux données de santé. »",
+   "surfaces": "Admin",
+   "action": "aucun"
+  },
+  "WEBHOOK_URL_NOT_ALLOWED": {
+   "message": "« Cette adresse n'est pas admise : HTTPS public sur le port 443 ou 8443 seulement. »",
+   "surfaces": "Admin, API",
+   "action": "focus sur « Adresse »"
+  },
+  "WEBHOOK_LIMIT_REACHED": {
+   "message": "« 10 points d'accès actifs au plus. »",
+   "surfaces": "Admin, API",
+   "action": "« Voir les points d'accès »"
+  },
+  "WEBHOOK_TEST_FAILED": {
+   "message": "« Le point d'accès a répondu {statut} en {duree}. »",
+   "surfaces": "Admin",
+   "action": "« Relancer le test »"
+  },
+  "OCCUPANCY_OVERLAP": {
+   "message": "« {espace} est déjà occupé du {debut} au {fin}. Choisissez une autre période ou terminez l'occupation en cours. »",
+   "surfaces": "=",
+   "action": "« Voir l'occupation en cours »"
+  },
+  "PO_NOT_RECEIVABLE": {
+   "message": "« La commande {reference} est au statut « {statut} » : seule une commande envoyée ou partiellement reçue se réceptionne. »",
+   "surfaces": "T : « Commande {reference} non réceptionnable. »",
+   "action": "« Choisir une autre commande »"
+  },
+  "PART_WAREHOUSE_LOCKED": {
+   "message": "« Le magasin de {article} est figé depuis son premier mouvement. Transférez le stock vers l'autre magasin. »",
+   "surfaces": "=",
+   "action": "« Créer un transfert »"
+  },
+  "CATALOG_REF_DUPLICATE": {
+   "message": "« La référence {reference} de {fournisseur} est déjà au catalogue. Proposez une nouvelle version de l'article existant. »",
+   "surfaces": "F : « Cette référence est déjà au catalogue. Proposez une nouvelle version. »",
+   "action": "« Ouvrir l'article »"
+  },
+  "EXPENSE_PERIOD_DUPLICATE": {
+   "message": "« Une dépense existe déjà pour {contrat} au titre de {periode} ({reference}). »",
+   "surfaces": "F : « Cette échéance est déjà facturée ({reference}). »",
+   "action": "« Ouvrir la dépense »"
+  },
+  "CALENDAR_DAY_DUPLICATE": {
+   "message": "« Le {date} figure déjà dans ce calendrier avec ce type et ce libellé. »",
+   "surfaces": "=",
+   "action": "focus sur « Date »"
+  },
+  "REGIME_CODE_LOCKED": {
+   "message": "« Le code {code} est figé : des contrôles portent ce régime. Créez un nouveau régime pour changer de code. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "ENERGY_SCOPE_DUPLICATE": {
+   "message": "« Une version du périmètre de {site} commence déjà le {date}. Modifiez-la ou choisissez une autre date. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la version »"
+  },
+  "COMPETENCY_ALREADY_CURRENT": {
+   "message": "« {nom} a déjà la compétence {competence} en attente ou valide. Renouvelez-la depuis sa fiche. »",
+   "surfaces": "=",
+   "action": "« Ouvrir la compétence »"
+  },
+  "RISK_LINK_DUPLICATE": {
+   "message": "« Cet objet est déjà lié au risque {reference}. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "KPI_PERIOD_NOT_FROZEN": {
+   "message": "« La période {periode} n'est pas figée : sa valeur se recalcule sans révision. »",
+   "surfaces": "=",
+   "action": "« Fermer »"
+  },
+  "DUPLICATE_ENTRY": {
+   "message": "« Cet élément figure déjà dans la liste. »",
+   "surfaces": "T =",
+   "action": "focus sur la ligne existante"
+  },
+  "SSO_GROUP_MAPPING_DUPLICATE": {
+   "message": "« Le groupe {groupe} est déjà mappé au rôle {role}. »",
+   "surfaces": "=",
+   "action": "focus sur « Groupe du fournisseur »"
+  },
+  "EMAIL_FORMAT_INVALID": {
+   "message": "« Saisissez une adresse e-mail valide. »",
+   "surfaces": "T =",
+   "action": "focus sur « E-mail »"
+  },
+  "LOCAL_CODE_TOO_WEAK": {
+   "message": "« Choisissez un code moins évident. »",
+   "surfaces": "T =",
+   "action": "focus sur « Code à 6 chiffres »"
+  },
+  "SELECTION_TOO_LARGE": {
+   "message": "« {n} fiches sélectionnées : 200 au plus par validation. Affinez les filtres ou validez en plusieurs fois. »",
+   "surfaces": "=",
+   "action": "« Affiner les filtres »"
+  }
+ }
+}

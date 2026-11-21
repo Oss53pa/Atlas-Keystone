@@ -17,6 +17,7 @@ def main(src: str, dsn: str, out: str) -> None:
     data = json.load(open(src, encoding='utf-8'))
     pending = list(range(len(data['statements'])))
     last_err: dict[int, str] = {}
+    order: list[int] = []  # ordre réel de réussite = ordre des dépendances
     passes = 0
     with psycopg.connect(dsn, autocommit=True) as cx:
         while pending:
@@ -26,6 +27,7 @@ def main(src: str, dsn: str, out: str) -> None:
                 try:
                     cx.execute(data['statements'][i]['sql'])
                     last_err.pop(i, None)
+                    order.append(i)
                 except psycopg.Error as e:
                     last_err[i] = (e.diag.message_primary or str(e)).strip()
                     failed.append(i)
@@ -35,7 +37,7 @@ def main(src: str, dsn: str, out: str) -> None:
             pending = failed
     res = [{'src': data['statements'][i]['src'], 'proposal': data['statements'][i].get('proposal', False),
             'error': last_err[i], 'sql': data['statements'][i]['sql'][:300]} for i in sorted(last_err)]
-    json.dump({'passes': passes, 'total': len(data['statements']), 'failed': res, 'templates': data['templates']},
+    json.dump({'passes': passes, 'total': len(data['statements']), 'failed': res, 'templates': data['templates'], 'order': order},
               open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'{len(data["statements"])} instructions, {len(res)} en échec après {passes} passes -> {out}')
 
