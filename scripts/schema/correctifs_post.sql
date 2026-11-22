@@ -158,3 +158,119 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
     FROM keystone.sla_pauses sp
    WHERE sp.work_order_id = p_wo AND p_clock = ANY (sp.clocks)
      AND (auth.uid() IS NULL OR sp.tenant_id = keystone.current_tenant()) $$;
+
+-- C23 : consume_part (sortie de pièce) et wo_punch (pointage d'OT) écrivaient en se limitant au technicien appelant,
+-- sans permission. Décision d'Oss53pa (22/11/2026) : wo.execute exigée (« pointer, exécuter, renseigner checklist et
+-- pièces », Admin partie 2 §1.3) pour tout utilisateur connecté ; tâches de fond inchangées. Corps d'origine repris tel quel,
+-- seul le contrôle est inséré en tête.
+CREATE OR REPLACE FUNCTION keystone.consume_part(p_part uuid, p_qty numeric, p_wo uuid, p_meta jsonb DEFAULT '{}'::jsonb)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'keystone', 'pg_temp'
+AS $function$
+DECLARE p keystone.spare_parts; w keystone.work_orders; r keystone.stock_reservations; v_mv uuid; v_val bigint;
+BEGIN
+  IF auth.uid() IS NOT NULL THEN PERFORM keystone.assert_permission('wo.execute'); END IF;
+  SELECT * INTO w FROM keystone.work_orders WHERE id = p_wo AND tenant_id = keystone.current_tenant();
+  IF NOT FOUND THEN PERFORM keystone.raise_error('NOT_FOUND'); END IF;
+  IF w.status NOT IN ('in_progress','on_hold') THEN
+    PERFORM keystone.raise_error('INVALID_TRANSITION'); END IF;
+  SELECT * INTO p FROM keystone.spare_parts WHERE id = p_part AND tenant_id = w.tenant_id FOR UPDATE;
+  PERFORM keystone.stock_owner_check(p.warehouse_id, w);                 -- STOCK_OWNER_MISMATCH
+  SELECT * INTO r FROM keystone.stock_reservations
+   WHERE part_id = p_part AND work_order_id = p_wo AND status = 'active' FOR UPDATE;
+  -- disponible pour cet OT = disponible général plus son propre reliquat réservé
+  IF p_qty > p.available_qty + coalesce(r.qty - r.consumed_qty, 0) THEN
+    PERFORM keystone.raise_error('INSUFFICIENT_STOCK', jsonb_build_object('available', p.available_qty, 'requested', p_qty));
+  END IF;
+  v_val := keystone.round_half_even(p_qty * p.avg_unit_cost);
+  INSERT INTO keystone.stock_movements(tenant_id, part_id, direction, qty, unit_cost, value, qty_after,
+         avg_cost_after, work_order_id, reservation_id, reason, created_by)
+  VALUES (w.tenant_id, p_part, 'out', -p_qty, p.avg_unit_cost, -v_val, p.qty - p_qty, p.avg_unit_cost,
+          p_wo, r.id, 'wo_consumption', auth.uid()) RETURNING id INTO v_mv;
+  UPDATE keystone.spare_parts SET qty = qty - p_qty WHERE id = p_part;
+  IF r.id IS NOT NULL THEN
+    UPDATE keystone.stock_reservations SET consumed_qty = least(qty, consumed_qty + p_qty),
+           status = CASE WHEN consumed_qty + p_qty >= qty THEN 'consumed' ELSE status END,
+           closed_at = CASE WHEN consumed_qty + p_qty >= qty THEN now() END
+     WHERE id = r.id;
+  END IF;
+  INSERT INTO keystone.work_order_lines(tenant_id, work_order_id, kind, phase, label, qty, unit, unit_cost,
+         amount, currency, part_id, stock_movement_id)
+  VALUES (w.tenant_id, p_wo, 'part', 'actual', p.name, p_qty, p.unit, p.avg_unit_cost, v_val, p.currency, p_part, v_mv);
+  PERFORM keystone.notify_if_below_min(p_part);   -- notification et suggestion de demande d'achat (RG-STK-04)
+  RETURN v_mv;
+END; $function$;
+CREATE OR REPLACE FUNCTION keystone.wo_punch(p_wo uuid, p_action wo_punch_action, p_meta jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'keystone', 'pg_temp'
+AS $function$
+DECLARE w keystone.work_orders; r jsonb; v_person uuid; v_scan uuid; v_at timestamptz;
+BEGIN
+  IF auth.uid() IS NOT NULL THEN PERFORM keystone.assert_permission('wo.execute'); END IF;
+  SELECT * INTO w FROM keystone.work_orders WHERE id = p_wo AND tenant_id = keystone.current_tenant() FOR UPDATE;
+  IF NOT FOUND THEN PERFORM keystone.raise_error('NOT_FOUND'); END IF;
+  v_person := keystone.current_person_id();
+  IF v_person IS DISTINCT FROM w.assignee_id
+     AND NOT EXISTS (SELECT 1 FROM keystone.work_order_team WHERE work_order_id = w.id AND person_id = v_person)
+  THEN PERFORM keystone.raise_error('PERMISSION_DENIED'); END IF;
+
+  -- Heure de terrain (A94) : occurred_at de l'appareil, bornée par l'heure de réception serveur
+  v_at := keystone.field_time(w, p_meta);
+  p_meta := p_meta || jsonb_build_object('field_at', v_at);   -- lu par T09, T14, T20
+
+  -- Scan obligatoire à chaque pointage
+  IF w.asset_id IS NOT NULL OR w.location_id IS NOT NULL THEN
+    IF p_meta->>'scanned_identifier' IS NULL THEN PERFORM keystone.raise_error('SCAN_REQUIRED'); END IF;
+    r := keystone.resolve_identifier(p_meta->>'scanned_identifier');
+    IF NOT keystone.wo_scan_matches(w, r) THEN
+      PERFORM keystone.raise_error('SCAN_MISMATCH', jsonb_build_object('scanned', r)); END IF;
+    INSERT INTO keystone.wo_scan_log(tenant_id, work_order_id, action, identifier, resolved_kind, resolved_id,
+           scanned_by, person_id, scanned_at, offline, device_session_id,
+           briefing_ack_at, ppe_confirmed, briefing_version)
+    VALUES (w.tenant_id, w.id, p_action, p_meta->>'scanned_identifier', r->>'kind', (r->>'id')::uuid,
+           auth.uid(), v_person, v_at,
+           coalesce((p_meta->>'offline')::boolean, false), (p_meta->>'device_session_id')::uuid,
+           CASE WHEN p_action = 'start' AND (p_meta->>'briefing_ack')::boolean THEN v_at END,
+           CASE WHEN p_action = 'start' THEN ARRAY(SELECT jsonb_array_elements_text(coalesce(p_meta->'ppe_confirmed','[]'))) END,
+           CASE WHEN p_action = 'start' THEN p_meta->>'briefing_version' END)
+    RETURNING id INTO v_scan;
+  END IF;
+
+  CASE p_action
+    WHEN 'diagnose_start' THEN                    -- visite de diagnostic, statut planned
+      IF w.status <> 'planned' THEN PERFORM keystone.raise_error('INVALID_PUNCH'); END IF;
+      PERFORM keystone.wo_session_open(w, v_person, 'diagnosis', v_scan, v_at);
+    WHEN 'diagnose_end' THEN
+      PERFORM keystone.wo_session_close(w, v_person, 'diagnosis', v_scan, v_at);
+    WHEN 'start' THEN
+      IF w.status = 'assigned' AND w.stage = 'committed' THEN
+        PERFORM keystone.wo_transition(p_wo, 'in_progress', 'in_progress', p_meta);
+      ELSIF w.status = 'in_progress' AND w.rework_pending THEN   -- redémarrage après reprise T17
+        PERFORM keystone.wo_guard_permit_required(w, p_meta);
+        UPDATE keystone.work_orders SET rework_pending = false WHERE id = w.id;
+      ELSIF w.status = 'draft' AND w.priority = 1 THEN          -- urgence P1, T20
+        PERFORM keystone.wo_transition(p_wo, 'in_progress', 'in_progress', p_meta || '{"emergency":true}');
+      ELSE PERFORM keystone.raise_error('INVALID_PUNCH'); END IF;
+      PERFORM keystone.wo_session_open(w, v_person, 'intervention', v_scan, v_at);
+    WHEN 'pause' THEN
+      PERFORM keystone.wo_session_close(w, v_person, 'intervention', v_scan, v_at);
+      IF NOT keystone.wo_has_open_session(w.id) THEN
+        PERFORM keystone.wo_transition(p_wo, 'in_progress', 'on_hold', p_meta || '{"hold_reason":"technician_break"}');
+      END IF;
+    WHEN 'resume' THEN
+      IF w.status = 'on_hold' THEN PERFORM keystone.wo_transition(p_wo, 'in_progress', 'in_progress', p_meta); END IF;
+      PERFORM keystone.wo_session_open(w, v_person, 'intervention', v_scan, v_at);
+    WHEN 'finish' THEN
+      PERFORM keystone.wo_session_close(w, v_person, 'intervention', v_scan, v_at);
+      IF NOT keystone.wo_has_open_session(w.id) THEN
+        PERFORM keystone.wo_transition(p_wo, 'reported', 'done', p_meta);
+      END IF;
+  END CASE;
+
+  -- Présence (Annexe S) : on_wo au start et au resume, break à la pause, on_duty à la fin
+  PERFORM keystone.presence_write_from_punch(w, v_person, p_action, v_scan);
+END; $function$;
