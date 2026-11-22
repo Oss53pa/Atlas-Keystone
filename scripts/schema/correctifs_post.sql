@@ -143,3 +143,18 @@ BEGIN
   END IF;
   PERFORM set_config('keystone.pr_link', 'off', true);
 END $$;
+
+-- C22 : site_tz et sla_effective_due (SECURITY DEFINER) lisaient sans filtre de tenant : un identifiant connu suffisait
+-- à lire le fuseau d'un site ou les pauses SLA d'un OT d'un autre client. Filtre ajouté pour tout utilisateur connecté ;
+-- les tâches de fond (sans utilisateur) gardent la lecture complète. Calcul inchangé.
+CREATE OR REPLACE FUNCTION keystone.site_tz(p_site uuid) RETURNS text
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = atlas_core, pg_temp AS $$
+  SELECT time_zone FROM atlas_core.sites
+   WHERE id = p_site AND (auth.uid() IS NULL OR tenant_id = keystone.current_tenant()) $$;
+CREATE OR REPLACE FUNCTION keystone.sla_effective_due(p_due timestamptz, p_wo uuid, p_clock keystone.sla_clock) RETURNS timestamptz
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+  -- échéance plus pauses de l'OT lié qui portent l'horloge (A07, sla_pauses de l'Annexe B)
+  SELECT p_due + coalesce(sum(coalesce(sp.ended_at, now()) - sp.started_at), interval '0')
+    FROM keystone.sla_pauses sp
+   WHERE sp.work_order_id = p_wo AND p_clock = ANY (sp.clocks)
+     AND (auth.uid() IS NULL OR sp.tenant_id = keystone.current_tenant()) $$;

@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1488 instructions réussies sur 1510 ; 22 écarts restants : docs/lot0 §6.
+-- 1490 instructions réussies sur 1512 ; 22 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -5375,6 +5375,15 @@ BEGIN
   END IF;
   PERFORM set_config('keystone.pr_link', 'off', true);
 END $$;
+
+-- correctif_post
+-- C22 : site_tz et sla_effective_due (SECURITY DEFINER) lisaient sans filtre de tenant : un identifiant connu suffisait
+-- à lire le fuseau d'un site ou les pauses SLA d'un OT d'un autre client. Filtre ajouté pour tout utilisateur connecté ;
+-- les tâches de fond (sans utilisateur) gardent la lecture complète. Calcul inchangé.
+CREATE OR REPLACE FUNCTION keystone.site_tz(p_site uuid) RETURNS text
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = atlas_core, pg_temp AS $$
+  SELECT time_zone FROM atlas_core.sites
+   WHERE id = p_site AND (auth.uid() IS NULL OR tenant_id = keystone.current_tenant()) $$;
 
 -- Referentiels_Transverses#2
 -- NULL hors de 1 à 25 ; la colonne appelante porte CHECK (score BETWEEN 1 AND 25)
@@ -13240,6 +13249,15 @@ CREATE TABLE keystone.anomalies (
 -- mutuellement : la clé de work_orders est posée après la création des deux tables, sans changer sa règle [Confirmé].
 ALTER TABLE keystone.work_orders
   ADD CONSTRAINT fk_wo_purchase_request FOREIGN KEY (purchase_request_id) REFERENCES keystone.purchase_requests (id) ON DELETE RESTRICT;
+
+-- correctif_post
+CREATE OR REPLACE FUNCTION keystone.sla_effective_due(p_due timestamptz, p_wo uuid, p_clock keystone.sla_clock) RETURNS timestamptz
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+  -- échéance plus pauses de l'OT lié qui portent l'horloge (A07, sla_pauses de l'Annexe B)
+  SELECT p_due + coalesce(sum(coalesce(sp.ended_at, now()) - sp.started_at), interval '0')
+    FROM keystone.sla_pauses sp
+   WHERE sp.work_order_id = p_wo AND p_clock = ANY (sp.clocks)
+     AND (auth.uid() IS NULL OR sp.tenant_id = keystone.current_tenant()) $$;
 
 -- AnnexeA_Socle_Partie2#6
 CREATE TABLE keystone.asset_status_history (

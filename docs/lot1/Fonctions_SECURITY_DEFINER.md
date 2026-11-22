@@ -89,4 +89,4 @@ Inventaire de la base de test (conventions appliquées). Une fonction SECURITY D
 ## Priorités
 - `pr_link_work_order(uuid,uuid)` : **traité** (C21, décision d'Oss53pa du 22/11/2026). Elle était limitée au tenant (`current_tenant()`) mais sans permission ; `purchase.request` est désormais exigée de tout utilisateur connecté, tâches de fond autorisées. Vérifié : refus `PERMISSION_DENIED` sans la permission, accepté avec.
 - `consume_part`, `wo_punch` écrivent, limitées à l'appelant (technicien) sans permission explicite : confirmer que le périmètre suffit (Annexe P).
-- Les lectures sans contrôle (`client_ticket_last_reminder`, `competency_gaps`, `sectors_of_location`…) contournent la RLS : vérifier qu'elles filtrent par `current_tenant()` avant de les laisser à authenticated.
+- Fonctions sans permission ni périmètre, vérifiées le 22/11/2026 : toutes filtrent par `current_tenant()` sauf `site_tz` et `sla_effective_due`, corrigées (C22 : filtre par tenant pour tout utilisateur connecté, tâches de fond inchangées). Vérifié : un utilisateur du client A n'obtient pas le fuseau d'un site du client B ; le client B et les tâches de fond l'obtiennent.
