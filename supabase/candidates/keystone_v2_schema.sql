@@ -1,5 +1,5 @@
 -- Schéma candidat Atlas Keystone, généré par scripts/schema/emit_candidate.py. NE PAS APPLIQUER EN L'ÉTAT.
--- 1487 instructions réussies sur 1509 ; 22 écarts restants : docs/lot0 §6.
+-- 1488 instructions réussies sur 1510 ; 22 écarts restants : docs/lot0 §6.
 -- Prérequis : extensions (pgcrypto, postgis, vector, pg_trgm, btree_gist, unaccent, pg_jsonschema),
 -- puis scripts/schema/correctifs_corpus.sql.
 BEGIN;
@@ -5355,6 +5355,26 @@ END $$;
 
 -- correctif_post
 REVOKE EXECUTE ON FUNCTION keystone.audit_pseudonymize(uuid, name, jsonb) FROM PUBLIC, anon, authenticated;
+
+-- correctif_post
+-- C21 : keystone.pr_link_work_order (Annexe E) n'exigeait aucune permission (SECURITY DEFINER, limitée au tenant).
+-- Décision d'Oss53pa (22/11/2026) : purchase.request exigée de tout utilisateur connecté (cohérent avec D31) ;
+-- les tâches de fond (sans utilisateur, service_role) restent autorisées. Corps inchangé par ailleurs.
+CREATE OR REPLACE FUNCTION keystone.pr_link_work_order(p_request uuid, p_work_order uuid) RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+BEGIN
+  IF auth.uid() IS NOT NULL THEN PERFORM keystone.assert_permission('purchase.request'); END IF;
+  PERFORM set_config('keystone.pr_link', 'on', true);
+  UPDATE keystone.purchase_requests SET work_order_id = p_work_order
+   WHERE id = p_request AND tenant_id = keystone.current_tenant()
+     AND (work_order_id IS NULL OR work_order_id = p_work_order OR p_work_order IS NULL);
+  IF p_work_order IS NOT NULL THEN
+    UPDATE keystone.work_orders SET purchase_request_id = p_request
+     WHERE id = p_work_order AND tenant_id = keystone.current_tenant()
+       AND purchase_request_id IS DISTINCT FROM p_request;     -- passe trg_wo_purchase_request_link (B.15.2)
+  END IF;
+  PERFORM set_config('keystone.pr_link', 'off', true);
+END $$;
 
 -- Referentiels_Transverses#2
 -- NULL hors de 1 à 25 ; la colonne appelante porte CHECK (score BETWEEN 1 AND 25)

@@ -87,6 +87,6 @@ Inventaire de la base de test (conventions appliquées). Une fonction SECURITY D
 - `space_at_local_point(uuid,numeric,numeric)`
 
 ## Priorités
-- `pr_link_work_order(uuid,uuid)` **écrit** (rattache une demande d'achat à un OT) sans contrôle de permission : à protéger par `purchase.request` ou `wo.*` (Annexe E, D31), ou à réserver au worker.
+- `pr_link_work_order(uuid,uuid)` : **traité** (C21, décision d'Oss53pa du 22/11/2026). Elle était limitée au tenant (`current_tenant()`) mais sans permission ; `purchase.request` est désormais exigée de tout utilisateur connecté, tâches de fond autorisées. Vérifié : refus `PERMISSION_DENIED` sans la permission, accepté avec.
 - `consume_part`, `wo_punch` écrivent, limitées à l'appelant (technicien) sans permission explicite : confirmer que le périmètre suffit (Annexe P).
 - Les lectures sans contrôle (`client_ticket_last_reminder`, `competency_gaps`, `sectors_of_location`…) contournent la RLS : vérifier qu'elles filtrent par `current_tenant()` avant de les laisser à authenticated.
