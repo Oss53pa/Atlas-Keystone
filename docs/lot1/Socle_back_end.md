@@ -39,3 +39,8 @@ Livré dans `correctifs_post.sql`, aligné sur Architecture Portails partie 2 §
 Recette `scripts/schema/recette_profils.sql` (base neuve, 12 contrôles réussis) : cartes conformes, trois refus, bascule en aal2, un seul défaut, crochet puis crochet vide après suspension, journal à empreinte recalculée identique, privilèges, autre utilisateur 0 profil.
 Suppositions à valider : une surface sans ligne `tenant_surfaces` est activée et sans double authentification ; l'IP vient de `cf-connecting-ip`, sinon de la première valeur de `x-forwarded-for` (falsifiable hors passerelle).
 Reste : non appliqué à la branche ; crochet à activer dans le tableau de bord (Authentication > Hooks > Customize Access Token).
+
+## Interface : sélecteur de profil (AP-01, 24/11/2026)
+`apps/web/src/lib/profiles.ts` (règles d'ouverture §3.2), `features/auth/ProfileSelector.tsx` (cartes radio, défaut, suspendu, états chargement, aucun profil, erreur), ouverture en session par l'avatar, la palette (« Changer de profil ») et `G` `P` ; contenu remonté à chaque bascule (caches vidés) ; annonce « Profil {label} actif ». Aperçu de développement : `?apercu-profils` (`=session`, `=chargement`, `=aucun`, `=erreur`).
+Vérifié en navigateur : 1280 (modale de 480) et 360 (page pleine, « Continuer » en barre basse, aucun défilement horizontal) ; flèches et Entrée.
+Limites : surfaces autres que la console affichent un renvoi vers le changement de profil (portails à leur lot) ; `npm run lint` échoue déjà avant ce lot (aucun `eslint.config.js` dans le dépôt).

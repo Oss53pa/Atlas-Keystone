@@ -8,6 +8,7 @@ import { ContractorApp } from './features/contractor-app/ContractorApp.tsx';
 import { TenantApp } from './features/tenant-portal/TenantApp.tsx';
 import { TechApp } from './features/tech-app/TechApp.tsx';
 import { FormPreview } from './features/forms/FormPreview.tsx';
+import { ProfilePreview } from './features/auth/ProfilePreview.tsx';
 
 // Portail occupant public (sans compte) si l'URL porte ?qr=… / ?suivi=… / ?portail ; espace prestataire si ?prestataire ; portail locataire si ?locataire ; app technicien si ?technicien
 const params = new URLSearchParams(window.location.search);
@@ -17,7 +18,8 @@ const isLessee = params.has('locataire');
 const isTech = params.has('technicien');
 // Aperçu du moteur de formulaires : mode développement uniquement (retiré du build de production).
 const isFormPreview = import.meta.env.DEV && params.has('apercu-formulaire');
+const isProfilePreview = import.meta.env.DEV && params.has('apercu-profils');
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>{isFormPreview ? <FormPreview /> : isTech ? <TechApp /> : isLessee ? <TenantApp /> : isContractor ? <ContractorApp /> : isPortal ? <OccupantPortal /> : <App />}</StrictMode>,
+  <StrictMode>{isProfilePreview ? <ProfilePreview /> : isFormPreview ? <FormPreview /> : isTech ? <TechApp /> : isLessee ? <TenantApp /> : isContractor ? <ContractorApp /> : isPortal ? <OccupantPortal /> : <App />}</StrictMode>,
 );

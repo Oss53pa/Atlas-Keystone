@@ -3,7 +3,7 @@ import { ArrowLeft, Bell, ChevronDown, LogOut, Search } from 'lucide-react';
 
 /** En-tête de l'application (refonte v4) : logo, sommaire, retour, entité, recherche, état, alertes. */
 export function Header({
-  onHome, onSommaire, onBack, canBack, site, onCycleSite, dateFull, time, onSearch, bell, onIncident, user, onSignOut,
+  onHome, onSommaire, onBack, canBack, site, onCycleSite, dateFull, time, onSearch, bell, onIncident, user, onSignOut, onSwitchProfile,
 }: {
   onHome: () => void;
   onSommaire: () => void;
@@ -18,6 +18,8 @@ export function Header({
   onIncident: () => void;
   user: { initials: string; title: string };
   onSignOut?: () => void;
+  /** Menu de l'avatar « Changer de profil » (Architecture Portails §3.2). */
+  onSwitchProfile?: () => void;
 }) {
   return (
     <header className="ak-header ak-noprint">
@@ -54,7 +56,11 @@ export function Header({
         <button className="ak-btn-line" onClick={onIncident} style={{ margin: '0 12px 0 6px' }}>
           Signaler un incident
         </button>
-        <span className="ak-avatar" title={user.title}>{user.initials}</span>
+        {onSwitchProfile ? (
+          <button className="ak-avatar" onClick={onSwitchProfile} title={`${user.title}, changer de profil`} aria-label="Changer de profil" style={{ cursor: 'pointer', color: 'inherit', font: 'inherit', fontSize: 11, fontWeight: 600 }}>{user.initials}</button>
+        ) : (
+          <span className="ak-avatar" title={user.title}>{user.initials}</span>
+        )}
         {onSignOut && (
           <button className="ak-btn-text" onClick={onSignOut} title="Se déconnecter" aria-label="Se déconnecter" style={{ marginLeft: 4 }}>
             <LogOut size={15} aria-hidden />

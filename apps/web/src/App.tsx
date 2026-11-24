@@ -34,6 +34,8 @@ import { Icon } from './shell/Icon.tsx';
 import { useSession, signOut } from './lib/auth.ts';
 import { useAal } from './lib/mfa.ts';
 import { MfaChallenge } from './features/auth/MfaChallenge.tsx';
+import { ProfileSelector, ProfileStatePage } from './features/auth/ProfileSelector.tsx';
+import { useActiveProfile, SURFACE_LABEL } from './lib/profiles.ts';
 import { globalSearch } from './data/search.ts';
 import { FocusProvider, type Focus } from './lib/focus.tsx';
 import { isBackendConfigured } from './lib/supabase.ts';
@@ -101,6 +103,10 @@ function initialPage(): string {
 export function App() {
   const { session, ready } = useSession();
   const { aal, refresh: refreshAal } = useAal(session);
+  const mfaPending = aal?.next === 'aal2' && aal.current !== 'aal2';
+  const prof = useActiveProfile(session, isBackendConfigured && Boolean(session) && !mfaPending);
+  const [announce, setAnnounce] = useState('');
+  const gPressed = useRef(0);
   const chs = useMemo(() => buildChapters(DECLINAISON), []);
   const [page, setPage] = useState(() => (findModule(buildChapters(DECLINAISON), initialPage()) ? initialPage() : 'control-tower'));
   const [history, setHistory] = useState<string[]>([]);
@@ -147,6 +153,8 @@ export function App() {
   }, [go]);
   useEffect(() => { const t = window.setInterval(() => setNow(new Date()), 30_000); return () => window.clearInterval(t); }, []);
 
+  const openPickerRef = useRef(prof.openPicker);
+  openPickerRef.current = prof.openPicker;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tg = (e.target as HTMLElement | null)?.tagName?.toLowerCase() ?? '';
@@ -154,6 +162,12 @@ export function App() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(false); setSommaire((s) => !s); return; }
       if (e.key === 'Escape') { setSommaire(false); return; }
       if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !typing) { e.preventDefault(); setFull((f) => !f); }
+      // G puis P : changer de profil (Architecture Portails §3.2).
+      if (!typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const k = e.key.toLowerCase();
+        if (k === 'g') { gPressed.current = Date.now(); return; }
+        if (k === 'p' && Date.now() - gPressed.current < 1200 && isBackendConfigured) { gPressed.current = 0; e.preventDefault(); void openPickerRef.current(); }
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -169,8 +183,11 @@ export function App() {
     const ctx: Command[] = SITES.filter((s) => s !== site).map((s) => ({
       id: `site:${s}`, label: `Basculer sur ${s}`, group: 'Périmètre', icon: <ArrowRightLeft size={17} />, run: () => setSite(s),
     }));
-    return [...nav, ...ctx];
-  }, [chs, go, site]);
+    const profile: Command[] = isBackendConfigured
+      ? [{ id: 'profile:switch', label: 'Changer de profil', group: 'Périmètre', hint: 'G P', icon: <User size={17} />, run: () => void prof.openPicker() }]
+      : [];
+    return [...nav, ...ctx, ...profile];
+  }, [chs, go, site, prof.openPicker]);
 
   const onSearch = useCallback(async (q: string): Promise<Command[]> => {
     if (!isBackendConfigured) return [];
@@ -195,6 +212,25 @@ export function App() {
   if (isBackendConfigured && !session) return <Login />;
   if (isBackendConfigured && aal?.next === 'aal2' && aal.current !== 'aal2') {
     return <MfaChallenge email={session?.user?.email ?? ''} onDone={refreshAal} />;
+  }
+  if (isBackendConfigured) {
+    const st = prof.state;
+    if (st.step === 'loading') return <ProfileStatePage kind="loading" />;
+    if (st.step === 'none') return <ProfileStatePage kind="none" />;
+    if (st.step === 'error') return <ProfileStatePage kind="error" onRetry={() => void prof.load()} />;
+    if (st.step === 'mfa') {
+      // Double authentification exigée par la surface ou le rôle (MFA_REQUIRED) : code, puis nouvelle bascule.
+      return <MfaChallenge email={session?.user?.email ?? ''} onDone={() => { refreshAal(); void prof.choose(st.profileId).catch(() => void prof.load()); }} />;
+    }
+    if (st.step === 'choose') {
+      return <ProfileSelector profiles={st.profiles} inSession={false} onContinue={(id) => prof.choose(id)} />;
+    }
+    if (st.claims.surface !== 'console') {
+      return (
+        <ProfileStatePage kind="error" message={`${SURFACE_LABEL[st.claims.surface]} : espace livré avec son lot. Changez de profil pour ouvrir la console.`}
+          onRetry={() => void prof.openPicker()} />
+      );
+    }
   }
 
   const email = session?.user?.email ?? '';
@@ -239,9 +275,10 @@ export function App() {
               onIncident={() => go('hsse-events')}
               user={{ initials, title: `${name}, Exploitant` }}
               onSignOut={isBackendConfigured ? () => void signOut() : undefined}
+              onSwitchProfile={isBackendConfigured ? () => void prof.openPicker() : undefined}
             />
           )}
-          <main className="ak-body">
+          <main className="ak-body" key={prof.activeId || 'demo'}>
             <div className="ak-pagehead">
               <div style={{ minWidth: 0 }}>
                 <div className="ak-eyebrow">{eyebrow}</div>
@@ -287,6 +324,18 @@ export function App() {
           </main>
         </>
       )}
+      {prof.picker && (
+        <ProfileSelector
+          profiles={prof.picker} inSession onClose={prof.closePicker}
+          onContinue={async (id) => {
+            const label = prof.picker?.find((p) => p.profile_id === id)?.label ?? '';
+            await prof.choose(id);
+            setAnnounce(`Profil ${label} actif`);
+            document.title = `${label} · Atlas Keystone`;
+          }}
+        />
+      )}
+      <div className="ak-sr-only" role="status" aria-live="polite">{announce}</div>
       <CommandPalette open={palette} onClose={() => setPalette(false)} commands={commands} onSearch={onSearch} />
       {toast && <div className="ak-toast" role="status" aria-live="polite">{toast}</div>}
     </div>
