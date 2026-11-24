@@ -1,5 +1,6 @@
 -- Recette de la chaîne de profils (C24 à C29) et du journal des accès (C28). Tout est annulé (ROLLBACK).
--- psql -v ON_ERROR_STOP=0 -f scripts/schema/recette_profils.sql : les lignes « ERROR » attendues sont annoncées par « attendu ».
+-- psql -f scripts/schema/recette_profils.sql : les lignes « ERROR » attendues sont annoncées par « attendu » ;
+-- elles sont encadrées par \set ON_ERROR_STOP off, la recette passe donc aussi sous -v ON_ERROR_STOP=1.
 \pset tuples_only on
 BEGIN;
 INSERT INTO atlas_core.tenants (id, slug, display_name, country_code, default_currency) VALUES
@@ -23,9 +24,11 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claims', '{"sub":"11111111-0000-0000-0000-000000000001","session_id":"55555555-0000-0000-0000-000000000005","role":"authenticated","aal":"aal1"}', true) IS NULL;
 SELECT set_config('request.headers', '{"user-agent":"Recette/1.0","x-forwarded-for":"203.0.113.7, 10.0.0.1"}', true) IS NULL;
 SELECT '1. cartes (attendu : A puis B suspendu, C absent car surface désactivée) : ' || string_agg(label||' | '||coalesce(organization,'NR')||' | '||coalesce(role_label,'NR')||' | '||status||coalesce(' : '||suspended_reason,'')||' | tous sites '||scope_all, ' ;; ') FROM keystone.my_profiles();
+\set ON_ERROR_STOP off
 SAVEPOINT s1; SELECT '2. attendu MFA_REQUIRED'; SELECT keystone.switch_profile('99999999-0000-0000-0000-00000000000a'); ROLLBACK TO s1;
 SAVEPOINT s2; SELECT '3. attendu PROFILE_NOT_OWNED (suspendu)'; SELECT keystone.switch_profile('99999999-0000-0000-0000-00000000000b'); ROLLBACK TO s2;
 SAVEPOINT s3; SELECT '4. attendu SURFACE_DISABLED'; SELECT keystone.switch_profile('99999999-0000-0000-0000-00000000000c'); ROLLBACK TO s3;
+\set ON_ERROR_STOP on
 SELECT set_config('request.jwt.claims', '{"sub":"11111111-0000-0000-0000-000000000001","session_id":"55555555-0000-0000-0000-000000000005","role":"authenticated","aal":"aal2"}', true) IS NULL;
 SELECT '5. aal2, bascule : ' || (keystone.switch_profile('99999999-0000-0000-0000-00000000000a') ->> 'surface');
 SELECT keystone.set_default_profile('99999999-0000-0000-0000-00000000000a', true);
@@ -47,5 +50,7 @@ SELECT '    anon my_profiles (attendu f) : ' || has_function_privilege('anon','k
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claims', '{"sub":"22222222-0000-0000-0000-000000000002","session_id":"66666666-0000-0000-0000-000000000006","role":"authenticated"}', true) IS NULL;
 SELECT '11. autre utilisateur, profils visibles (attendu 0) : ' || count(*) FROM keystone.my_profiles();
+\set ON_ERROR_STOP off
 SAVEPOINT s4; SELECT '12. attendu PROFILE_NOT_OWNED'; SELECT keystone.set_default_profile('99999999-0000-0000-0000-00000000000a', false); ROLLBACK TO s4;
+\set ON_ERROR_STOP on
 ROLLBACK;
