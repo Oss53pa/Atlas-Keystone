@@ -274,3 +274,76 @@ BEGIN
   -- Présence (Annexe S) : on_wo au start et au resume, break à la pause, on_duty à la fin
   PERFORM keystone.presence_write_from_punch(w, v_person, p_action, v_scan);
 END; $function$;
+
+-- C24 à C27 : chaîne de connexion du profil actif (Annexe Admin §1 et partie 3 §1). Sans elles, le jeton ne porte ni
+-- tenant_id ni active_profile_id : toutes les politiques renvoient 0 ligne et l'application est vide pour tous.
+
+-- C24 : keystone.my_profiles() : liste des profils de l'appelant pour le sélecteur « Je me connecte en tant que »
+-- (Portail occupants partie 3, Lot 10). Absente du corpus. Ne renvoie que les profils de auth.uid(), tous tenants
+-- confondus, puisque l'appelant n'a pas encore de profil actif.
+CREATE OR REPLACE FUNCTION keystone.my_profiles() RETURNS TABLE (
+  profile_id uuid, tenant_id uuid, tenant_name text, kind keystone.profile_kind, surface keystone.surface_code,
+  label text, is_default boolean, roles text[])
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+  SELECT p.id, p.tenant_id, t.display_name, p.kind,
+         (CASE p.kind WHEN 'internal' THEN 'console' WHEN 'vendor' THEN 'vendor_portal'
+                      WHEN 'client' THEN 'client_portal' ELSE 'occupant_portal' END)::keystone.surface_code,
+         p.label, p.is_default,
+         coalesce((SELECT array_agg(r.label ORDER BY r.label) FROM keystone.user_roles ur JOIN keystone.roles r ON r.id = ur.role_id
+                    WHERE ur.profile_id = p.id), '{}')
+    FROM keystone.user_profiles p JOIN atlas_core.tenants t ON t.id = p.tenant_id
+   WHERE p.user_id = auth.uid() AND p.status = 'active' AND p.deleted_at IS NULL
+   ORDER BY p.is_default DESC, t.display_name, p.label $$;
+
+-- C25 : keystone.switch_profile(p_profile), Annexe Admin §1 : profil de auth.uid(), actif ; écrit session_profiles ;
+-- renvoie la surface ; le client rafraîchit ensuite son jeton. Contrôles SURFACE_DISABLED et MFA_REQUIRED du corpus
+-- non branchés : ils dépendent des réglages de surface et de l'AAL, livrés avec l'administration (Lot 10).
+CREATE OR REPLACE FUNCTION keystone.switch_profile(p_profile uuid) RETURNS jsonb
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+DECLARE p keystone.user_profiles; v_session uuid := nullif(auth.jwt() ->> 'session_id', '')::uuid; v_surface keystone.surface_code;
+BEGIN
+  SELECT * INTO p FROM keystone.user_profiles
+   WHERE id = p_profile AND user_id = auth.uid() AND status = 'active' AND deleted_at IS NULL;
+  IF NOT FOUND THEN PERFORM keystone.raise_error('PROFILE_NOT_OWNED'); END IF;
+  IF v_session IS NULL THEN PERFORM keystone.raise_error('SESSION_EXPIRED'); END IF;
+  v_surface := (CASE p.kind WHEN 'internal' THEN 'console' WHEN 'vendor' THEN 'vendor_portal'
+                            WHEN 'client' THEN 'client_portal' ELSE 'occupant_portal' END)::keystone.surface_code;
+  INSERT INTO keystone.session_profiles (session_id, tenant_id, user_id, profile_id, surface)
+  VALUES (v_session, p.tenant_id, p.user_id, p.id, v_surface)
+  ON CONFLICT (session_id) DO UPDATE SET tenant_id = EXCLUDED.tenant_id, profile_id = EXCLUDED.profile_id,
+                                         surface = EXCLUDED.surface, switched_at = now();
+  RETURN jsonb_build_object('tenant_id', p.tenant_id, 'profile_id', p.id, 'surface', v_surface, 'refresh_token', true);
+END $$;
+
+-- C26 : crochet d'émission du jeton Supabase Auth (custom access token hook), Annexe Admin §1 : ajoute tenant_id,
+-- active_profile_id et surface lus dans session_profiles. À activer dans Supabase : Authentication, Hooks,
+-- « Customize Access Token », fonction keystone.custom_access_token_hook. Sans ligne de session : jeton inchangé.
+CREATE OR REPLACE FUNCTION keystone.custom_access_token_hook(event jsonb) RETURNS jsonb
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+DECLARE c jsonb := coalesce(event -> 'claims', '{}'::jsonb); s keystone.session_profiles;
+BEGIN
+  SELECT * INTO s FROM keystone.session_profiles
+   WHERE session_id = nullif(c ->> 'session_id', '')::uuid AND user_id = nullif(event ->> 'user_id', '')::uuid;
+  IF FOUND THEN
+    c := c || jsonb_build_object('tenant_id', s.tenant_id, 'active_profile_id', s.profile_id, 'surface', s.surface);
+  END IF;
+  RETURN jsonb_set(event, '{claims}', c);
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_auth_admin') THEN
+    GRANT USAGE ON SCHEMA keystone TO supabase_auth_admin;
+    GRANT EXECUTE ON FUNCTION keystone.custom_access_token_hook(jsonb) TO supabase_auth_admin;
+  END IF;
+END $$;
+REVOKE EXECUTE ON FUNCTION keystone.custom_access_token_hook(jsonb) FROM PUBLIC, anon, authenticated;
+
+-- C27 : keystone.my_permissions() : permissions du profil actif, pour masquer dans l'interface ce que l'appelant ne
+-- peut pas faire (la base reste seule juge, par RLS et RPC). Même lecture que has_permission (Annexe A.0.4).
+CREATE OR REPLACE FUNCTION keystone.my_permissions() RETURNS text[]
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = keystone, pg_temp AS $$
+  SELECT coalesce(array_agg(DISTINCT rp.permission_code ORDER BY rp.permission_code), '{}')
+    FROM keystone.user_roles ur
+    JOIN keystone.role_permissions rp ON rp.role_id = ur.role_id
+    JOIN keystone.users u ON u.id = ur.user_id AND u.status = 'active'
+   WHERE ur.profile_id = keystone.active_profile() $$;
+GRANT EXECUTE ON FUNCTION keystone.my_profiles(), keystone.switch_profile(uuid), keystone.my_permissions() TO authenticated;

@@ -26,3 +26,9 @@ Voir `supabase/candidates/README.md`.
 Branche `keystone-v2-socle` (PostgreSQL 17.12), schéma appliqué par l'API de gestion Supabase (jeton temporaire, injecté par le proxy de la session, jamais lu) : extensions, `correctifs_corpus.sql`, schéma candidat, codes d'erreur, référentiels, `conventions_socle.sql`, `rls_lecture.sql` : 7 envois réussis.
 Constaté : 572 tables, 515 politiques d'isolation, 464 politiques de lecture, 460 audits chaînés, 321 horodatages, 623 codes d'erreur, XOF et XAF à exposant 0 ; `anon` sans accès ; `audit_pseudonymize` non exécutable par `authenticated`.
 Recette (`scripts/schema/recette_supabase.sql`, bloc annulé) : sans rôle 0 ligne, avec rôle 1 ligne, intrusion refusée, écriture du journal refusée, jeton d'un autre tenant 0 ligne, 8 lignes d'audit à chaîne et empreintes valides. Aucune donnée de test restante.
+
+## Chaîne de profils (C24 à C27, 24/11/2026)
+Manque constaté : sans `switch_profile` ni crochet de jeton, aucun jeton ne portait `tenant_id` ni `active_profile_id` : l'application aurait été vide pour tous.
+Livré dans `correctifs_post.sql` : `my_profiles()` (profils actifs de l'appelant, surface déduite du type), `switch_profile(profil)` (contrôle de propriété, écrit `session_profiles`), `custom_access_token_hook(event)` (ajoute `tenant_id`, `active_profile_id`, `surface`), `my_permissions()`.
+Recette locale (bloc annulé) : deux profils proposés, 0 ligne avant choix, bascule acceptée, crochet ajoute les trois revendications, permissions du profil et 1 ligne après rafraîchissement, autre utilisateur 0 profil et `PROFILE_NOT_OWNED`, crochet refusé à `authenticated`.
+Reste : non appliqué à la branche ; crochet à activer dans le tableau de bord (Authentication > Hooks > Customize Access Token) ; contrôles `SURFACE_DISABLED` et `MFA_REQUIRED` au lot 10.
