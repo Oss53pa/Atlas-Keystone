@@ -12,4 +12,4 @@ Ordre d'application sur une base de test : extensions, `scripts/schema/correctif
 `keystone_v2_error_codes.sql`, `keystone_v2_seed_reference.sql`, `scripts/schema/conventions_socle.sql` (RLS d'isolation, audit chaîné,
 horodatage, droits), `scripts/schema/rls_lecture.sql` (lecture par module), puis les recettes
 `scripts/schema/recette_socle.sql` et `scripts/schema/recette_permissions.sql`. Application à une base Supabase : seulement après zéro écart bloquant (docs/lot0 §6),
-avec l'accord d'Oss53pa, d'abord sur une branche, puis hors des heures d'utilisation (CLAUDE.md, règle 4).
+avec l'accord d'Oss53pa, après essai sur une base Postgres locale (jamais de branche Supabase payante, CLAUDE.md règle 5), hors des heures d'utilisation (CLAUDE.md, règle 4).
