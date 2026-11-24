@@ -27,8 +27,15 @@ Branche `keystone-v2-socle` (PostgreSQL 17.12), schéma appliqué par l'API de g
 Constaté : 572 tables, 515 politiques d'isolation, 464 politiques de lecture, 460 audits chaînés, 321 horodatages, 623 codes d'erreur, XOF et XAF à exposant 0 ; `anon` sans accès ; `audit_pseudonymize` non exécutable par `authenticated`.
 Recette (`scripts/schema/recette_supabase.sql`, bloc annulé) : sans rôle 0 ligne, avec rôle 1 ligne, intrusion refusée, écriture du journal refusée, jeton d'un autre tenant 0 ligne, 8 lignes d'audit à chaîne et empreintes valides. Aucune donnée de test restante.
 
-## Chaîne de profils (C24 à C27, 24/11/2026)
-Manque constaté : sans `switch_profile` ni crochet de jeton, aucun jeton ne portait `tenant_id` ni `active_profile_id` : l'application aurait été vide pour tous.
-Livré dans `correctifs_post.sql` : `my_profiles()` (profils actifs de l'appelant, surface déduite du type), `switch_profile(profil)` (contrôle de propriété, écrit `session_profiles`), `custom_access_token_hook(event)` (ajoute `tenant_id`, `active_profile_id`, `surface`), `my_permissions()`.
-Recette locale (bloc annulé) : deux profils proposés, 0 ligne avant choix, bascule acceptée, crochet ajoute les trois revendications, permissions du profil et 1 ligne après rafraîchissement, autre utilisateur 0 profil et `PROFILE_NOT_OWNED`, crochet refusé à `authenticated`.
-Reste : non appliqué à la branche ; crochet à activer dans le tableau de bord (Authentication > Hooks > Customize Access Token) ; contrôles `SURFACE_DISABLED` et `MFA_REQUIRED` au lot 10.
+## Chaîne de profils et journal des accès (C24 à C29, 24/11/2026)
+Manque constaté : sans `switch_profile` ni crochet de jeton, aucun jeton ne portait `tenant_id` ni `active_profile_id` : l'application aurait été vide pour tous. `log_access` (A.2.5) n'existait qu'en prose.
+Livré dans `correctifs_post.sql`, aligné sur Architecture Portails partie 2 §15 (AP-01) :
+- `my_profiles()` : champs de la carte (organisation, rôle principal, périmètre, défaut, suspendu et motif, dernière utilisation), surfaces désactivées exclues, ordre de §15 ;
+- `switch_profile(profil)` : `PROFILE_NOT_OWNED` (autre compte ou suspendu), `SURFACE_DISABLED`, `MFA_REQUIRED` (`mfa_policy` 'all', ou 'role_based' et rôle `requires_mfa`, sans jeton aal2), écrit `session_profiles` et `access_log` 'profile_switched' ;
+- `custom_access_token_hook(event)` : ajoute `tenant_id`, `active_profile_id`, `surface` ; profil suspendu depuis la bascule : jeton sans tenant ;
+- `my_permissions()`, `set_default_profile(profil, oui/non)` (un seul défaut par compte) ;
+- `access_log_write` (interne, chaînée comme `tg_audit`), `log_access` (authenticated), `log_access_for` (service_role).
+`conventions_socle.sql` retire l'exécution à `authenticated` sur `access_log_write`, `log_access_for` et le crochet (l'octroi global les aurait rouverts : écriture du journal de n'importe quel tenant).
+Recette `scripts/schema/recette_profils.sql` (base neuve, 12 contrôles réussis) : cartes conformes, trois refus, bascule en aal2, un seul défaut, crochet puis crochet vide après suspension, journal à empreinte recalculée identique, privilèges, autre utilisateur 0 profil.
+Suppositions à valider : une surface sans ligne `tenant_surfaces` est activée et sans double authentification ; l'IP vient de `cf-connecting-ip`, sinon de la première valeur de `x-forwarded-for` (falsifiable hors passerelle).
+Reste : non appliqué à la branche ; crochet à activer dans le tableau de bord (Authentication > Hooks > Customize Access Token).

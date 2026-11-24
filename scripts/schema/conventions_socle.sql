@@ -68,7 +68,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA keystone REVOKE EXECUTE ON FUNCTIONS FROM PUB
 
 -- 5. Retraits APRÈS l'octroi global du point 4 (qui sinon les annulerait) :
 --    fonctions de trigger (un trigger se déclenche sans droit EXECUTE de l'appelant), fonctions internes d'audit et de
---    pseudonymisation, et toute fonction dont le schéma retire explicitement l'exécution à authenticated.
+--    pseudonymisation, écriture brute du journal des accès, crochet de jeton (réservé à supabase_auth_admin), et toute fonction dont le schéma retire explicitement l'exécution à authenticated.
 DO $$
 DECLARE f record; n int := 0;
 BEGIN
@@ -77,7 +77,8 @@ BEGIN
     FROM pg_proc p JOIN pg_namespace ns ON ns.oid = p.pronamespace
     WHERE ns.nspname IN ('keystone', 'atlas_core')
       AND (p.prorettype = 'trigger'::regtype
-           OR p.proname IN ('audit_pseudonymize', 'audit_hash', 'tg_audit', 'tg_audit_immutable'))
+           OR p.proname IN ('audit_pseudonymize', 'audit_hash', 'tg_audit', 'tg_audit_immutable',
+                             'access_log_write', 'log_access_for', 'custom_access_token_hook'))
   LOOP
     EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM authenticated', f.sig);
     n := n + 1;
