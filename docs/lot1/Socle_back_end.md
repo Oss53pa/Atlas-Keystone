@@ -21,3 +21,8 @@ Base de test locale (Postgres 16) ; rien n'est appliqué à la base Supabase par
 
 ## Ordre d'application (base de test ou branche)
 Voir `supabase/candidates/README.md`.
+
+## Essai réel sur Supabase (24/11/2026)
+Branche `keystone-v2-socle` (PostgreSQL 17.12), schéma appliqué par l'API de gestion Supabase (jeton temporaire, injecté par le proxy de la session, jamais lu) : extensions, `correctifs_corpus.sql`, schéma candidat, codes d'erreur, référentiels, `conventions_socle.sql`, `rls_lecture.sql` : 7 envois réussis.
+Constaté : 572 tables, 515 politiques d'isolation, 464 politiques de lecture, 460 audits chaînés, 321 horodatages, 623 codes d'erreur, XOF et XAF à exposant 0 ; `anon` sans accès ; `audit_pseudonymize` non exécutable par `authenticated`.
+Recette (`scripts/schema/recette_supabase.sql`, bloc annulé) : sans rôle 0 ligne, avec rôle 1 ligne, intrusion refusée, écriture du journal refusée, jeton d'un autre tenant 0 ligne, 8 lignes d'audit à chaîne et empreintes valides. Aucune donnée de test restante.
