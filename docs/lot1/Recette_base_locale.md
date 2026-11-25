@@ -93,6 +93,48 @@ La fille n'a pas de RLS et son parent non plus :
 
 À confirmer une fois pour toutes dans `docs/lot1/Socle_back_end.md` plutôt que table par table.
 
+## 2.5 Écart de cloisonnement sur les vues — 12 vues sur 40, fuite **prouvée**
+
+Les écrans lisent des vues, pas des tables. Or une vue appartient à `postgres` (superutilisateur) : sans
+`security_invoker=true`, elle lit ses tables **avec les droits du propriétaire, donc sans leur RLS**. Le cloisonnement
+doit alors venir d'un filtre écrit dans la vue. Sur les 40 vues lisibles par `authenticated` : 21 portent
+`security_invoker=true`, 8 portent un filtre `current_tenant()` — et **12 n'ont ni l'un ni l'autre**.
+
+Démonstration sur la base locale, deux clients et un actif chacun, jeton du client A :
+
+```
+A sur keystone.assets (table, RLS)  : rien
+A sur keystone.v_assets_fleet (vue) : Groupe froid du client A | Groupe froid du client B
+```
+
+[Confirmé] La table refuse, la vue livre les deux clients. Les 12 vues concernées et les tables cloisonnées
+qu'elles contournent :
+
+| Vue | Tables RLS contournées |
+|---|---|
+| `agent_actions` | `agent_runs` |
+| `hsse_rates_monthly_v` | `hsse_events`, `worked_hours` |
+| `sensor_streams` | `iot_devices`, `iot_readings` |
+| `v_asset_life` | `asset_categories`, `assets` |
+| `v_asset_missing_docs` | `asset_category_required_docs`, `assets`, `doc_links`, `ged_documents` |
+| `v_asset_stop_impact` | `asset_served_spaces`, `space_occupancies` |
+| `v_assets_fleet` | `assets` |
+| `v_client_security_kpis` | `service_contract_scope`, `service_contracts` |
+| `v_headcount_missing` | `atlas_core.buildings`, `levels`, `occupant_headcount`, `space_occupancies`, `spaces` |
+| `v_vendor_work_orders` | `work_orders` |
+| `v_wo_templates_for_site` | `site_ext`, `wo_templates` |
+| `vendor_safety_events_v` | `hsse_events` |
+
+Deux aggravations : `hsse_rates_monthly_v` et `vendor_safety_events_v` exposent les événements HSSE, dont les données
+de santé que la seconde passe des modules réservait à `event.medical_read` ; `v_vendor_work_orders` et
+`v_client_security_kpis` filtrent par contrat ou par prestataire mais jamais par client.
+
+Le modèle correct existe déjà dans le schéma : `keystone.sites` est une vue `security_barrier` avec
+`WHERE s.tenant_id = current_tenant() AND site_in_scope(s.id)`, ce qui lui permet de lire `atlas_core` sans accorder
+`USAGE` sur ce schéma au rôle `authenticated` (vérifié : `authenticated` n'a pas ce droit). Les 12 vues ci-dessus
+doivent recevoir soit ce filtre, soit `security_invoker=true` quand la table lue est dans `keystone`. C'est une
+décision de schéma, à grouper avec les 31 tables filles dans le même lot de structure.
+
 ## 3. Écart de partitionnement : 7 tables n'acceptent aucune écriture
 
 [Confirmé] : `keystone_v2_schema.sql` ne contient aucun `PARTITION OF` ni fonction de création de partition, et la base locale compte 0 partition. Un `INSERT` dans ces tables échoue donc avec « no partition of relation found for row » :

@@ -50,3 +50,28 @@ SELECT 'tables lisibles par anon (attendu 0) : ' || count(*)
 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE c.relkind = 'r' AND n.nspname IN ('keystone','atlas_core','atlas_public')
   AND has_table_privilege('anon', c.oid, 'SELECT');
+
+-- 6. Vues : une vue appartient à postgres (superutilisateur). Sans security_invoker=true, elle lit ses tables
+--    avec les droits du propriétaire, donc SANS la RLS de ces tables. Le cloisonnement doit alors venir
+--    d'un filtre écrit dans la vue (WHERE tenant_id = current_tenant()). Sans l'un ni l'autre : fuite inter-client.
+\echo '-- vues sans security_invoker ET sans filtre par client (fuite) --'
+SELECT c.relname || ' -> ' || coalesce(string_agg(DISTINCT t.relname, ', ' ORDER BY t.relname), 'aucune table RLS')
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+LEFT JOIN pg_depend d ON d.classid = 'pg_rewrite'::regclass AND d.refclassid = 'pg_class'::regclass
+     AND d.objid = (SELECT r.oid FROM pg_rewrite r WHERE r.ev_class = c.oid AND r.rulename = '_RETURN')
+     AND d.refobjid <> c.oid
+LEFT JOIN pg_class t ON t.oid = d.refobjid AND t.relrowsecurity
+WHERE c.relkind = 'v' AND n.nspname IN ('keystone','atlas_core')
+  AND (c.reloptions IS NULL OR c.reloptions::text NOT LIKE '%security_invoker=true%')
+  AND pg_get_viewdef(c.oid, true) !~* 'current_tenant\(\)'
+  AND has_table_privilege('authenticated', c.oid, 'SELECT')
+GROUP BY c.relname
+ORDER BY 1;
+
+SELECT 'vues lisibles par authenticated : ' || count(*)
+     || ' dont security_invoker=true : ' || count(*) FILTER (WHERE c.reloptions::text LIKE '%security_invoker=true%')
+     || ' dont filtre current_tenant() : ' || count(*) FILTER (WHERE pg_get_viewdef(c.oid, true) ~* 'current_tenant\(\)')
+FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE c.relkind = 'v' AND n.nspname IN ('keystone','atlas_core')
+  AND has_table_privilege('authenticated', c.oid, 'SELECT');
