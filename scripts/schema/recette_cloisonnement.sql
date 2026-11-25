@@ -75,3 +75,19 @@ SELECT 'vues lisibles par authenticated : ' || count(*)
 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE c.relkind = 'v' AND n.nspname IN ('keystone','atlas_core')
   AND has_table_privilege('authenticated', c.oid, 'SELECT');
+
+-- 7. Écriture par les vues. Une vue simple est modifiable ; sans WITH CHECK OPTION, rien n'empêche d'écrire
+--    une ligne hors du périmètre de la vue, et sans security_invoker l'écriture contourne la RLS de la table.
+\echo '-- vues ouvertes en ecriture a authenticated (INSERT/UPDATE/DELETE) --'
+SELECT c.relname
+    || ' [' || string_agg(p.priv, ',' ORDER BY p.priv) || ']'
+    || ' check_option=' || coalesce(v.check_option, 'NONE')
+    || CASE WHEN c.reloptions::text LIKE '%security_invoker=true%' THEN ' security_invoker' ELSE ' SANS security_invoker' END
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+JOIN information_schema.views v ON v.table_schema = n.nspname AND v.table_name = c.relname
+CROSS JOIN LATERAL (VALUES ('INSERT'), ('UPDATE'), ('DELETE')) AS p(priv)
+WHERE c.relkind = 'v' AND n.nspname IN ('keystone','atlas_core')
+  AND has_table_privilege('authenticated', c.oid, p.priv)
+GROUP BY c.relname, c.reloptions, v.check_option
+ORDER BY 1;

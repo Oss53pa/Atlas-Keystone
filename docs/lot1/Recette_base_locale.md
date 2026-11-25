@@ -135,6 +135,27 @@ Le modèle correct existe déjà dans le schéma : `keystone.sites` est une vue 
 doivent recevoir soit ce filtre, soit `security_invoker=true` quand la table lue est dans `keystone`. C'est une
 décision de schéma, à grouper avec les 31 tables filles dans le même lot de structure.
 
+## 2.6 Écriture inter-client par les vues — prouvée aussi
+
+Les **40** vues ont `INSERT`, `UPDATE` et `DELETE` accordés à `authenticated`, **aucune** avec `WITH CHECK OPTION`,
+dont **19** sans `security_invoker=true`. Pour ces 19, l'écriture passe avec les droits du propriétaire `postgres` :
+ni la RLS de la table visée, ni le périmètre de la vue ne s'appliquent.
+
+Démonstration sur la base locale, un actif du client B, jeton du client A :
+
+```
+lignes du client B modifiees par un jeton du client A : 1
+lignes du client B supprimees : 1
+```
+
+[Confirmé] Un compte connecté du client A renomme puis supprime l'actif du client B par
+`keystone.v_assets_fleet`. C'est plus grave que la lecture : c'est une écriture et une suppression chez un autre
+client, sans trace d'intrusion puisque l'opération est légitime du point de vue des droits.
+
+À décider par Oss53pa, dans le même lot de structure : retirer `INSERT`, `UPDATE`, `DELETE` des vues de lecture
+(les écrans écrivent par les tables ou par des RPC), et n'accorder l'écriture qu'aux vues que le cahier des charges
+désigne comme modifiables, avec `security_invoker=true` et `WITH CHECK OPTION`.
+
 ## 3. Écart de partitionnement : 7 tables n'acceptent aucune écriture
 
 [Confirmé] : `keystone_v2_schema.sql` ne contient aucun `PARTITION OF` ni fonction de création de partition, et la base locale compte 0 partition. Un `INSERT` dans ces tables échoue donc avec « no partition of relation found for row » :
